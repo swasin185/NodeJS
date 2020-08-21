@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <button onclick="bubble.runSort();" style="width:120px; height:40px;">Bubble Sort</button>
+    <canvas id="bubbleCanvas" width="350" height="200"></canvas>
+    <hr>
+    <button onclick="selection.runSort();" style="width:120px; height:40px;">Selection Sort</button>
+    <canvas id="selectCanvas" width="350" height="200"></canvas>
+    <hr>
+    <button onclick="insertion.runSort();" style="width:120px; height:40px;">Insertion Sort</button>
+    <canvas id="insertCanvas" width="350" height="200"></canvas>
+    <hr>
+    <button onclick="quick.runSort();" style="width:120px; height:40px;">Quick Sort</button>
+    <canvas id="quickCanvas" width="350" height="200"></canvas>
+</body>
+<script> var exports = {};  </script>
+<script src="script.js"></script>
+<script>
+    var bubble = new BubbleSort(100, "bubbleCanvas");
+    var selection = new SelectSort(100, "selectCanvas");
+    var insertion = new InsertSort(100, "insertCanvas");
+    var quick = new QuickSort(100, "quickCanvas");
+</script>
+
+</html>

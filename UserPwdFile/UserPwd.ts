@@ -1,5 +1,3 @@
-import { WSASERVICE_NOT_FOUND } from "constants";
-
 class UserPwd {
 	id: string;
 	name: string;
@@ -26,7 +24,7 @@ function writeFile(data: UserPwd[]): void {
 function checkUserPwd(users: UserPwd[], uid: string, pwd: string): UserPwd {
 	let user: UserPwd;
 	let i = findUser(users, uid);
-	if (i != -1 && users[i].password == pwd) {
+	if (i != -1 && users[i].password == hashText(pwd)) {
 		user = users[i];
 		user.logCnt++;
 	}
@@ -55,7 +53,7 @@ function insertUser(users: UserPwd[]) {
 	let newUser = new UserPwd();
 	newUser.id = prompts('new user id :');
 	newUser.name = prompts(newUser.id + ' name :');
-	newUser.password = prompts(newUser.id + ' password :', { echo: '*' });
+	newUser.password = hashText(prompts(newUser.id + ' password :', { echo: '*' }));
 	newUser.level = Number(prompts(newUser.id + ' level :'));
 	users[users.length] = newUser;
 }
@@ -65,7 +63,7 @@ function changeUser(users: UserPwd[]) {
 	if (i != -1) {
 		let changeUser = users[i];
 		changeUser.name = prompts(changeUser.id + ' name :');
-		changeUser.password = prompts(changeUser.id + ' password :', { echo: '*' });
+		changeUser.password = hashText(prompts(changeUser.id + ' password :', { echo: '*' }));
 		changeUser.level = Number(prompts(changeUser.id + ' level :'));
 	} else {
 		console.log('user not found!');
@@ -90,7 +88,11 @@ function deleteUser(users: UserPwd[], loginUser: UserPwd): UserPwd[] {
 	}
 	return updateUsers;
 }
-
+//-----------------------------------------------------------------------------
+const hashFx: any = require('crypto').createHash('md5');
+function hashText(password: string): string {
+	return hashFx.update(password).digest('hex');
+}
 //-----------------------------------------------------------------------------
 var userData: UserPwd[] = readFile();
 let loginUser: UserPwd;
@@ -98,7 +100,7 @@ if (userData.length == 0) {
 	loginUser = new UserPwd();
 	loginUser.id = 'admin';
 	loginUser.name = 'Tom';
-	loginUser.password = 'abc123';
+	loginUser.password = hashText('abc123');
 	loginUser.level = 9;
 	userData[userData.length] = loginUser;
 }

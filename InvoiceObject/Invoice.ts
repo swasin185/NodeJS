@@ -18,6 +18,8 @@ class Invoice {
     }
     public toString(): string {
         let st: string = 'ref:' + this.invRef + '\tdate:' + this.created + '\tcustomer:' + this.customer + '\n';
+        for (let it of this.items) 
+            st += it.descript + '\t' + it.quantity + '\t' + it.price + '\t' + it.totalItem + '\t' + it.totalVat + '\t' + it.totalAmt + '\n';
         st += 'Total Item:\t' + this.totalItem + '\n';
         st += 'Total VAT:\t' + this.totalVat + '\n';
         st += 'Total Amount:\t' + this.totalAmt + '\n';

@@ -1,24 +1,27 @@
+const cv = document.getElementById("cpxCanvas") as HTMLCanvasElement;
+const cx = cv.getContext("2d") as CanvasRenderingContext2D;
+const WIDTH = cv.width;
+const HEIGHT = cv.height;
+const MID_WIDTH = cv.width / 2;
+const MID_HEIGHT = cv.height / 2;
+
 const COLORS = ['magenta', 'cyan', 'blue', 'green', 'yellow', 'orange', 'red'];
 const PI2 = Math.PI * 2;
 
-// Class 
-class Sprite {
-    x: number;              // horizontal position
-    y: number;              // vertical position
-    color: string = 'Grey'; // color name
-}
 class Ball {
     x: number;              // horizontal position
     y: number;              // vertical position
+    dx: number;
+    dy: number;
     radius: number = 5;     // pixel 
-    speed: number = 0;      // pixel per frame
-    direction: number = 0;  // radian
+    speed: number = 5;      // pixel per frame
+    direction: number = 1;  // radian
     color: string = 'Grey'; // color name
     radiusPower2: number;             // radius power of 2
     constructor(x: number, y: number) {
         this.x = x;
         this.y = y;
-        this.radius = Math.floor(Math.random() * 10) + 11;
+        this.radius = Math.floor(Math.random() * 10) + 5;
         this.color = COLORS[Math.floor(Math.random() * COLORS.length)];
         this.radiusPower2 = this.radius * this.radius;
     }
@@ -34,13 +37,25 @@ class Ball {
         return c2 <= this.radiusPower2;
     }
     move(): void {
-        let dx = Math.cos(this.direction) * this.speed;
-        let dy = Math.sin(this.direction) * this.speed;
-        this.x += dx;
-        this.y += dy;
+        if (this.x <= this.radius || this.x >= WIDTH - this.radius)
+            this.reflect(0)
+        if (this.y <= this.radius || this.y >= HEIGHT - this.radius)
+            this.reflect(Math.PI / 2)
+        this.x += this.dx;
+        this.y -= this.dy;
+    }
+    setDirection(d: number): void {
+        this.direction = d;
+        this.dx = Math.cos(this.direction) * this.speed;
+        this.dy = Math.sin(this.direction) * this.speed;
+    }
+    setSpeed(s: number): void {
+        this.speed = s;
+        this.setDirection(this.direction);
     }
     reflect(pAngle: number): void {
-        this.direction = 2 * pAngle - this.direction;
+        this.setDirection(Math.PI - 2 * pAngle - this.direction);
+        console.log(this.direction);
     }
     setRadius(radius: number): void {
         this.radius = radius;
@@ -49,11 +64,11 @@ class Ball {
     getCollideAngle(ball: Ball): number {
         let dx = this.x - ball.x;
         let dy = this.y - ball.y;
-        let angle = PI2;
+        let angle = Math.PI / 2;
         if (dx != 0) {
             angle = Math.atan(dy / dx);
         }
-        return angle - Math.PI / 2;
+        return angle;
     }
     isCollided(ball: Ball): boolean {
         if (this != ball && ball != null) {
@@ -88,33 +103,27 @@ class Box {
 
 // ประกาศตัวแปร Global 
 // ----------------------------------------------------------------------------
-const cv = document.getElementById("cpxCanvas") as HTMLCanvasElement;
-const cx = cv.getContext("2d") as CanvasRenderingContext2D;
 const boardSize = document.getElementById("boardSize") as HTMLInputElement;
 const txtRunTime = document.getElementById("runTime") as HTMLLabelElement;
-
-const WIDTH = cv.width;
-const HEIGHT = cv.height;
-const MID_WIDTH = cv.width / 2;
-const MID_HEIGHT = cv.height / 2;
 
 // var imgData = cx.createImageData(WIDTH, HEIGHT); // width x height
 // var data = imgData.data;
 
 var n = 10;
 
-var ball = new Ball(WIDTH / 2, 2);
-paint();
+var ball = new Ball(WIDTH / 2, HEIGHT / 2);
+ball.setDirection(1);
+calculate();
 // การทำงานเริ่มต้น
 // ----------------------------------------------------------------------------
 
 // ฟังก์ชั่น
 // ----------------------------------------------------------------------------
 async function calculate() {
-    for (let i = 0; i < 150; i++) {
-        ball.y += 2.5;
+    while (true) {
+        ball.move();
         paint();
-        await new Promise(r => setTimeout(r, 5));
+        await new Promise(r => setTimeout(r, 10));
     }
 }
 

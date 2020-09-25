@@ -1,3 +1,16 @@
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -42,34 +55,53 @@ var MID_WIDTH = cv.width / 2;
 var MID_HEIGHT = cv.height / 2;
 var COLORS = ['magenta', 'cyan', 'blue', 'green', 'yellow', 'orange', 'red'];
 var PI2 = Math.PI * 2;
-var Ball = /** @class */ (function () {
-    function Ball(x, y) {
+var PI_2 = Math.PI / 2;
+var Sprite = /** @class */ (function () {
+    function Sprite(x, y, color, r) {
         this.radius = 5; // pixel 
-        this.speed = 5; // pixel per frame
-        this.direction = 1; // radian
         this.color = 'Grey'; // color name
+        this.setXY(x, y);
+        this.setRadius(r);
+        this.color = color;
+    }
+    Sprite.prototype.setXY = function (x, y) {
         this.x = x;
         this.y = y;
-        this.radius = Math.floor(Math.random() * 10) + 5;
-        this.color = COLORS[Math.floor(Math.random() * COLORS.length)];
-        this.radiusPower2 = this.radius * this.radius;
-    }
-    Ball.prototype.draw = function () {
+    };
+    Sprite.prototype.setRadius = function (radius) {
+        this.radius = radius;
+    };
+    Sprite.prototype.draw = function () {
         cx.fillStyle = this.color;
         cx.beginPath();
         cx.arc(this.x, this.y, this.radius, 0, PI2);
         cx.closePath();
         cx.fill();
     };
-    Ball.prototype.isClickIn = function (x, y) {
-        var c2 = (x - this.x) * (x - this.x) + (y - this.y) * (y - this.y);
-        return c2 <= this.radiusPower2;
+    Sprite.prototype.getX = function () {
+        return this.x;
     };
+    Sprite.prototype.getY = function () {
+        return this.y;
+    };
+    Sprite.prototype.getRadius = function () {
+        return this.radius;
+    };
+    return Sprite;
+}());
+var Ball = /** @class */ (function (_super) {
+    __extends(Ball, _super);
+    function Ball(x, y) {
+        var _this = _super.call(this, x, y, COLORS[Math.floor(Math.random() * COLORS.length)], Math.floor(Math.random() * 10) + 5) || this;
+        _this.speed = 5; // pixel per frame
+        _this.direction = 1; // radian
+        return _this;
+    }
     Ball.prototype.move = function () {
         if (this.x <= this.radius || this.x >= WIDTH - this.radius)
             this.reflect(0);
         if (this.y <= this.radius || this.y >= HEIGHT - this.radius)
-            this.reflect(Math.PI / 2);
+            this.reflect(PI_2);
         this.x += this.dx;
         this.y -= this.dy;
     };
@@ -84,27 +116,22 @@ var Ball = /** @class */ (function () {
     };
     Ball.prototype.reflect = function (pAngle) {
         this.setDirection(Math.PI - 2 * pAngle - this.direction);
-        console.log(this.direction);
+        //        console.log(this.direction);
     };
-    Ball.prototype.setRadius = function (radius) {
-        this.radius = radius;
-        this.radiusPower2 = radius * radius;
-    };
-    Ball.prototype.getCollideAngle = function (ball) {
-        var dx = this.x - ball.x;
-        var dy = this.y - ball.y;
-        var angle = Math.PI / 2;
-        if (dx != 0) {
+    Ball.prototype.getCollideAngle = function (obj) {
+        var dx = this.x - obj.getX();
+        var dy = this.y - obj.getY();
+        var angle = PI_2;
+        if (dx != 0)
             angle = Math.atan(dy / dx);
-        }
         return angle;
     };
-    Ball.prototype.isCollided = function (ball) {
-        if (this != ball && ball != null) {
-            var dx = this.x - ball.x;
-            var dy = this.y - ball.y;
-            var ballDistance = dx * dx + dy * dy;
-            var collideDistance = ball.radius + this.radius;
+    Ball.prototype.isCollided = function (obj) {
+        if (this != obj && obj != null) {
+            var dx = this.x - obj.getX();
+            var dy = this.y - obj.getY();
+            var ballDistance = Math.sqrt(dx * dx + dy * dy);
+            var collideDistance = obj.getRadius() + this.radius;
             /* r is ratio of collide difference and ball distance */
             var r = (collideDistance - ballDistance) / ballDistance;
             /* if ball is overlape then seperate balls */
@@ -112,6 +139,7 @@ var Ball = /** @class */ (function () {
                 this.x += dx * r;
                 this.y += dy * r;
             }
+            //            console.log('distance', ballDistance, collideDistance);
             return ballDistance <= collideDistance;
         }
         else {
@@ -119,12 +147,14 @@ var Ball = /** @class */ (function () {
         }
     };
     return Ball;
-}());
-var Pin = /** @class */ (function () {
-    function Pin() {
+}(Sprite));
+var Pin = /** @class */ (function (_super) {
+    __extends(Pin, _super);
+    function Pin(x, y) {
+        return _super.call(this, x, y, 'blue', 5) || this;
     }
     return Pin;
-}());
+}(Sprite));
 var Box = /** @class */ (function () {
     function Box() {
     }
@@ -137,26 +167,52 @@ var txtRunTime = document.getElementById("runTime");
 // var imgData = cx.createImageData(WIDTH, HEIGHT); // width x height
 // var data = imgData.data;
 var n = 10;
+var allPins = new Array((2 * n + n) / 2);
+var pin_n = 0;
 var ball = new Ball(WIDTH / 2, HEIGHT / 2);
-ball.setDirection(1);
-calculate();
 // การทำงานเริ่มต้น
 // ----------------------------------------------------------------------------
+ball.setDirection(1);
+calculate();
 // ฟังก์ชั่น
 // ----------------------------------------------------------------------------
 function calculate() {
     return __awaiter(this, void 0, void 0, function () {
+        var size, mid, x, y, i, x_1, j, collided, i;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    if (!true) return [3 /*break*/, 2];
+                    n = Number(boardSize.value);
+                    size = 50;
+                    mid = size / 2;
+                    x = MID_WIDTH;
+                    y = 10;
+                    for (i = 0; i < n; i++) {
+                        x_1 = MID_WIDTH - (i * mid);
+                        allPins[pin_n++] = new Pin(x_1 - mid, y + size);
+                        for (j = 0; j <= i; j++) {
+                            allPins[pin_n++] = new Pin(x_1 + mid, y + size);
+                            x_1 += size;
+                        }
+                        y += size;
+                    }
+                    _a.label = 1;
+                case 1:
+                    if (!true) return [3 /*break*/, 3];
+                    collided = false;
+                    for (i = 0; i < pin_n && !collided; i++) {
+                        if (ball.isCollided(allPins[i])) {
+                            collided = true;
+                            ball.reflect(ball.getCollideAngle(allPins[i]));
+                        }
+                    }
                     ball.move();
                     paint();
                     return [4 /*yield*/, new Promise(function (r) { return setTimeout(r, 10); })];
-                case 1:
+                case 2:
                     _a.sent();
-                    return [3 /*break*/, 0];
-                case 2: return [2 /*return*/];
+                    return [3 /*break*/, 1];
+                case 3: return [2 /*return*/];
             }
         });
     });
@@ -164,6 +220,9 @@ function calculate() {
 function paint() {
     n = Number(boardSize.value);
     cx.clearRect(0, 0, cv.width, cv.height);
+    for (var i = 0; i < pin_n; i++) {
+        allPins[i].draw();
+    }
     var x = MID_WIDTH;
     var y = 10;
     var size = 50;
@@ -173,21 +232,7 @@ function paint() {
     var mid = size / 2;
     for (var i = 0; i < n; i++) {
         x = MID_WIDTH - (i * mid);
-        cx.beginPath();
-        cx.arc(x - mid, y + size, 5, 0, PI2);
-        cx.closePath();
-        cx.fill();
         for (var j = 0; j <= i; j++) {
-            // cx.beginPath();
-            // cx.moveTo(x, y);
-            // cx.lineTo(x + mid, y + size);
-            // cx.lineTo(x - mid, y + size);
-            // cx.closePath();
-            // cx.stroke();
-            cx.beginPath();
-            cx.arc(x + mid, y + size, 5, 0, PI2);
-            cx.closePath();
-            cx.fill();
             cx.beginPath();
             cx.moveTo(x - mid, y + size);
             cx.lineTo(x - mid, y + mid - 5);

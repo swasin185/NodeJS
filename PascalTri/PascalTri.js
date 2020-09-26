@@ -56,6 +56,7 @@ var MID_HEIGHT = cv.height / 2;
 var COLORS = ['magenta', 'cyan', 'blue', 'green', 'yellow', 'orange', 'red'];
 var PI2 = Math.PI * 2;
 var PI_2 = Math.PI / 2;
+var GRAVITY = 1;
 var Sprite = /** @class */ (function () {
     function Sprite(x, y, color, r) {
         this.radius = 5; // pixel 
@@ -95,15 +96,45 @@ var Ball = /** @class */ (function (_super) {
         var _this = _super.call(this, x, y, COLORS[Math.floor(Math.random() * COLORS.length)], Math.floor(Math.random() * 10) + 5) || this;
         _this.speed = 5; // pixel per frame
         _this.direction = 1; // radian
+        _this.gravity = GRAVITY;
         return _this;
     }
     Ball.prototype.move = function () {
         if (this.x <= this.radius || this.x >= WIDTH - this.radius)
             this.reflect(0);
-        if (this.y <= this.radius || this.y >= HEIGHT - this.radius)
+        if ((this.y < 0 && this.y <= this.radius) || (this.y > 0 && this.y >= HEIGHT - this.radius))
             this.reflect(PI_2);
+        // this.setDirection(this.direction + Math.atan(gravity * Math.sin(PI_2 - this.direction) /
+        //     (this.speed * gravity * Math.cos(PI_2 - this.direction))));
+        if (this.y > 0 && this.y > HEIGHT - this.radius) {
+            this.dx /= 2;
+            this.dy *= 0.7;
+        }
+        else {
+            this.gravity *= 1.05;
+            if (this.dy < this.gravity)
+                this.gravity = GRAVITY;
+            this.dy -= this.gravity;
+        }
+        console.log(this.dy, this.gravity);
         this.x += this.dx;
         this.y -= this.dy;
+        if (this.y > 0 && this.y > HEIGHT - this.radius) {
+            this.y = HEIGHT - this.radius + 1;
+            if (this.dy > -0.0000001 && this.dy < 0.0000001)
+                this.dy = 0;
+            if (this.dx > -0.0000001 && this.dx < 0.0000001)
+                this.dx = 0;
+        }
+        if (this.dx != 0)
+            this.direction = Math.atan(this.dy / this.dx);
+        else {
+            if (this.dy > 0)
+                this.direction = PI_2;
+            else
+                this.direction = -PI_2;
+        }
+        this.speed = this.dy / Math.sin(this.direction);
     };
     Ball.prototype.setDirection = function (d) {
         this.direction = d;
@@ -116,7 +147,7 @@ var Ball = /** @class */ (function (_super) {
     };
     Ball.prototype.reflect = function (pAngle) {
         this.setDirection(Math.PI - 2 * pAngle - this.direction);
-        //        console.log(this.direction);
+        // console.log(this.direction);
     };
     Ball.prototype.getCollideAngle = function (obj) {
         var dx = this.x - obj.getX();
@@ -169,16 +200,17 @@ var txtRunTime = document.getElementById("runTime");
 var n = 10;
 var allPins = new Array((2 * n + n) / 2);
 var pin_n = 0;
-var ball = new Ball(WIDTH / 2, HEIGHT / 2);
+var ball = new Ball(60, HEIGHT * 0.9);
 // การทำงานเริ่มต้น
 // ----------------------------------------------------------------------------
 ball.setDirection(1);
+ball.setSpeed(30);
 calculate();
 // ฟังก์ชั่น
 // ----------------------------------------------------------------------------
 function calculate() {
     return __awaiter(this, void 0, void 0, function () {
-        var size, mid, x, y, i, x_1, j, collided, i;
+        var size, mid, x, y, i, x_1, j, collided;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
@@ -199,16 +231,16 @@ function calculate() {
                     _a.label = 1;
                 case 1:
                     if (!true) return [3 /*break*/, 3];
-                    collided = false;
-                    for (i = 0; i < pin_n && !collided; i++) {
-                        if (ball.isCollided(allPins[i])) {
-                            collided = true;
-                            ball.reflect(ball.getCollideAngle(allPins[i]));
-                        }
-                    }
+                    // collided = false;
+                    // for (let i = 0; i < pin_n && !collided; i++) {
+                    //     if (ball.isCollided(allPins[i])) {
+                    //         collided = true;
+                    //         ball.reflect(ball.getCollideAngle(allPins[i]));
+                    //     }
+                    // }
                     ball.move();
                     paint();
-                    return [4 /*yield*/, new Promise(function (r) { return setTimeout(r, 10); })];
+                    return [4 /*yield*/, new Promise(function (r) { return setTimeout(r, 500); })];
                 case 2:
                     _a.sent();
                     return [3 /*break*/, 1];

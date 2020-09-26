@@ -8,6 +8,7 @@ const MID_HEIGHT = cv.height / 2;
 const COLORS = ['magenta', 'cyan', 'blue', 'green', 'yellow', 'orange', 'red'];
 const PI2 = Math.PI * 2;
 const PI_2 = Math.PI / 2;
+const GRAVITY = 1;
 
 class Sprite {
     protected x: number;              // horizontal position
@@ -49,16 +50,48 @@ class Ball extends Sprite {
     dy: number;
     speed: number = 5;      // pixel per frame
     direction: number = 1;  // radian
+    gravity = GRAVITY;
+
     constructor(x: number, y: number) {
         super(x, y, COLORS[Math.floor(Math.random() * COLORS.length)], Math.floor(Math.random() * 10) + 5);
     }
     move(): void {
         if (this.x <= this.radius || this.x >= WIDTH - this.radius)
             this.reflect(0)
-        if (this.y <= this.radius || this.y >= HEIGHT - this.radius)
+        if ((this.y < 0 && this.y <= this.radius) || (this.y > 0 && this.y >= HEIGHT - this.radius)) 
             this.reflect(PI_2)
+
+        // this.setDirection(this.direction + Math.atan(gravity * Math.sin(PI_2 - this.direction) /
+        //     (this.speed * gravity * Math.cos(PI_2 - this.direction))));
+        if (this.y > 0 && this.y > HEIGHT - this.radius) {
+            this.dx /= 2;
+            this.dy *= 0.7;
+        } else {
+            this.gravity *= 1.05;
+            if (this.dy < this.gravity)
+                this.gravity = GRAVITY;
+            this.dy -= this.gravity;
+        }
+        console.log(this.dy, this.gravity);
         this.x += this.dx;
         this.y -= this.dy;
+        if (this.y > 0 && this.y > HEIGHT - this.radius) {
+            this.y = HEIGHT - this.radius + 1;
+            if (this.dy > -0.0000001 && this.dy < 0.0000001)
+                this.dy = 0;
+            if (this.dx > -0.0000001 && this.dx < 0.0000001)
+                this.dx = 0;
+        }
+
+        if (this.dx != 0)
+            this.direction = Math.atan(this.dy / this.dx);
+        else {
+            if (this.dy > 0)
+                this.direction = PI_2;
+            else
+                this.direction = -PI_2;
+        }
+        this.speed = this.dy / Math.sin(this.direction);
     }
     setDirection(d: number): void {
         this.direction = d;
@@ -71,7 +104,7 @@ class Ball extends Sprite {
     }
     reflect(pAngle: number): void {
         this.setDirection(Math.PI - 2 * pAngle - this.direction);
-        //        console.log(this.direction);
+        // console.log(this.direction);
     }
     getCollideAngle(obj: Sprite): number {
         let dx = this.x - obj.getX();
@@ -127,10 +160,11 @@ var n = 10;
 var allPins: Pin[] = new Array((2 * n + n) / 2);
 var pin_n: number = 0;
 
-var ball = new Ball(WIDTH / 2, HEIGHT / 2);
+var ball = new Ball(60, HEIGHT * 0.9);
 // การทำงานเริ่มต้น
 // ----------------------------------------------------------------------------
 ball.setDirection(1);
+ball.setSpeed(30);
 calculate();
 
 
@@ -151,18 +185,18 @@ async function calculate() {
         }
         y += size;
     }
-    let collided : boolean;
+    let collided: boolean;
     while (true) {
-        collided = false;
-        for (let i = 0; i < pin_n && !collided; i++) {
-            if (ball.isCollided(allPins[i])) {
-                collided = true;
-                ball.reflect(ball.getCollideAngle(allPins[i]));
-            }
-        }
+        // collided = false;
+        // for (let i = 0; i < pin_n && !collided; i++) {
+        //     if (ball.isCollided(allPins[i])) {
+        //         collided = true;
+        //         ball.reflect(ball.getCollideAngle(allPins[i]));
+        //     }
+        // }
         ball.move();
         paint();
-        await new Promise(r => setTimeout(r, 10));
+        await new Promise(r => setTimeout(r, 500));
     }
 }
 

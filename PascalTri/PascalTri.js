@@ -57,10 +57,11 @@ var COLORS = ['magenta', 'cyan', 'blue', 'green', 'yellow', 'orange', 'red'];
 var PI2 = Math.PI * 2;
 var PI_2 = Math.PI / 2;
 var GRAVITY = 1;
+var RESISTANCE = 0.5;
 var Sprite = /** @class */ (function () {
     function Sprite(x, y, color, r) {
         this.radius = 5; // pixel 
-        this.color = 'Grey'; // color name
+        this.color = 'yellow'; // color name
         this.setXY(x, y);
         this.setRadius(r);
         this.color = color;
@@ -93,37 +94,32 @@ var Sprite = /** @class */ (function () {
 var Ball = /** @class */ (function (_super) {
     __extends(Ball, _super);
     function Ball(x, y) {
-        var _this = _super.call(this, x, y, COLORS[Math.floor(Math.random() * COLORS.length)], Math.floor(Math.random() * 10) + 5) || this;
+        var _this = _super.call(this, x, y, COLORS[Math.floor(Math.random() * COLORS.length)], 12) || this;
         _this.speed = 5; // pixel per frame
         _this.direction = 1; // radian
         _this.gravity = GRAVITY;
+        _this.removed = false;
         return _this;
     }
     Ball.prototype.move = function () {
         if (this.x <= this.radius || this.x >= WIDTH - this.radius)
             this.reflect(0);
-        if ((this.y < 0 && this.y <= this.radius) || (this.y > 0 && this.y >= HEIGHT - this.radius))
+        if ((this.y < 0 && this.y <= this.radius) || (this.y > 0 && this.y >= HEIGHT - this.radius)) {
             this.reflect(PI_2);
-        // this.setDirection(this.direction + Math.atan(gravity * Math.sin(PI_2 - this.direction) /
-        //     (this.speed * gravity * Math.cos(PI_2 - this.direction))));
-        if (this.y > 0 && this.y > HEIGHT - this.radius) {
-            this.dx /= 2;
-            this.dy *= 0.7;
         }
-        else {
-            this.gravity *= 1.05;
-            if (this.dy < this.gravity)
+        if (!(this.dy > 0 && this.y > HEIGHT - this.radius)) {
+            this.gravity *= 1.01;
+            if (this.dy > 0 && this.dy < this.gravity)
                 this.gravity = GRAVITY;
             this.dy -= this.gravity;
         }
-        console.log(this.dy, this.gravity);
         this.x += this.dx;
         this.y -= this.dy;
         if (this.y > 0 && this.y > HEIGHT - this.radius) {
-            this.y = HEIGHT - this.radius + 1;
-            if (this.dy > -0.0000001 && this.dy < 0.0000001)
+            this.y = HEIGHT - this.radius;
+            if (this.dy > -1E-6 && this.dy < 1E-6)
                 this.dy = 0;
-            if (this.dx > -0.0000001 && this.dx < 0.0000001)
+            if (this.dx > -1E-6 && this.dx < 1E-6)
                 this.dx = 0;
         }
         if (this.dx != 0)
@@ -135,6 +131,7 @@ var Ball = /** @class */ (function (_super) {
                 this.direction = -PI_2;
         }
         this.speed = this.dy / Math.sin(this.direction);
+        console.log(this.speed, this.dx, this.dy);
     };
     Ball.prototype.setDirection = function (d) {
         this.direction = d;
@@ -147,7 +144,8 @@ var Ball = /** @class */ (function (_super) {
     };
     Ball.prototype.reflect = function (pAngle) {
         this.setDirection(Math.PI - 2 * pAngle - this.direction);
-        // console.log(this.direction);
+        this.dx *= RESISTANCE + Math.random() / 10;
+        this.dy *= RESISTANCE - Math.random() / 10;
     };
     Ball.prototype.getCollideAngle = function (obj) {
         var dx = this.x - obj.getX();
@@ -166,7 +164,7 @@ var Ball = /** @class */ (function (_super) {
             /* r is ratio of collide difference and ball distance */
             var r = (collideDistance - ballDistance) / ballDistance;
             /* if ball is overlape then seperate balls */
-            if (r > 0) {
+            if (r > 0 && !(obj instanceof Box)) {
                 this.x += dx * r;
                 this.y += dy * r;
             }
@@ -177,92 +175,127 @@ var Ball = /** @class */ (function (_super) {
             return false;
         }
     };
+    Ball.prototype.remove = function () {
+        this.removed = true;
+    };
+    Ball.prototype.isRemoved = function () {
+        return this.removed;
+    };
+    Ball.prototype.setRemove = function (r) {
+        this.removed = r;
+    };
     return Ball;
 }(Sprite));
 var Pin = /** @class */ (function (_super) {
     __extends(Pin, _super);
     function Pin(x, y) {
-        return _super.call(this, x, y, 'blue', 5) || this;
+        return _super.call(this, x, y, 'black', 5) || this;
     }
     return Pin;
 }(Sprite));
-var Box = /** @class */ (function () {
-    function Box() {
+var Box = /** @class */ (function (_super) {
+    __extends(Box, _super);
+    function Box(x, y) {
+        var _this = _super.call(this, x, y, 'black', 25) || this;
+        _this.count = 0;
+        _this.size = _this.radius * 2;
+        return _this;
     }
+    Box.prototype.draw = function () {
+        cx.fillStyle = this.color;
+        cx.fillRect(this.x - this.radius, this.y, this.size, this.size);
+        cx.strokeStyle = 'yellow';
+        cx.strokeText(String(this.count), this.x - 10, this.y + this.radius + 5);
+    };
+    Box.prototype.countBall = function () {
+        this.count++;
+    };
     return Box;
-}());
+}(Sprite));
 // ประกาศตัวแปร Global 
 // ----------------------------------------------------------------------------
-var boardSize = document.getElementById("boardSize");
 var txtRunTime = document.getElementById("runTime");
 // var imgData = cx.createImageData(WIDTH, HEIGHT); // width x height
 // var data = imgData.data;
-var n = 10;
-var allPins = new Array((2 * n + n) / 2);
+var n = 15;
+var allPins = new Array((n * n + n) / 2);
 var pin_n = 0;
-var ball = new Ball(60, HEIGHT * 0.9);
+var boxs = new Array(n);
+var ball = new Ball(WIDTH / 2 + Math.random() * 4 - 2, 50);
 // การทำงานเริ่มต้น
 // ----------------------------------------------------------------------------
-ball.setDirection(1);
-ball.setSpeed(30);
-calculate();
+ball.setDirection(PI_2);
+ball.setSpeed(0);
+var size = 50;
+var mid = size / 2;
+var x = MID_WIDTH;
+var y = 20;
+allPins[pin_n++] = new Pin(x, y);
+for (var i = 0; i < n; i++) {
+    var x_1 = MID_WIDTH - (i * mid);
+    allPins[pin_n++] = new Pin(x_1 - mid, y + size);
+    allPins[pin_n++] = new Pin(x_1 - mid, y + size - mid - 5);
+    for (var j = 0; j <= i; j++) {
+        allPins[pin_n++] = new Pin(x_1 + mid, y + size);
+        x_1 += size;
+    }
+    allPins[pin_n++] = new Pin(x_1 - size + mid, y + size - mid - 5);
+    y += size;
+}
+y += size;
+x = MID_WIDTH - (n * mid - mid);
+for (var i = 0; i < n; i++) {
+    boxs[i] = new Box(x, y);
+    x += size;
+}
+paint();
 // ฟังก์ชั่น
 // ----------------------------------------------------------------------------
 function calculate() {
     return __awaiter(this, void 0, void 0, function () {
-        var size, mid, x, y, i, x_1, j, collided;
+        var collided, i, i;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    n = Number(boardSize.value);
-                    size = 50;
-                    mid = size / 2;
-                    x = MID_WIDTH;
-                    y = 10;
-                    for (i = 0; i < n; i++) {
-                        x_1 = MID_WIDTH - (i * mid);
-                        allPins[pin_n++] = new Pin(x_1 - mid, y + size);
-                        for (j = 0; j <= i; j++) {
-                            allPins[pin_n++] = new Pin(x_1 + mid, y + size);
-                            x_1 += size;
-                        }
-                        y += size;
+                    if (!true) return [3 /*break*/, 2];
+                    if (ball.isRemoved()) {
+                        ball.setXY(WIDTH / 2 + Math.random() * 4 - 2, 50);
+                        ball.setRemove(false);
                     }
-                    _a.label = 1;
-                case 1:
-                    if (!true) return [3 /*break*/, 3];
-                    // collided = false;
-                    // for (let i = 0; i < pin_n && !collided; i++) {
-                    //     if (ball.isCollided(allPins[i])) {
-                    //         collided = true;
-                    //         ball.reflect(ball.getCollideAngle(allPins[i]));
-                    //     }
-                    // }
+                    collided = false;
+                    for (i = 0; i < pin_n && !collided; i++) {
+                        if (ball.isCollided(allPins[i])) {
+                            collided = true;
+                            ball.reflect(ball.getCollideAngle(allPins[i]));
+                        }
+                    }
+                    for (i = 0; i < n && !ball.isRemoved(); i++) {
+                        if (ball.isCollided(boxs[i])) {
+                            boxs[i].countBall();
+                            ball.remove();
+                        }
+                    }
                     ball.move();
                     paint();
-                    return [4 /*yield*/, new Promise(function (r) { return setTimeout(r, 500); })];
-                case 2:
+                    return [4 /*yield*/, new Promise(function (r) { return setTimeout(r, 20); })];
+                case 1:
                     _a.sent();
-                    return [3 /*break*/, 1];
-                case 3: return [2 /*return*/];
+                    return [3 /*break*/, 0];
+                case 2: return [2 /*return*/];
             }
         });
     });
 }
 function paint() {
-    n = Number(boardSize.value);
     cx.clearRect(0, 0, cv.width, cv.height);
-    for (var i = 0; i < pin_n; i++) {
-        allPins[i].draw();
-    }
     var x = MID_WIDTH;
-    var y = 10;
+    var y = 20;
     var size = 50;
-    cx.fillStyle = 'black';
     cx.shadowBlur = 10;
-    cx.shadowColor = 'Grey';
+    cx.shadowColor = 'blue';
     var mid = size / 2;
     for (var i = 0; i < n; i++) {
+        boxs[i].draw();
         x = MID_WIDTH - (i * mid);
         for (var j = 0; j <= i; j++) {
             cx.beginPath();
@@ -276,6 +309,9 @@ function paint() {
             x += size;
         }
         y += size;
+    }
+    for (var i = 0; i < pin_n; i++) {
+        allPins[i].draw();
     }
     ball.draw();
 }

@@ -9,12 +9,13 @@ const COLORS = ['magenta', 'cyan', 'blue', 'green', 'yellow', 'orange', 'red'];
 const PI2 = Math.PI * 2;
 const PI_2 = Math.PI / 2;
 const GRAVITY = 1;
+const RESISTANCE = 0.5;
 
 class Sprite {
     protected x: number;              // horizontal position
     protected y: number;              // vertical position
     protected radius: number = 5;     // pixel 
-    protected color: string = 'Grey'; // color name
+    protected color: string = 'yellow'; // color name
     constructor(x: number, y: number, color: string, r: number) {
         this.setXY(x, y);
         this.setRadius(r);
@@ -51,38 +52,31 @@ class Ball extends Sprite {
     speed: number = 5;      // pixel per frame
     direction: number = 1;  // radian
     gravity = GRAVITY;
-
+    removed: boolean = false;
     constructor(x: number, y: number) {
-        super(x, y, COLORS[Math.floor(Math.random() * COLORS.length)], Math.floor(Math.random() * 10) + 5);
+        super(x, y, COLORS[Math.floor(Math.random() * COLORS.length)], 12);
     }
     move(): void {
         if (this.x <= this.radius || this.x >= WIDTH - this.radius)
-            this.reflect(0)
-        if ((this.y < 0 && this.y <= this.radius) || (this.y > 0 && this.y >= HEIGHT - this.radius)) 
-            this.reflect(PI_2)
-
-        // this.setDirection(this.direction + Math.atan(gravity * Math.sin(PI_2 - this.direction) /
-        //     (this.speed * gravity * Math.cos(PI_2 - this.direction))));
-        if (this.y > 0 && this.y > HEIGHT - this.radius) {
-            this.dx /= 2;
-            this.dy *= 0.7;
-        } else {
-            this.gravity *= 1.05;
-            if (this.dy < this.gravity)
+            this.reflect(0);
+        if ((this.y < 0 && this.y <= this.radius) || (this.y > 0 && this.y >= HEIGHT - this.radius)) {
+            this.reflect(PI_2);
+        }
+        if (!(this.dy > 0 && this.y > HEIGHT - this.radius)) {
+            this.gravity *= 1.01;
+            if (this.dy > 0 && this.dy < this.gravity)
                 this.gravity = GRAVITY;
             this.dy -= this.gravity;
         }
-        console.log(this.dy, this.gravity);
         this.x += this.dx;
         this.y -= this.dy;
         if (this.y > 0 && this.y > HEIGHT - this.radius) {
-            this.y = HEIGHT - this.radius + 1;
-            if (this.dy > -0.0000001 && this.dy < 0.0000001)
+            this.y = HEIGHT - this.radius;
+            if (this.dy > -1E-6 && this.dy < 1E-6)
                 this.dy = 0;
-            if (this.dx > -0.0000001 && this.dx < 0.0000001)
+            if (this.dx > -1E-6 && this.dx < 1E-6)
                 this.dx = 0;
         }
-
         if (this.dx != 0)
             this.direction = Math.atan(this.dy / this.dx);
         else {
@@ -92,6 +86,7 @@ class Ball extends Sprite {
                 this.direction = -PI_2;
         }
         this.speed = this.dy / Math.sin(this.direction);
+        console.log(this.speed, this.dx, this.dy)
     }
     setDirection(d: number): void {
         this.direction = d;
@@ -104,7 +99,8 @@ class Ball extends Sprite {
     }
     reflect(pAngle: number): void {
         this.setDirection(Math.PI - 2 * pAngle - this.direction);
-        // console.log(this.direction);
+        this.dx *= RESISTANCE + Math.random() / 10;
+        this.dy *= RESISTANCE - Math.random() / 10;
     }
     getCollideAngle(obj: Sprite): number {
         let dx = this.x - obj.getX();
@@ -123,7 +119,7 @@ class Ball extends Sprite {
             /* r is ratio of collide difference and ball distance */
             let r = (collideDistance - ballDistance) / ballDistance;
             /* if ball is overlape then seperate balls */
-            if (r > 0) {
+            if (r > 0 && !(obj instanceof Box)) {
                 this.x += dx * r;
                 this.y += dy * r;
             }
@@ -133,90 +129,121 @@ class Ball extends Sprite {
             return false;
         }
     }
+    remove(): void {
+        this.removed = true;
+    }
+    isRemoved(): boolean {
+        return this.removed;
+    }
+    setRemove(r : boolean) : void {
+        this.removed = r;
+    }
 }
 
 class Pin extends Sprite {
     constructor(x: number, y: number) {
-        super(x, y, 'blue', 5);
+        super(x, y, 'black', 5);
     }
 }
 
-class Box {
-    private x: number;
-    private y: number;
-    private size: number;
+class Box extends Sprite {
+    size: number;
+    count: number = 0;
+    constructor(x: number, y: number) {
+        super(x, y, 'black', 25);
+        this.size = this.radius * 2;
+    }
+    draw(): void {
+        cx.fillStyle = this.color;
+        cx.fillRect(this.x - this.radius, this.y, this.size, this.size);
+        cx.strokeStyle = 'yellow';
+        cx.strokeText(String(this.count), this.x - 10, this.y + this.radius + 5);
+    }
+    countBall(): void {
+        this.count++;
+    }
 }
 
 // ประกาศตัวแปร Global 
 // ----------------------------------------------------------------------------
-const boardSize = document.getElementById("boardSize") as HTMLInputElement;
 const txtRunTime = document.getElementById("runTime") as HTMLLabelElement;
 
 // var imgData = cx.createImageData(WIDTH, HEIGHT); // width x height
 // var data = imgData.data;
 
-var n = 10;
-
-var allPins: Pin[] = new Array((2 * n + n) / 2);
+var n = 15;
+var allPins: Pin[] = new Array((n * n + n) / 2);
 var pin_n: number = 0;
-
-var ball = new Ball(60, HEIGHT * 0.9);
+var boxs: Box[] = new Array(n);
+var ball = new Ball(WIDTH / 2 + Math.random() * 4 - 2, 50);
 // การทำงานเริ่มต้น
 // ----------------------------------------------------------------------------
-ball.setDirection(1);
-ball.setSpeed(30);
-calculate();
-
+ball.setDirection(PI_2);
+ball.setSpeed(0);
+let size = 50;
+let mid = size / 2;
+let x = MID_WIDTH;
+let y = 20;
+allPins[pin_n++] = new Pin(x, y);
+for (let i = 0; i < n; i++) {
+    let x = MID_WIDTH - (i * mid);
+    allPins[pin_n++] = new Pin(x - mid, y + size);
+    allPins[pin_n++] = new Pin(x - mid, y + size - mid - 5);
+    for (let j = 0; j <= i; j++) {
+        allPins[pin_n++] = new Pin(x + mid, y + size);
+        x += size;
+    }
+    allPins[pin_n++] = new Pin(x - size + mid, y + size - mid - 5);
+    y += size;
+}
+y += size;
+x = MID_WIDTH - (n * mid - mid);
+for (let i = 0; i < n; i++) {
+    boxs[i] = new Box(x, y);
+    x += size;
+}
+paint();
 
 // ฟังก์ชั่น
 // ----------------------------------------------------------------------------
 async function calculate() {
-    n = Number(boardSize.value);
-    let size = 50;
-    let mid = size / 2;
-    let x = MID_WIDTH;
-    let y = 10;
-    for (let i = 0; i < n; i++) {
-        let x = MID_WIDTH - (i * mid);
-        allPins[pin_n++] = new Pin(x - mid, y + size);
-        for (let j = 0; j <= i; j++) {
-            allPins[pin_n++] = new Pin(x + mid, y + size);
-            x += size;
-        }
-        y += size;
-    }
     let collided: boolean;
     while (true) {
-        // collided = false;
-        // for (let i = 0; i < pin_n && !collided; i++) {
-        //     if (ball.isCollided(allPins[i])) {
-        //         collided = true;
-        //         ball.reflect(ball.getCollideAngle(allPins[i]));
-        //     }
-        // }
+        if (ball.isRemoved()) {
+            ball.setXY(WIDTH / 2 + Math.random() * 4 - 2, 50);
+            ball.setRemove(false);
+        }
+        collided = false;
+        for (let i = 0; i < pin_n && !collided; i++) {
+            if (ball.isCollided(allPins[i])) {
+                collided = true;
+                ball.reflect(ball.getCollideAngle(allPins[i]));
+            }
+        }
+        for (let i = 0; i < n && !ball.isRemoved(); i++) {
+            if (ball.isCollided(boxs[i])) {
+                boxs[i].countBall();
+                ball.remove();
+            }
+        }
         ball.move();
         paint();
-        await new Promise(r => setTimeout(r, 500));
+        await new Promise(r => setTimeout(r, 20));
     }
 }
 
 function paint() {
-    n = Number(boardSize.value);
     cx.clearRect(0, 0, cv.width, cv.height);
-    for (let i = 0; i < pin_n; i++) {
-        allPins[i].draw();
-    }
 
     let x = MID_WIDTH;
-    let y = 10;
+    let y = 20;
     let size = 50;
-    cx.fillStyle = 'black';
     cx.shadowBlur = 10;
-    cx.shadowColor = 'Grey';
+    cx.shadowColor = 'blue';
     let mid = size / 2;
     for (let i = 0; i < n; i++) {
+        boxs[i].draw();
         x = MID_WIDTH - (i * mid);
-
         for (let j = 0; j <= i; j++) {
             cx.beginPath();
             cx.moveTo(x - mid, y + size);
@@ -226,11 +253,13 @@ function paint() {
             cx.lineTo(x + mid, y + mid - 5);
             cx.lineTo(x, y);
             cx.stroke();
-
             x += size;
-
         }
         y += size;
+
+    }
+    for (let i = 0; i < pin_n; i++) {
+        allPins[i].draw();
     }
     ball.draw();
 }

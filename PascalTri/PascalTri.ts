@@ -9,7 +9,7 @@ const COLORS = ['magenta', 'cyan', 'blue', 'green', 'yellow', 'orange', 'red'];
 const PI2 = Math.PI * 2;
 const PI_2 = Math.PI / 2;
 const GRAVITY = 0.5;
-const RESISTANCE = 0.5;
+const RESISTANCE = 0.6;
 
 class Sprite {
     protected x: number;              // horizontal position
@@ -54,7 +54,7 @@ class Ball extends Sprite {
     gravity = GRAVITY;
     removed: boolean = false;
     constructor(x: number, y: number) {
-        super(x, y, COLORS[Math.floor(Math.random() * COLORS.length)], 12);
+        super(x, y, COLORS[Math.floor(Math.random() * COLORS.length)], 15);
     }
     move(): void {
         if (this.x <= this.radius || this.x >= WIDTH - this.radius)
@@ -118,9 +118,10 @@ class Ball extends Sprite {
             /* r is ratio of collide difference and ball distance */
             let r = (collideDistance - ballDistance) / ballDistance;
             /* if ball is overlape then seperate balls */
+            // รอแก้ไข todo
             if (r > 0 && !(obj instanceof Box)) {
-                this.x += dx * r;
-                this.y += dy * r;
+                this.x += Math.floor(dx * r);
+                this.y += Math.floor(dy * r);
             }
             return ballDistance <= collideDistance;
         } else {
@@ -173,24 +174,27 @@ var n = 15;
 var allPins: Pin[] = new Array((n * n + n) / 2);
 var pin_n: number = 0;
 var boxs: Box[] = new Array(n);
-var ball = new Ball(WIDTH / 2 + Math.random() * 4 - 2, 65);
+var balls: Ball[] = new Array(n);
+var ball = new Ball(WIDTH / 3 + Math.random() * 20, 15);
 ball.setSpeed(0);
 // การทำงานเริ่มต้น
 // ----------------------------------------------------------------------------
 let size = 50;
 let mid = size / 2;
 let x = MID_WIDTH;
-let y = 20;
+let y = 40;
 allPins[pin_n++] = new Pin(x, y);
 for (let i = 0; i < n; i++) {
     let x = MID_WIDTH - (i * mid);
     allPins[pin_n++] = new Pin(x - mid, y + size);
-    allPins[pin_n++] = new Pin(x - mid / 2, y + size - mid);
+    if (i > 0)
+        allPins[pin_n++] = new Pin(x - mid / 2, y + size - mid);
     for (let j = 0; j <= i; j++) {
         allPins[pin_n++] = new Pin(x + mid, y + size);
         x += size;
     }
-    allPins[pin_n++] = new Pin(x - size + mid / 2, y + size - mid);
+    if (i > 0)
+        allPins[pin_n++] = new Pin(x - size + mid / 2, y + size - mid);
     y += size;
 }
 y += size;
@@ -209,7 +213,7 @@ async function calculate() {
     let collided: boolean;
     while (true) {
         if (ball.isRemoved()) {
-            ball.setXY(WIDTH / 2 + Math.random() * 4 - 2, 60);
+            ball.setXY(WIDTH / 3 + Math.random() * 20, 20);
             ball.setRemove(false);
         }
         collided = false;
@@ -235,11 +239,20 @@ function paint() {
     cx.clearRect(0, 0, cv.width, cv.height);
 
     let x = MID_WIDTH;
-    let y = 20;
+    let y = 40;
     let size = 50;
     cx.shadowBlur = 10;
     cx.shadowColor = 'blue';
     let mid = size / 2;
+    cx.beginPath();
+    cx.moveTo(x - mid - 5, y + size - 5);
+    cx.lineTo(x - 200, y - 35);
+    cx.stroke();
+    cx.beginPath();
+    cx.moveTo(x + mid + 5, y + size - 5);
+    cx.lineTo(x + 200, y - 35);
+    cx.stroke();
+
     for (let i = 0; i < n; i++) {
         boxs[i].draw();
         // x = MID_WIDTH - (i * mid);

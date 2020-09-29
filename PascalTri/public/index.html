@@ -3,40 +3,27 @@
 
 <head>
 	<meta charset="UTF-8">
-	<title>Mandelbrot Set</title>
+	<title>Pascal's Triangle</title>
 </head>
 
-<body>
+<body bgcolor="darkgrey">
 	<table style="border:0; padding:5px;">
 		<tr>
 			<td width="500" style="vertical-align: top; padding:50px;">
-				<h1>Mandelbrot Set</h1>
-				<hr>
-				<h3>Z(0) = a + b i</h3>
-				<h3>Z(n) = Z(n-1)^2 + Z(0)</h3>
+				<h1>Pascal's Triangle</h1>
 				<hr>
 				<input type="button" value="Calculate" onclick="calculate()"></input>
-				<label id="runTime"> run time = </label>
+				<!-- <label id="runTime"> run time = </label> -->
 				<hr>
 				<table>
 					<tr>
-						<td>จุดกึ่งกลาง + Real :</td>
-						<td><input id="realValue" type="text" value="-0.75"
-								style="width: 120px; text-align: right;"></input></td>
-					</tr>
-					<tr>
-						<td>จุดกึ่งกลาง + Imaginary :</td>
-						<td><input id="imageValue" type="text" value="0.0"
-								style="width: 120px; text-align: right;"></input></td>
-					</tr>
-					<tr>
-						<td>ขนาด / 1K pixel :</td>
-						<td><input id="boundary" type="text" value="3.2"
-								style="width: 120px; text-align: right;"></input></td>
+						<!-- <td>Board Size :</td>
+						<td><input id="boardSize" type="text" value="10"
+								style="width: 120px; text-align: right;"></input></td> -->
 					</tr>
 				</table>
 			</td>
-			<td><canvas id="cpxCanvas" width="1000" height="1000" style="border:1px solid #000000;"
+			<td><canvas id="cpxCanvas" width="900" height="900" style="border:1px solid #000000;"
 					onclick="clickXY(event);"></canvas>
 			</td>
 		</tr>

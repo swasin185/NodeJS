@@ -57,7 +57,7 @@ var COLORS = ['magenta', 'cyan', 'blue', 'green', 'yellow', 'orange', 'red'];
 var PI2 = Math.PI * 2;
 var PI_2 = Math.PI / 2;
 var GRAVITY = 0.5;
-var RESISTANCE = 0.6;
+var RESISTANCE = 0.5;
 var Sprite = /** @class */ (function () {
     function Sprite(x, y, color, r) {
         this.radius = 5; // pixel 
@@ -159,16 +159,17 @@ var Ball = /** @class */ (function (_super) {
             var dx = this.x - obj.getX();
             var dy = this.y - obj.getY();
             var ballDistance = Math.sqrt(dx * dx + dy * dy);
-            var collideDistance = obj.getRadius() + this.radius;
+            var radius2 = obj.getRadius() + this.radius;
             /* r is ratio of collide difference and ball distance */
-            var r = (collideDistance - ballDistance) / ballDistance;
-            /* if ball is overlape then seperate balls */
-            // รอแก้ไข todo
+            var r = radius2 - ballDistance;
             if (r > 0 && !(obj instanceof Box)) {
-                this.x += Math.floor(dx * r);
-                this.y += Math.floor(dy * r);
+                var tetha = this.getCollideAngle(obj);
+                console.log(this.x, this.y, 'tetha', tetha);
+                this.x -= r * Math.cos(tetha);
+                this.y += r * Math.sin(tetha);
+                console.log(this.x, this.y, '**');
             }
-            return ballDistance <= collideDistance;
+            return ballDistance <= radius2;
         }
         else {
             return false;
@@ -220,16 +221,20 @@ var n = 15;
 var allPins = new Array((n * n + n) / 2);
 var pin_n = 0;
 var boxs = new Array(n);
-var balls = new Array(n);
-var ball = new Ball(WIDTH / 3 + Math.random() * 20, 15);
-ball.setSpeed(0);
+var balls = new Array(0);
+balls[0] = new Ball(WIDTH * 4 / 7, 20);
+balls[0].setSpeed(4.5);
+balls[0].setDirection(Math.PI);
+// balls[1] = new Ball(WIDTH * 4 / 7, 20);
+// balls[1].setSpeed(5);
+// balls[1].setDirection(Math.PI);
 // การทำงานเริ่มต้น
 // ----------------------------------------------------------------------------
 var size = 50;
 var mid = size / 2;
 var x = MID_WIDTH;
 var y = 40;
-allPins[pin_n++] = new Pin(x, y);
+//allPins[pin_n++] = new Pin(x, y);
 for (var i = 0; i < n; i++) {
     var x_1 = MID_WIDTH - (i * mid);
     allPins[pin_n++] = new Pin(x_1 - mid, y + size);
@@ -254,33 +259,47 @@ paint();
 // ----------------------------------------------------------------------------
 function calculate() {
     return __awaiter(this, void 0, void 0, function () {
-        var collided, i, i;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
+        var collided, _i, balls_1, ball, i, i, j, _a, balls_2, ball, i;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
                 case 0:
                     if (!true) return [3 /*break*/, 2];
-                    if (ball.isRemoved()) {
-                        ball.setXY(WIDTH / 3 + Math.random() * 20, 20);
-                        ball.setRemove(false);
-                    }
+                    // if (ball.isRemoved()) {
+                    //     ball.setXY(WIDTH / 3 + Math.random() * 20, 20);
+                    //     ball.setRemove(false);
+                    // }
                     collided = false;
-                    for (i = 0; i < pin_n && !collided; i++) {
-                        if (ball.isCollided(allPins[i])) {
-                            collided = true;
-                            ball.reflect(ball.getCollideAngle(allPins[i]));
+                    for (_i = 0, balls_1 = balls; _i < balls_1.length; _i++) {
+                        ball = balls_1[_i];
+                        for (i = 0; i < pin_n && !collided; i++) {
+                            if (ball.isCollided(allPins[i])) {
+                                collided = true;
+                                ball.reflect(ball.getCollideAngle(allPins[i]));
+                            }
                         }
                     }
-                    for (i = 0; i < n && !ball.isRemoved(); i++) {
-                        if (ball.isCollided(boxs[i])) {
-                            boxs[i].countBall();
-                            ball.remove();
+                    for (i = 0; i < (balls.length - 1); i++) {
+                        for (j = i + 1; j < balls.length; j++) {
+                            if (balls[i].isCollided(balls[j])) {
+                                balls[i].reflect(balls[i].getCollideAngle(balls[j]));
+                                balls[j].reflect(balls[j].getCollideAngle(balls[i]));
+                            }
                         }
                     }
-                    ball.move();
+                    for (_a = 0, balls_2 = balls; _a < balls_2.length; _a++) {
+                        ball = balls_2[_a];
+                        for (i = 0; i < n && !ball.isRemoved(); i++) {
+                            if (ball.isCollided(boxs[i])) {
+                                boxs[i].countBall();
+                                ball.remove();
+                            }
+                        }
+                        ball.move();
+                    }
                     paint();
-                    return [4 /*yield*/, new Promise(function (r) { return setTimeout(r, 15); })];
+                    return [4 /*yield*/, new Promise(function (r) { return setTimeout(r, 1000); })];
                 case 1:
-                    _a.sent();
+                    _b.sent();
                     return [3 /*break*/, 0];
                 case 2: return [2 /*return*/];
             }
@@ -322,5 +341,8 @@ function paint() {
     for (var i = 0; i < pin_n; i++) {
         allPins[i].draw();
     }
-    ball.draw();
+    for (var _i = 0, balls_3 = balls; _i < balls_3.length; _i++) {
+        var ball = balls_3[_i];
+        ball.draw();
+    }
 }

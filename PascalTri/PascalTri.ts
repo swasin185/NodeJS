@@ -8,8 +8,8 @@ const MID_HEIGHT = cv.height / 2;
 const COLORS = ['magenta', 'cyan', 'blue', 'green', 'yellow', 'orange', 'red'];
 const PI2 = Math.PI * 2;
 const PI_2 = Math.PI / 2;
-const GRAVITY = 0;
-const RESISTANCE = 1;
+const GRAVITY = 0.5;
+const RESISTANCE = 0.5;
 
 class Sprite {
     protected x: number;              // horizontal position
@@ -54,7 +54,7 @@ class Ball extends Sprite {
     gravity = GRAVITY;
     removed: boolean = false;
     constructor(x: number, y: number) {
-        super(x, y, COLORS[Math.floor(Math.random() * COLORS.length)], 20);
+        super(x, y, COLORS[Math.floor(Math.random() * COLORS.length)], 15);
     }
     move(): void {
         if (this.x <= this.radius || this.x >= WIDTH - this.radius)
@@ -98,13 +98,13 @@ class Ball extends Sprite {
     }
     reflect(pAngle: number): void {
         let reflectAngle = Math.PI - 2 * pAngle - this.direction;
-        console.log(this.color, this.direction, reflectAngle);
+        // console.log(this.color, this.direction, reflectAngle);
         this.setDirection(reflectAngle);
-        // this.dx *= RESISTANCE + Math.random() / 10;
-        // this.dy *= RESISTANCE - Math.random() / 10;
+        this.dx *= RESISTANCE + Math.random() / 10;
+        this.dy *= RESISTANCE - Math.random() / 10;
     }
     getCollideAngle(obj: Sprite): number {
-        let dx = this.x - obj.getX();
+        let dx = -this.x + obj.getX();
         let dy = this.y - obj.getY();
         let angle = PI_2;
         if (dx != 0)
@@ -113,7 +113,7 @@ class Ball extends Sprite {
     }
     isCollided(obj: Sprite): boolean {
         if (this != obj && obj != null) {
-            let dx = this.x - obj.getX();
+            let dx = -this.x + obj.getX();
             let dy = this.y - obj.getY();
             let ballDistance = Math.sqrt(dx * dx + dy * dy);
             let radius2 = obj.getRadius() + this.radius;
@@ -122,10 +122,10 @@ class Ball extends Sprite {
             let r = radius2 - ballDistance;
             if (r > 0 && !(obj instanceof Box)) {
                 let tetha = this.getCollideAngle(obj);
-                console.log(this.x, this.y, 'tetha', tetha, this.dx, this.dy)
-                // this.x -= r * Math.cos(tetha) * Math.sign(this.dx);
-                // this.y += r * Math.sin(tetha) * Math.sign(this.dy);
-                // console.log(this.x,this.y,'**')
+                console.log(dx, dy, this.color, tetha, this.dx, this.dy)
+                this.x -= r * Math.cos(tetha);
+                this.y += r * Math.sin(tetha);
+                console.log(this.x, this.y, '**')
             }
             return ballDistance <= radius2;
         } else {
@@ -180,17 +180,17 @@ var pin_n: number = 0;
 var boxs: Box[] = new Array(n);
 var balls: Ball[] = new Array(0);
 
-balls[0] = new Ball(WIDTH * 3 / 7, 25);
-balls[0].setSpeed(2);
-balls[0].setDirection(-Math.PI / 10);
-balls[1] = new Ball(WIDTH * 4 / 7, 25);
-balls[1].setSpeed(2);
-balls[1].setDirection(Math.PI * 11 / 10);
-for (let i = 2; i < 10; i++) {
-    balls[i] = new Ball(Math.random() * WIDTH, Math.random() * HEIGHT);
-    balls[i].setSpeed(Math.random() * 3);
-    balls[i].setDirection(Math.random() * Math.PI * 2);
-}
+balls[0] = new Ball(WIDTH * 3.2 / 7, 25);
+balls[0].setSpeed(0);
+balls[0].setDirection(-Math.PI / 2);
+balls[1] = new Ball(WIDTH * 3.8 / 7, 25);
+balls[1].setSpeed(0);
+balls[1].setDirection(-Math.PI / 2);
+// for (let i = 2; i < 5; i++) {
+//     balls[i] = new Ball(Math.random() * WIDTH, Math.random() * HEIGHT);
+//     balls[i].setSpeed(Math.random() * 3);
+//     balls[i].setDirection(Math.random() * Math.PI * 2);
+// }
 
 // การทำงานเริ่มต้น
 // ----------------------------------------------------------------------------
@@ -226,19 +226,19 @@ paint();
 // ----------------------------------------------------------------------------
 async function calculate() {
     let collided: boolean = false;
-    while (true) {
+    while (!collided) {
         // if (ball.isRemoved()) {
         //     ball.setXY(WIDTH / 3 + Math.random() * 20, 20);
         //     ball.setRemove(false);
         // }
         collided = false;
-        // for (let ball of balls)
-        //     for (let i = 0; i < pin_n && !collided; i++) {
-        //         if (ball.isCollided(allPins[i])) {
-        //             collided = true;
-        //             ball.reflect(ball.getCollideAngle(allPins[i]));
-        //         }
-        //     }
+        for (let ball of balls)
+            for (let i = 0; i < pin_n; i++) {
+                if (ball.isCollided(allPins[i])) {
+                    collided = true;
+                    ball.reflect(ball.getCollideAngle(allPins[i]));
+                }
+            }
 
         for (let i = 0; i < (balls.length - 1); i++) {
             for (let j = i + 1; j < balls.length; j++) {
@@ -261,7 +261,7 @@ async function calculate() {
 
         }
         paint();
-        await new Promise(r => setTimeout(r, 10));
+        await new Promise(r => setTimeout(r, 50));
     }
 }
 

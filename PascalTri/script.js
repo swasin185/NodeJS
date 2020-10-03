@@ -149,8 +149,8 @@ var Ball = /** @class */ (function (_super) {
         this.dy *= RESISTANCE - Math.random() / 10;
     };
     Ball.prototype.getCollideAngle = function (obj) {
-        var dx = -this.x + obj.getX();
-        var dy = this.y - obj.getY();
+        var dx = obj.getX() - this.x;
+        var dy = -(obj.getY() - this.y);
         var angle = PI_2;
         if (dx != 0)
             angle = Math.atan(dy / dx);
@@ -158,18 +158,19 @@ var Ball = /** @class */ (function (_super) {
     };
     Ball.prototype.isCollided = function (obj) {
         if (this != obj && obj != null) {
-            var dx = -this.x + obj.getX();
-            var dy = this.y - obj.getY();
+            var dx = obj.getX() - this.x;
+            var dy = -(obj.getY() - this.y);
             var ballDistance = Math.sqrt(dx * dx + dy * dy);
             var radius2 = obj.getRadius() + this.radius;
             /* r is ratio of collide difference and ball distance */
             var r = radius2 - ballDistance;
             if (r > 0 && !(obj instanceof Box)) {
-                var tetha = this.getCollideAngle(obj);
-                console.log(dx, dy, this.color, tetha, this.dx, this.dy);
+                var tetha = Math.asin(dy / ballDistance); //this.getCollideAngle(obj);
+                console.log("dist=", ballDistance, Math.atan(dy / dx));
+                console.log("xy=", this.x, this.y, "obj.xy=", obj.getX(), obj.getY());
+                console.log('dxdy=', dx, dy, this.color, tetha, this.dx, this.dy);
                 this.x -= r * Math.cos(tetha);
                 this.y += r * Math.sin(tetha);
-                console.log(this.x, this.y, '**');
             }
             return ballDistance <= radius2;
         }

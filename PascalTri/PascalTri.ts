@@ -104,8 +104,8 @@ class Ball extends Sprite {
         this.dy *= RESISTANCE - Math.random() / 10;
     }
     getCollideAngle(obj: Sprite): number {
-        let dx = -this.x + obj.getX();
-        let dy = this.y - obj.getY();
+        let dx = obj.getX() - this.x;
+        let dy = -(obj.getY() - this.y);
         let angle = PI_2;
         if (dx != 0)
             angle = Math.atan(dy / dx);
@@ -113,19 +113,20 @@ class Ball extends Sprite {
     }
     isCollided(obj: Sprite): boolean {
         if (this != obj && obj != null) {
-            let dx = -this.x + obj.getX();
-            let dy = this.y - obj.getY();
+            let dx = obj.getX() - this.x;
+            let dy = -(obj.getY() - this.y);
             let ballDistance = Math.sqrt(dx * dx + dy * dy);
             let radius2 = obj.getRadius() + this.radius;
 
             /* r is ratio of collide difference and ball distance */
             let r = radius2 - ballDistance;
             if (r > 0 && !(obj instanceof Box)) {
-                let tetha = this.getCollideAngle(obj);
-                console.log(dx, dy, this.color, tetha, this.dx, this.dy)
+                let tetha = Math.asin(dy / ballDistance); //this.getCollideAngle(obj);
+                console.log("dist=", ballDistance, Math.atan(dy / dx))
+                console.log("xy=", this.x, this.y, "obj.xy=", obj.getX(), obj.getY())
+                console.log('dxdy=', dx, dy, this.color, tetha, this.dx, this.dy)
                 this.x -= r * Math.cos(tetha);
                 this.y += r * Math.sin(tetha);
-                console.log(this.x, this.y, '**')
             }
             return ballDistance <= radius2;
         } else {

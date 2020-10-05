@@ -57,7 +57,7 @@ var COLORS = ['magenta', 'cyan', 'blue', 'green', 'yellow', 'orange', 'red'];
 var PI2 = Math.PI * 2;
 var PI_2 = Math.PI / 2;
 var GRAVITY = 0.1;
-var RESISTANCE = 0.5;
+var RESISTANCE = 0.6;
 var Sprite = /** @class */ (function () {
     function Sprite(x, y, color, r) {
         this.radius = 5; // pixel 
@@ -121,34 +121,20 @@ var Ball = /** @class */ (function (_super) {
         return _this;
     }
     Ball.prototype.move = function () {
-        // if (!(this.dy > 0 && this.y > HEIGHT - this.radius)) {
-        //     // this.gravity *= 1.01;
-        //     // if (this.dy > 0 && this.dy < this.gravity)
-        //     //     this.gravity = GRAVITY;
-        //     this.dy -= this.gravity;
-        // }
-        this.gravity *= 1.01;
+        this.gravity *= 1.005;
         this.dy -= this.gravity;
         this.speed = Math.sqrt(this.dx * this.dx + this.dy * this.dy);
         this.setDirection(this.getAngle(this.dx, this.dy));
         this.x += this.dx;
         this.y -= this.dy;
-        // if (this.dx != 0)
-        //     this.direction = Math.atan(this.dy / this.dx);
-        // else {
-        //     if (this.dy > 0)
-        //         this.direction = PI_2;
-        //     else
-        //         this.direction = -PI_2;
-        // }
     };
     Ball.prototype.setDirection = function (d) {
         this.direction = d;
         this.dx = Math.cos(this.direction) * this.speed;
         this.dy = Math.sin(this.direction) * this.speed;
-        if (this.dy > -1E-6 && this.dy < 1E-6)
+        if (this.dy > -1E-4 && this.dy < 1E-4)
             this.dy = 0;
-        if (this.dx > -1E-6 && this.dx < 1E-6)
+        if (this.dx > -1E-4 && this.dx < 1E-4)
             this.dx = 0;
         // console.log(this.direction, this.dx, this.dy)
     };
@@ -163,8 +149,8 @@ var Ball = /** @class */ (function (_super) {
         else
             reflectAngle -= Math.PI;
         this.setDirection(reflectAngle);
-        this.dx *= RESISTANCE + Math.random() / 10;
-        this.dy *= RESISTANCE - Math.random() / 10;
+        this.dx *= RESISTANCE;
+        this.dy *= RESISTANCE;
     };
     Ball.prototype.getCollideAngle = function (obj) {
         var dx = obj.getX() - this.x;
@@ -173,11 +159,20 @@ var Ball = /** @class */ (function (_super) {
     };
     Ball.prototype.bounce = function (x1, y1, x2, y2) {
         var isBounce = false;
-        if (this.x <= x1 + this.radius || this.x >= x2 - this.radius) {
+        if (this.x < x1 + this.radius || this.x > x2 - this.radius) {
+            if (this.x < x1 + this.radius)
+                this.x = x1 + this.radius;
+            else
+                this.x = x2 - this.radius;
             this.reflect(0);
             isBounce = true;
         }
-        if (this.y <= y1 + this.radius || this.y >= y2 - this.radius) {
+        if (this.y < y1 + this.radius || this.y > y2 - this.radius) {
+            if (this.y < y1 + this.radius)
+                this.y = y1 + this.radius;
+            else {
+                this.y = y2 - this.radius;
+            }
             this.reflect(PI_2);
             isBounce = true;
         }
@@ -192,7 +187,7 @@ var Ball = /** @class */ (function (_super) {
             /* r is ratio of collide difference and ball distance */
             var r = radius2 - ballDistance;
             if (r > 0 && !(obj instanceof Box)) {
-                var tetha = Math.asin(dy / ballDistance); //this.getCollideAngle(obj);
+                var tetha = this.getAngle(dx, dy); //this.getCollideAngle(obj);
                 // console.log("dist=", round(ballDistance), round(Math.atan(dy / dx)));
                 // console.log("xy=", round(this.x), round(this.y), "obj.xy=", obj.getX(), obj.getY());
                 // console.log('dxdy=', round(dx), round(dy), this.color, round(tetha), round(this.dx), round(this.dy));
@@ -311,7 +306,7 @@ function calculate() {
                     collided = false;
                     _a.label = 1;
                 case 1:
-                    if (!true) return [3 /*break*/, 3];
+                    if (!!collided) return [3 /*break*/, 3];
                     // if (ball.isRemoved()) {
                     //     ball.setXY(WIDTH / 3 + Math.random() * 20, 20);
                     //     ball.setRemove(false);
@@ -341,7 +336,7 @@ function calculate() {
                                 ball.remove();
                             }
                         }
-                        ball.bounce(0, 0, WIDTH, HEIGHT);
+                        collided = ball.bounce(0, 0, WIDTH, HEIGHT);
                         ball.move();
                     }
                     paint();

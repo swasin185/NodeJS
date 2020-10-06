@@ -8,8 +8,8 @@ const MID_HEIGHT = cv.height / 2;
 const COLORS = ['magenta', 'cyan', 'blue', 'green', 'yellow', 'orange', 'red'];
 const PI2 = Math.PI * 2;
 const PI_2 = Math.PI / 2;
-const GRAVITY = 0.1;
-const RESISTANCE = 0.6;
+const GRAVITY = 0.5;
+const RESISTANCE = 0.9;
 
 class Sprite {
     protected x: number;              // horizontal position
@@ -75,8 +75,13 @@ class Ball extends Sprite {
         super(x, y, COLORS[Math.floor(Math.random() * COLORS.length)], 30);
     }
     move(): void {
-        this.gravity *= 1.005;
-        this.dy -= this.gravity;
+        if (this.dy > 0 && this.dy <= this.gravity) {
+            this.dy -= this.gravity;
+            this.gravity = GRAVITY;
+        } else {
+            this.dy -= this.gravity;
+            this.gravity *= 1.05;
+        }
         this.speed = Math.sqrt(this.dx * this.dx + this.dy * this.dy);
         this.setDirection(this.getAngle(this.dx, this.dy));
         this.x += this.dx;
@@ -103,7 +108,7 @@ class Ball extends Sprite {
         else
             reflectAngle -= Math.PI;
         this.setDirection(reflectAngle);
-        
+
         this.dx *= RESISTANCE;
         this.dy *= RESISTANCE;
     }
@@ -143,13 +148,11 @@ class Ball extends Sprite {
             /* r is ratio of collide difference and ball distance */
             let r = radius2 - ballDistance;
             if (r > 0 && !(obj instanceof Box)) {
-                let tetha = this.getAngle(dx, dy) //this.getCollideAngle(obj);
-                // console.log("dist=", round(ballDistance), round(Math.atan(dy / dx)));
-                // console.log("xy=", round(this.x), round(this.y), "obj.xy=", obj.getX(), obj.getY());
-                // console.log('dxdy=', round(dx), round(dy), this.color, round(tetha), round(this.dx), round(this.dy));
-                this.x -= r * Math.cos(tetha);
-                this.y += r * Math.sin(tetha);
+                let theta = this.getAngle(dx, dy) //this.getCollideAngle(obj);
+                this.x -= r * Math.cos(theta);
+                this.y += r * Math.sin(theta);
             }
+
             return ballDistance <= radius2;
         } else {
             return false;
@@ -258,7 +261,8 @@ paint();
 // ----------------------------------------------------------------------------
 async function calculate() {
     let collided: boolean = false;
-    while (!collided) {
+    let allSpeed = 1;
+    while (allSpeed > 0) {
         // if (ball.isRemoved()) {
         //     ball.setXY(WIDTH / 3 + Math.random() * 20, 20);
         //     ball.setRemove(false);
@@ -293,8 +297,14 @@ async function calculate() {
             ball.move();
         }
         paint();
-        await new Promise(r => setTimeout(r, 50));
+        await new Promise(r => setTimeout(r, 20));
+        allSpeed = 0;
+        for (let ball of balls) {
+            allSpeed += ball.speed;
+        }
+
     }
+    console.log('STOP');
 }
 
 function paint() {

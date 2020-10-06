@@ -56,8 +56,8 @@ var MID_HEIGHT = cv.height / 2;
 var COLORS = ['magenta', 'cyan', 'blue', 'green', 'yellow', 'orange', 'red'];
 var PI2 = Math.PI * 2;
 var PI_2 = Math.PI / 2;
-var GRAVITY = 0.1;
-var RESISTANCE = 0.6;
+var GRAVITY = 0.5;
+var RESISTANCE = 0.9;
 var Sprite = /** @class */ (function () {
     function Sprite(x, y, color, r) {
         this.radius = 5; // pixel 
@@ -121,8 +121,14 @@ var Ball = /** @class */ (function (_super) {
         return _this;
     }
     Ball.prototype.move = function () {
-        this.gravity *= 1.005;
-        this.dy -= this.gravity;
+        if (this.dy > 0 && this.dy <= this.gravity) {
+            this.dy -= this.gravity;
+            this.gravity = GRAVITY;
+        }
+        else {
+            this.dy -= this.gravity;
+            this.gravity *= 1.05;
+        }
         this.speed = Math.sqrt(this.dx * this.dx + this.dy * this.dy);
         this.setDirection(this.getAngle(this.dx, this.dy));
         this.x += this.dx;
@@ -187,12 +193,9 @@ var Ball = /** @class */ (function (_super) {
             /* r is ratio of collide difference and ball distance */
             var r = radius2 - ballDistance;
             if (r > 0 && !(obj instanceof Box)) {
-                var tetha = this.getAngle(dx, dy); //this.getCollideAngle(obj);
-                // console.log("dist=", round(ballDistance), round(Math.atan(dy / dx)));
-                // console.log("xy=", round(this.x), round(this.y), "obj.xy=", obj.getX(), obj.getY());
-                // console.log('dxdy=', round(dx), round(dy), this.color, round(tetha), round(this.dx), round(this.dy));
-                this.x -= r * Math.cos(tetha);
-                this.y += r * Math.sin(tetha);
+                var theta = this.getAngle(dx, dy); //this.getCollideAngle(obj);
+                this.x -= r * Math.cos(theta);
+                this.y += r * Math.sin(theta);
             }
             return ballDistance <= radius2;
         }
@@ -299,14 +302,15 @@ paint();
 // ----------------------------------------------------------------------------
 function calculate() {
     return __awaiter(this, void 0, void 0, function () {
-        var collided, i, j, _i, balls_1, ball, i;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
+        var collided, allSpeed, i, j, _i, balls_1, ball, i, _a, balls_2, ball;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
                 case 0:
                     collided = false;
-                    _a.label = 1;
+                    allSpeed = 1;
+                    _b.label = 1;
                 case 1:
-                    if (!!collided) return [3 /*break*/, 3];
+                    if (!(allSpeed > 0)) return [3 /*break*/, 3];
                     // if (ball.isRemoved()) {
                     //     ball.setXY(WIDTH / 3 + Math.random() * 20, 20);
                     //     ball.setRemove(false);
@@ -340,11 +344,18 @@ function calculate() {
                         ball.move();
                     }
                     paint();
-                    return [4 /*yield*/, new Promise(function (r) { return setTimeout(r, 50); })];
+                    return [4 /*yield*/, new Promise(function (r) { return setTimeout(r, 20); })];
                 case 2:
-                    _a.sent();
+                    _b.sent();
+                    allSpeed = 0;
+                    for (_a = 0, balls_2 = balls; _a < balls_2.length; _a++) {
+                        ball = balls_2[_a];
+                        allSpeed += ball.speed;
+                    }
                     return [3 /*break*/, 1];
-                case 3: return [2 /*return*/];
+                case 3:
+                    console.log('STOP');
+                    return [2 /*return*/];
             }
         });
     });
@@ -376,8 +387,8 @@ function paint() {
     // for (let i = 0; i < pin_n; i++) {
     //     allPins[i].draw();
     // }
-    for (var _i = 0, balls_2 = balls; _i < balls_2.length; _i++) {
-        var ball = balls_2[_i];
+    for (var _i = 0, balls_3 = balls; _i < balls_3.length; _i++) {
+        var ball = balls_3[_i];
         ball.draw();
     }
 }
@@ -385,8 +396,8 @@ function round(x) {
     return Math.round(x * 1000) / 1000;
 }
 function clickXY(e) {
-    for (var _i = 0, balls_3 = balls; _i < balls_3.length; _i++) {
-        var ball = balls_3[_i];
+    for (var _i = 0, balls_4 = balls; _i < balls_4.length; _i++) {
+        var ball = balls_4[_i];
         if (ball.isClickIn(e.offsetX, e.offsetY))
             console.log(ball);
     }

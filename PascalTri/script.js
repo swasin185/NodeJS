@@ -56,8 +56,8 @@ var MID_HEIGHT = cv.height / 2;
 var COLORS = ['magenta', 'cyan', 'blue', 'green', 'yellow', 'orange', 'red'];
 var PI2 = Math.PI * 2;
 var PI_2 = Math.PI / 2;
-var GRAVITY = 0.5;
-var RESISTANCE = 0.9;
+var GRAVITY = 0.2;
+var RESISTANCE = 0.5;
 var Sprite = /** @class */ (function () {
     function Sprite(x, y, color, r) {
         this.radius = 5; // pixel 
@@ -113,8 +113,8 @@ var Sprite = /** @class */ (function () {
 var Ball = /** @class */ (function (_super) {
     __extends(Ball, _super);
     function Ball(x, y) {
-        var _this = _super.call(this, x, y, COLORS[Math.floor(Math.random() * COLORS.length)], 30) || this;
-        _this.speed = 5; // pixel per frame
+        var _this = _super.call(this, x, y, COLORS[Math.floor(Math.random() * COLORS.length)], 15) || this;
+        _this.speed = 0; // pixel per frame
         _this.direction = 1; // radian
         _this.gravity = GRAVITY;
         _this.removed = false;
@@ -127,7 +127,7 @@ var Ball = /** @class */ (function (_super) {
         }
         else {
             this.dy -= this.gravity;
-            this.gravity *= 1.05;
+            this.gravity *= 1.01;
         }
         this.speed = Math.sqrt(this.dx * this.dx + this.dy * this.dy);
         this.setDirection(this.getAngle(this.dx, this.dy));
@@ -142,7 +142,6 @@ var Ball = /** @class */ (function (_super) {
             this.dy = 0;
         if (this.dx > -1E-4 && this.dx < 1E-4)
             this.dx = 0;
-        // console.log(this.direction, this.dx, this.dy)
     };
     Ball.prototype.setSpeed = function (s) {
         this.speed = s;
@@ -155,8 +154,8 @@ var Ball = /** @class */ (function (_super) {
         else
             reflectAngle -= Math.PI;
         this.setDirection(reflectAngle);
-        this.dx *= RESISTANCE;
-        this.dy *= RESISTANCE;
+        this.dx *= RESISTANCE + Math.random() / 10;
+        this.dy *= RESISTANCE + Math.random() / 10;
     };
     Ball.prototype.getCollideAngle = function (obj) {
         var dx = obj.getX() - this.x;
@@ -250,21 +249,10 @@ var allPins = new Array((n * n + n) / 2);
 var pin_n = 0;
 var boxs = new Array(n);
 var balls = new Array(0);
-balls[0] = new Ball(WIDTH * 3.2 / 7, 124);
-balls[0].setSpeed(1);
+balls[0] = new Ball(WIDTH / 2.02, 16);
 balls[0].setDirection(0);
-balls[1] = new Ball(WIDTH * 3.8 / 7, 128);
-balls[1].setSpeed(1);
+balls[1] = new Ball(WIDTH / 2.01, 50);
 balls[1].setDirection(Math.PI);
-balls[2] = new Ball(WIDTH * 6.6 / 7, 45);
-balls[2].setSpeed(1);
-balls[2].setDirection(-Math.PI / 4);
-balls[3] = new Ball(WIDTH * 0.3 / 7, 150);
-balls[3].setSpeed(1);
-balls[3].setDirection(Math.PI * 3 / 4);
-balls[4] = new Ball(WIDTH * 0.5 / 7, HEIGHT * 8 / 10);
-balls[4].setSpeed(1);
-balls[4].setDirection(-PI_2);
 // for (let i = 2; i < 5; i++) {
 //     balls[i] = new Ball(Math.random() * WIDTH, Math.random() * HEIGHT);
 //     balls[i].setSpeed(Math.random() * 3);
@@ -302,13 +290,13 @@ paint();
 // ----------------------------------------------------------------------------
 function calculate() {
     return __awaiter(this, void 0, void 0, function () {
-        var collided, allSpeed, i, j, _i, balls_1, ball, i, _a, balls_2, ball;
-        return __generator(this, function (_b) {
-            switch (_b.label) {
+        var collided, allSpeed, _i, balls_1, ball, i, i, j, _a, balls_2, ball, i, _b, balls_3, ball;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
                 case 0:
                     collided = false;
                     allSpeed = 1;
-                    _b.label = 1;
+                    _c.label = 1;
                 case 1:
                     if (!(allSpeed > 0)) return [3 /*break*/, 3];
                     // if (ball.isRemoved()) {
@@ -316,13 +304,15 @@ function calculate() {
                     //     ball.setRemove(false);
                     // }
                     collided = false;
-                    // for (let ball of balls)
-                    //     for (let i = 0; i < pin_n; i++) {
-                    //         if (ball.isCollided(allPins[i])) {
-                    //             collided = true;
-                    //             ball.reflect(ball.getCollideAngle(allPins[i]));
-                    //         }
-                    //     }
+                    for (_i = 0, balls_1 = balls; _i < balls_1.length; _i++) {
+                        ball = balls_1[_i];
+                        for (i = 0; i < pin_n; i++) {
+                            if (ball.isCollided(allPins[i])) {
+                                collided = true;
+                                ball.reflect(ball.getCollideAngle(allPins[i]));
+                            }
+                        }
+                    }
                     for (i = 0; i < (balls.length - 1); i++) {
                         for (j = i + 1; j < balls.length; j++) {
                             if (balls[i].isCollided(balls[j])) {
@@ -332,8 +322,8 @@ function calculate() {
                             }
                         }
                     }
-                    for (_i = 0, balls_1 = balls; _i < balls_1.length; _i++) {
-                        ball = balls_1[_i];
+                    for (_a = 0, balls_2 = balls; _a < balls_2.length; _a++) {
+                        ball = balls_2[_a];
                         for (i = 0; i < n && !ball.isRemoved(); i++) {
                             if (ball.isCollided(boxs[i])) {
                                 boxs[i].countBall();
@@ -344,12 +334,12 @@ function calculate() {
                         ball.move();
                     }
                     paint();
-                    return [4 /*yield*/, new Promise(function (r) { return setTimeout(r, 20); })];
+                    return [4 /*yield*/, new Promise(function (r) { return setTimeout(r, 10); })];
                 case 2:
-                    _b.sent();
+                    _c.sent();
                     allSpeed = 0;
-                    for (_a = 0, balls_2 = balls; _a < balls_2.length; _a++) {
-                        ball = balls_2[_a];
+                    for (_b = 0, balls_3 = balls; _b < balls_3.length; _b++) {
+                        ball = balls_3[_b];
                         allSpeed += ball.speed;
                     }
                     return [3 /*break*/, 1];
@@ -370,25 +360,25 @@ function paint() {
     var mid = size / 2;
     for (var i = 0; i < n; i++) {
         boxs[i].draw();
-        // x = MID_WIDTH - (i * mid);
-        // for (let j = 0; j <= i; j++) {
-        //     cx.beginPath();
-        //     cx.moveTo(x - mid, y + size);
-        //     // cx.lineTo(x - mid, y + mid - 5);
-        //     cx.lineTo(x, y);
-        //     cx.moveTo(x + mid, y + size);
-        //     // cx.lineTo(x + mid, y + mid - 5);
-        //     cx.lineTo(x, y);
-        //     cx.stroke();
-        //     x += size;
-        // }
-        // y += size;
+        x = MID_WIDTH - (i * mid);
+        for (var j = 0; j <= i; j++) {
+            cx.beginPath();
+            cx.moveTo(x - mid, y + size);
+            // cx.lineTo(x - mid, y + mid - 5);
+            cx.lineTo(x, y);
+            cx.moveTo(x + mid, y + size);
+            // cx.lineTo(x + mid, y + mid - 5);
+            cx.lineTo(x, y);
+            cx.stroke();
+            x += size;
+        }
+        y += size;
     }
-    // for (let i = 0; i < pin_n; i++) {
-    //     allPins[i].draw();
-    // }
-    for (var _i = 0, balls_3 = balls; _i < balls_3.length; _i++) {
-        var ball = balls_3[_i];
+    for (var i = 0; i < pin_n; i++) {
+        allPins[i].draw();
+    }
+    for (var _i = 0, balls_4 = balls; _i < balls_4.length; _i++) {
+        var ball = balls_4[_i];
         ball.draw();
     }
 }
@@ -396,8 +386,8 @@ function round(x) {
     return Math.round(x * 1000) / 1000;
 }
 function clickXY(e) {
-    for (var _i = 0, balls_4 = balls; _i < balls_4.length; _i++) {
-        var ball = balls_4[_i];
+    for (var _i = 0, balls_5 = balls; _i < balls_5.length; _i++) {
+        var ball = balls_5[_i];
         if (ball.isClickIn(e.offsetX, e.offsetY))
             console.log(ball);
     }

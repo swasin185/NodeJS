@@ -8,8 +8,8 @@ const MID_HEIGHT = cv.height / 2;
 const COLORS = ['magenta', 'cyan', 'blue', 'green', 'yellow', 'orange', 'red'];
 const PI2 = Math.PI * 2;
 const PI_2 = Math.PI / 2;
-const GRAVITY = 0.5;
-const RESISTANCE = 0.9;
+const GRAVITY = 0.2;
+const RESISTANCE = 0.5;
 
 class Sprite {
     protected x: number;              // horizontal position
@@ -67,12 +67,12 @@ class Sprite {
 class Ball extends Sprite {
     dx: number;
     dy: number;
-    speed: number = 5;      // pixel per frame
+    speed: number = 0;      // pixel per frame
     direction: number = 1;  // radian
     gravity = GRAVITY;
     removed: boolean = false;
     constructor(x: number, y: number) {
-        super(x, y, COLORS[Math.floor(Math.random() * COLORS.length)], 30);
+        super(x, y, COLORS[Math.floor(Math.random() * COLORS.length)], 15);
     }
     move(): void {
         if (this.dy > 0 && this.dy <= this.gravity) {
@@ -80,7 +80,7 @@ class Ball extends Sprite {
             this.gravity = GRAVITY;
         } else {
             this.dy -= this.gravity;
-            this.gravity *= 1.05;
+            this.gravity *= 1.01;
         }
         this.speed = Math.sqrt(this.dx * this.dx + this.dy * this.dy);
         this.setDirection(this.getAngle(this.dx, this.dy));
@@ -95,7 +95,6 @@ class Ball extends Sprite {
             this.dy = 0;
         if (this.dx > -1E-4 && this.dx < 1E-4)
             this.dx = 0;
-        // console.log(this.direction, this.dx, this.dy)
     }
     setSpeed(s: number): void {
         this.speed = s;
@@ -109,8 +108,8 @@ class Ball extends Sprite {
             reflectAngle -= Math.PI;
         this.setDirection(reflectAngle);
 
-        this.dx *= RESISTANCE;
-        this.dy *= RESISTANCE;
+        this.dx *= RESISTANCE + Math.random() / 10;
+        this.dy *= RESISTANCE + Math.random() / 10;
     }
     getCollideAngle(obj: Sprite): number {
         let dx = obj.getX() - this.x;
@@ -206,21 +205,10 @@ var pin_n: number = 0;
 var boxs: Box[] = new Array(n);
 var balls: Ball[] = new Array(0);
 
-balls[0] = new Ball(WIDTH * 3.2 / 7, 124);
-balls[0].setSpeed(1);
+balls[0] = new Ball(WIDTH / 2.02, 16);
 balls[0].setDirection(0);
-balls[1] = new Ball(WIDTH * 3.8 / 7, 128);
-balls[1].setSpeed(1);
+balls[1] = new Ball(WIDTH / 2.01, 50);
 balls[1].setDirection(Math.PI);
-balls[2] = new Ball(WIDTH * 6.6 / 7, 45);
-balls[2].setSpeed(1);
-balls[2].setDirection(-Math.PI / 4);
-balls[3] = new Ball(WIDTH * 0.3 / 7, 150);
-balls[3].setSpeed(1);
-balls[3].setDirection(Math.PI * 3 / 4);
-balls[4] = new Ball(WIDTH * 0.5 / 7, HEIGHT * 8 / 10);
-balls[4].setSpeed(1);
-balls[4].setDirection(-PI_2);
 // for (let i = 2; i < 5; i++) {
 //     balls[i] = new Ball(Math.random() * WIDTH, Math.random() * HEIGHT);
 //     balls[i].setSpeed(Math.random() * 3);
@@ -268,13 +256,13 @@ async function calculate() {
         //     ball.setRemove(false);
         // }
         collided = false;
-        // for (let ball of balls)
-        //     for (let i = 0; i < pin_n; i++) {
-        //         if (ball.isCollided(allPins[i])) {
-        //             collided = true;
-        //             ball.reflect(ball.getCollideAngle(allPins[i]));
-        //         }
-        //     }
+        for (let ball of balls)
+            for (let i = 0; i < pin_n; i++) {
+                if (ball.isCollided(allPins[i])) {
+                    collided = true;
+                    ball.reflect(ball.getCollideAngle(allPins[i]));
+                }
+            }
 
         for (let i = 0; i < (balls.length - 1); i++) {
             for (let j = i + 1; j < balls.length; j++) {
@@ -297,7 +285,7 @@ async function calculate() {
             ball.move();
         }
         paint();
-        await new Promise(r => setTimeout(r, 20));
+        await new Promise(r => setTimeout(r, 10));
         allSpeed = 0;
         for (let ball of balls) {
             allSpeed += ball.speed;
@@ -318,23 +306,23 @@ function paint() {
 
     for (let i = 0; i < n; i++) {
         boxs[i].draw();
-        // x = MID_WIDTH - (i * mid);
-        // for (let j = 0; j <= i; j++) {
-        //     cx.beginPath();
-        //     cx.moveTo(x - mid, y + size);
-        //     // cx.lineTo(x - mid, y + mid - 5);
-        //     cx.lineTo(x, y);
-        //     cx.moveTo(x + mid, y + size);
-        //     // cx.lineTo(x + mid, y + mid - 5);
-        //     cx.lineTo(x, y);
-        //     cx.stroke();
-        //     x += size;
-        // }
-        // y += size;
+        x = MID_WIDTH - (i * mid);
+        for (let j = 0; j <= i; j++) {
+            cx.beginPath();
+            cx.moveTo(x - mid, y + size);
+            // cx.lineTo(x - mid, y + mid - 5);
+            cx.lineTo(x, y);
+            cx.moveTo(x + mid, y + size);
+            // cx.lineTo(x + mid, y + mid - 5);
+            cx.lineTo(x, y);
+            cx.stroke();
+            x += size;
+        }
+        y += size;
     }
-    // for (let i = 0; i < pin_n; i++) {
-    //     allPins[i].draw();
-    // }
+    for (let i = 0; i < pin_n; i++) {
+        allPins[i].draw();
+    }
     for (let ball of balls)
         ball.draw();
 }

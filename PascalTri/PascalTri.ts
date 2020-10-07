@@ -5,10 +5,10 @@ const HEIGHT = cv.height;
 const MID_WIDTH = cv.width / 2;
 const MID_HEIGHT = cv.height / 2;
 
-const COLORS = ['magenta', 'cyan', 'blue', 'green', 'yellow', 'orange', 'red'];
+const COLORS = ['magenta', 'cyan', 'red', 'lime', 'yellow', 'orange', 'blue'];
 const PI2 = Math.PI * 2;
 const PI_2 = Math.PI / 2;
-const GRAVITY = 0.2;
+const GRAVITY = 0.1;
 const RESISTANCE = 0.6;
 
 class Sprite {
@@ -65,15 +65,16 @@ class Sprite {
 }
 
 class Ball extends Sprite {
-    dx: number;
-    dy: number;
-    speed: number = 0;      // pixel per frame
-    direction: number = 0;  // radian
-    gravity = GRAVITY;
-    removed: boolean = false;
+    private static ID = 0;
+    private dx: number;
+    private dy: number;
+    private speed: number = 0;     
+    private direction: number = 0; 
+    private gravity = GRAVITY;
+    private removed: boolean = false;
     constructor(x: number, y: number) {
-        super(x, y, COLORS[Math.floor(Math.random() * COLORS.length)], 15);
-        this.removed = true;
+        super(x, y, COLORS[Ball.ID % 7], 12);
+        Ball.ID++;
         this.setDirection(this.direction);
     }
     move(): void {
@@ -173,27 +174,27 @@ class Ball extends Sprite {
 
 class Pin extends Sprite {
     constructor(x: number, y: number) {
-        super(x, y, 'yellow', 3);
+        super(x, y, COLORS[Math.floor(Math.random() * COLORS.length)], 3);
     }
 }
 
 class Box extends Sprite {
-    static ID = 1;
-    id: number = Box.ID++;
-    size: number;
-    count: number = 0;
+    private static ID = 0;
+    private id: number = Box.ID++;
+    private size: number;
+    private count: number = 0;
     constructor(x: number, y: number) {
-        super(x, y, 'grey', 25);
+        super(x, y, 'black', 25);
         this.size = this.radius * 2;
     }
     draw(): void {
-        cx.fillStyle = this.color;
-        cx.strokeStyle = 'yellow';
-        cx.fillRect(this.x - this.radius, this.y, this.size, this.size);
-        cx.strokeRect(this.x - this.radius, this.y, this.size, this.size);
+        // cx.fillStyle = this.color;
+        cx.strokeStyle = 'lime';
+        // cx.fillRect(this.x - this.radius, this.y, this.size, this.size);
+        // cx.strokeRect(this.x - this.radius, this.y, this.size, this.size);
         cx.strokeText(String(this.count), this.x - 10, this.y + this.radius + 5);
-        cx.strokeStyle = 'black';
-        cx.strokeText(String(this.id), this.x - 10, this.y + this.radius * 3);
+        // cx.strokeStyle = 'yellow';
+        // cx.strokeText(String(this.id), this.x - 10, this.y + this.radius * 3);
     }
     countBall(): void {
         this.count++;
@@ -202,12 +203,10 @@ class Box extends Sprite {
 
 // ประกาศตัวแปร Global 
 // ----------------------------------------------------------------------------
-const txtRunTime = document.getElementById("runTime") as HTMLLabelElement;
-
 // var imgData = cx.createImageData(WIDTH, HEIGHT); // width x height
 // var data = imgData.data;
 
-var n = 15;
+var n = 16;
 var allPins: Pin[] = new Array((n * n + n) / 2);
 var pin_n: number = 0;
 var boxs: Box[] = new Array(n);
@@ -222,14 +221,14 @@ var balls: Ball[] = new Array(0);
 
 // การทำงานเริ่มต้น
 // ----------------------------------------------------------------------------
-let size = 50;
+let size = 45;
 let mid = size / 2;
 let x = MID_WIDTH;
-let y = 40;
+let y = 20;
 size *= Math.sqrt(3) / 2;
 let six = mid / Math.cos(Math.PI / 6);
 
-//allPins[pin_n++] = new Pin(x, y);
+allPins[pin_n++] = new Pin(x, y);
 for (let i = 0; i < n; i++) {
     let x = MID_WIDTH - (i * mid);
     allPins[pin_n++] = new Pin(x - mid, y + size);
@@ -264,15 +263,13 @@ async function calculate() {
             resetBall = false;
             for (let i = 0; i < balls.length && !resetBall; i++) {
                 if (balls[i].isRemoved()) {
-                    console.log(balls[i].isRemoved(), balls[i].removed, balls[i]);
                     resetBall = true;
-                    balls[i].setXY(MID_WIDTH, 70);
+                    balls[i].setXY(MID_WIDTH, 50);
                     balls[i].setRemove(false);
                 }
             }
             if (!resetBall) {
                 balls[balls.length] = new Ball(MID_WIDTH, 50);
-                console.log('new Ball', balls[balls.length - 1])
             }
         }
         for (let ball of balls)
@@ -302,15 +299,15 @@ async function calculate() {
             ball.move();
         }
         paint();
-        await new Promise(r => setTimeout(r, 20));
+        await new Promise(r => setTimeout(r, 5));
     }
 }
 
 function paint() {
     cx.clearRect(0, 0, cv.width, cv.height);
     let x = MID_WIDTH;
-    let y = 40;
-    let size = 50;
+    let y = 20;
+    let size = 45;
     cx.shadowBlur = 10;
     cx.shadowColor = 'blue';
 
@@ -319,26 +316,27 @@ function paint() {
     let six = mid / Math.cos(Math.PI / 6);
     for (let i = 0; i < n; i++) {
         boxs[i].draw();
-        x = MID_WIDTH - (i * mid);
-        for (let j = 0; j <= i; j++) {
-            cx.strokeStyle = 'grey';
-            cx.beginPath();
-            cx.moveTo(x - mid, y + size);
-            cx.lineTo(x - mid, y + size - six);
-            cx.lineTo(x, y);
-            cx.moveTo(x + mid, y + size);
-            cx.lineTo(x + mid, y + size - six);
-            cx.lineTo(x, y);
-            cx.stroke();
-            x += mid * 2;
-        }
-        y += size;
+        // x = MID_WIDTH - (i * mid);
+        // for (let j = 0; j <= i; j++) {
+        //     cx.strokeStyle = 'grey';
+        //     cx.beginPath();
+        //     cx.moveTo(x - mid, y + size);
+        //     cx.lineTo(x - mid, y + size - six);
+        //     cx.lineTo(x, y);
+        //     cx.moveTo(x + mid, y + size);
+        //     cx.lineTo(x + mid, y + size - six);
+        //     cx.lineTo(x, y);
+        //     cx.stroke();
+        //     x += mid * 2;
+        // }
+        // y += size;
     }
-    for (let i = 0; i < pin_n; i++) {
-        allPins[i].draw();
-    }
+    // for (let i = 0; i < pin_n; i++) {
+    //     allPins[i].draw();
+    // }
     for (let ball of balls)
-        ball.draw();
+        if (!ball.isRemoved())
+            ball.draw();
 }
 
 function round(x: number): number {
@@ -350,5 +348,4 @@ function clickXY(e: MouseEvent) {
         if (ball.isClickIn(e.offsetX, e.offsetY))
             console.log(ball);
     }
-
 }

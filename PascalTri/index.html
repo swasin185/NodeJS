@@ -5,30 +5,14 @@
 	<meta charset="UTF-8">
 	<title>Pascal's Triangle</title>
 </head>
+<body bgcolor="#221133">
+	<center>
+		<h1>Pascal's Triangle</h1>
+		<canvas id="cpxCanvas"; width="800"; height="800"; style="border:1px solid #FFFFFF; background-image: url('./background.jpg');"
+			onclick="clickXY(event);"></canvas>
 
-<body bgcolor="darkgrey">
-	<table style="border:1; padding:0px;">
-		<tr>
-			<td width="500" style="vertical-align: top; padding:50px;">
-				<h1>Pascal's Triangle</h1>
-				<hr>
-				<input type="button" value="Calculate" onclick="calculate()"></input>
-				<!-- <label id="runTime"> run time = </label> -->
-				<hr>
-				<table>
-					<tr>
-						<!-- <td>Board Size :</td>
-						<td><input id="boardSize" type="text" value="10"
-								style="width: 120px; text-align: right;"></input></td> -->
-					</tr>
-				</table>
-			</td>
-			<td><canvas id="cpxCanvas" width="800" height="800" style="border:1px solid #000000;"
-					onclick="clickXY(event);"></canvas>
-			</td>
-		</tr>
-	</table>
-	<script src="script.js"></script>
+	</center>
 </body>
+<script src="script.js"></script>
 
 </html>

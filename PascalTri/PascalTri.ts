@@ -9,7 +9,7 @@ const COLORS = ['magenta', 'cyan', 'red', 'lime', 'yellow', 'orange', 'blue'];
 const PI2 = Math.PI * 2;
 const PI_2 = Math.PI / 2;
 const GRAVITY = 0.1;
-const RESISTANCE = 0.6;
+const RESISTANCE = 0.6666;
 
 class Sprite {
     protected x: number;              // horizontal position
@@ -113,7 +113,7 @@ class Ball extends Sprite {
         if (this.dx != 0)
             this.dx *= RESISTANCE + Math.random() / 10;
         else
-            this.dx = Math.random() / 10 - 0.05;
+            this.dx = Math.random() - 0.5; // ถ้าตกลงมาแนวดิ่งด้วยมุม +Pi/2 -Pi/2 ให้เบี่ยงออกซ้ายขวา + - 0.5
         this.dy *= RESISTANCE + Math.random() / 10;
     }
     getCollideAngle(obj: Sprite): number {
@@ -211,6 +211,7 @@ var allPins: Pin[] = new Array((n * n + n) / 2);
 var pin_n: number = 0;
 var boxs: Box[] = new Array(n);
 var balls: Ball[] = new Array(0);
+var gun : Box = new Box(MID_WIDTH / 10, 10);
 
 
 // for (let i = 2; i < 5; i++) {
@@ -254,7 +255,7 @@ calculate();
 async function calculate() {
     let resetBall: boolean = false;
     let nearBall: boolean = true;
-    let nearArea: number = MID_HEIGHT / 2
+    let nearArea: number = HEIGHT / 6
     while (true) {
         nearBall = false;
         for (let i = 0; i < balls.length && !nearBall; i++) 
@@ -266,10 +267,12 @@ async function calculate() {
                     resetBall = true;
                     balls[i].setXY(MID_WIDTH, 50);
                     balls[i].setRemove(false);
+                    gun.countBall();
                 }
             }
             if (!resetBall) {
                 balls[balls.length] = new Ball(MID_WIDTH, 50);
+                gun.countBall();
             }
         }
         for (let ball of balls)
@@ -299,7 +302,7 @@ async function calculate() {
             ball.move();
         }
         paint();
-        await new Promise(r => setTimeout(r, 5));
+        await new Promise(r => setTimeout(r, 8));
     }
 }
 
@@ -338,6 +341,7 @@ function paint() {
     // for (let i = 0; i < pin_n; i++) {
     //     allPins[i].draw();
     // }
+    gun.draw();
     for (let i = 0; i < n; i++)
         boxs[i].draw();
     for (let ball of balls)

@@ -68,8 +68,8 @@ class Ball extends Sprite {
     private static ID = 0;
     private dx: number;
     private dy: number;
-    private speed: number = 0;     
-    private direction: number = 0; 
+    private speed: number = 0;
+    private direction: number = 0;
     private gravity = GRAVITY;
     private removed: boolean = false;
     constructor(x: number, y: number) {
@@ -192,7 +192,7 @@ class Box extends Sprite {
         cx.strokeStyle = 'lime';
         // cx.fillRect(this.x - this.radius, this.y, this.size, this.size);
         // cx.strokeRect(this.x - this.radius, this.y, this.size, this.size);
-        cx.strokeText(String(this.count), this.x - 10, this.y + this.radius + 5);
+        cx.strokeText(String(this.count), this.x - 10, this.y + this.radius);
         // cx.strokeStyle = 'yellow';
         // cx.strokeText(String(this.id), this.x - 10, this.y + this.radius * 3);
     }
@@ -240,7 +240,7 @@ for (let i = 0; i < n; i++) {
     allPins[pin_n++] = new Pin(x - mid, y + size - six);
     y += size;
 }
-y += mid;
+y += six;
 x = MID_WIDTH - (n * mid - mid);
 for (let i = 0; i < n; i++) {
     boxs[i] = new Box(x, y);
@@ -254,11 +254,11 @@ calculate();
 async function calculate() {
     let resetBall: boolean = false;
     let nearBall: boolean = true;
+    let nearArea: number = MID_HEIGHT / 2
     while (true) {
         nearBall = false;
-        for (let i = 0; i < balls.length && !nearBall; i++) {
-            nearBall = balls[i].getY() < MID_HEIGHT / 2;
-        }
+        for (let i = 0; i < balls.length && !nearBall; i++) 
+            nearBall = balls[i].getY() < nearArea;
         if (!nearBall) {
             resetBall = false;
             for (let i = 0; i < balls.length && !resetBall; i++) {
@@ -303,8 +303,7 @@ async function calculate() {
     }
 }
 
-function paint() {
-    cx.clearRect(0, 0, cv.width, cv.height);
+function paintLine() {
     let x = MID_WIDTH;
     let y = 20;
     let size = 45;
@@ -315,25 +314,32 @@ function paint() {
     size *= Math.sqrt(3) / 2;
     let six = mid / Math.cos(Math.PI / 6);
     for (let i = 0; i < n; i++) {
-        boxs[i].draw();
-        // x = MID_WIDTH - (i * mid);
-        // for (let j = 0; j <= i; j++) {
-        //     cx.strokeStyle = 'grey';
-        //     cx.beginPath();
-        //     cx.moveTo(x - mid, y + size);
-        //     cx.lineTo(x - mid, y + size - six);
-        //     cx.lineTo(x, y);
-        //     cx.moveTo(x + mid, y + size);
-        //     cx.lineTo(x + mid, y + size - six);
-        //     cx.lineTo(x, y);
-        //     cx.stroke();
-        //     x += mid * 2;
-        // }
-        // y += size;
+        x = MID_WIDTH - (i * mid);
+        for (let j = 0; j <= i; j++) {
+            cx.strokeStyle = 'grey';
+            cx.beginPath();
+            cx.moveTo(x - mid, y + size);
+            cx.lineTo(x - mid, y + size - six);
+            cx.lineTo(x, y);
+            cx.moveTo(x + mid, y + size);
+            cx.lineTo(x + mid, y + size - six);
+            cx.lineTo(x, y);
+            cx.stroke();
+            x += mid * 2;
+        }
+        y += size;
     }
+
+}
+
+function paint() {
+    cx.clearRect(0, 0, cv.width, cv.height);
+    // paintLine();
     // for (let i = 0; i < pin_n; i++) {
     //     allPins[i].draw();
     // }
+    for (let i = 0; i < n; i++)
+        boxs[i].draw();
     for (let ball of balls)
         if (!ball.isRemoved())
             ball.draw();

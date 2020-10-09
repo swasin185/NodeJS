@@ -90,6 +90,7 @@ function calculate() {
     center_image = Number(boxImage.value);
     center = new ComplexNumber(center_real, center_image);
 
+    let frontier = 2;
     let C: ComplexNumber;
     let Zn: ComplexNumber;
     let im: number;
@@ -101,12 +102,12 @@ function calculate() {
         for (let x = 0; x < WIDTH; x++) {
             re = Math.round((x - MID_WIDTH) * boundary / WIDTH * ComplexNumber.PRECISION) / ComplexNumber.PRECISION + center_real;
             C = new ComplexNumber(re, im);
-            //  C.add(center);
+            //C.add(center);
             let re0 = C.getReal();
             let im0 = C.getImage();
             Zn = new ComplexNumber(re0, im0);
             n = 1;
-            while (n < MAX_N && Zn.absolute() < Math.PI) {
+            while (n < MAX_N && Zn.absolute() < frontier) {
                 Zn.power2();
                 Zn.add(C);
                 if (Zn.getReal() == re0 && Zn.getImage() == im0)

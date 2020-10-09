@@ -7,9 +7,10 @@ const MID_HEIGHT = cv.height / 2;
 
 const COLORS = ['magenta', 'cyan', 'red', 'lime', 'yellow', 'orange', 'blue'];
 const PI2 = Math.PI * 2;
-const PI_2 = Math.PI / 2;
-const GRAVITY = 0.1;
-const RESISTANCE = 0.6666;
+const PI_2 = Math.PI / 2
+const GRAVITY = 0.2;
+const RESISTANCE = 0.5;
+const n = 16;
 
 class Sprite {
     protected x: number;              // horizontal position
@@ -72,8 +73,10 @@ class Ball extends Sprite {
     private direction: number = 0;
     private gravity = GRAVITY;
     private removed: boolean = false;
+    private path: boolean[] = new Array(n * n + n);
+
     constructor(x: number, y: number) {
-        super(x, y, COLORS[Ball.ID % 7], 12);
+        super(x, y, COLORS[Ball.ID % 7], 13);
         Ball.ID++;
         this.setDirection(this.direction);
     }
@@ -163,12 +166,26 @@ class Ball extends Sprite {
     }
     remove(): void {
         this.removed = true;
+        this.path.fill(false);
     }
     isRemoved(): boolean {
         return this.removed;
     }
     setRemove(r: boolean): void {
         this.removed = r;
+    }
+
+    countPathBox(boxs: Box[]) {
+        if (!this.isRemoved()) {
+            let cnt = false
+            for (let i = 0; i < boxs.length && !cnt; i++) {
+                cnt = this.isClickIn(boxs[i].getX(), boxs[i].getY()) && !this.path[i];
+                if (cnt) {
+                    this.path[i] = true;
+                    boxs[i].countBall();
+                }
+            }
+        }
     }
 }
 
@@ -184,7 +201,7 @@ class Box extends Sprite {
     private size: number;
     private count: number = 0;
     constructor(x: number, y: number) {
-        super(x, y, 'black', 25);
+        super(x, y, 'black', 5);
         this.size = this.radius * 2;
     }
     draw(): void {
@@ -192,7 +209,7 @@ class Box extends Sprite {
         cx.strokeStyle = 'lime';
         // cx.fillRect(this.x - this.radius, this.y, this.size, this.size);
         // cx.strokeRect(this.x - this.radius, this.y, this.size, this.size);
-        cx.strokeText(String(this.count), this.x - 10, this.y + this.radius);
+        cx.strokeText(String(this.count), this.x - Math.log10(this.count) * 4, this.y);
         // cx.strokeStyle = 'yellow';
         // cx.strokeText(String(this.id), this.x - 10, this.y + this.radius * 3);
     }
@@ -206,13 +223,10 @@ class Box extends Sprite {
 // var imgData = cx.createImageData(WIDTH, HEIGHT); // width x height
 // var data = imgData.data;
 
-var n = 16;
 var allPins: Pin[] = new Array((n * n + n) / 2);
 var pin_n: number = 0;
 var boxs: Box[] = new Array(n);
 var balls: Ball[] = new Array(0);
-var gun : Box = new Box(MID_WIDTH / 10, 10);
-
 
 // for (let i = 2; i < 5; i++) {
 //     balls[i] = new Ball(Math.random() * WIDTH, Math.random() * HEIGHT);
@@ -230,23 +244,25 @@ size *= Math.sqrt(3) / 2;
 let six = mid / Math.cos(Math.PI / 6);
 
 allPins[pin_n++] = new Pin(x, y);
+let bx = 0;
 for (let i = 0; i < n; i++) {
     let x = MID_WIDTH - (i * mid);
     allPins[pin_n++] = new Pin(x - mid, y + size);
     allPins[pin_n++] = new Pin(x - mid, y + size - six);
     for (let j = 0; j <= i; j++) {
+        boxs[bx++] = new Box(x, y + size);
         allPins[pin_n++] = new Pin(x + mid, y + size);
         x += mid * 2;
     }
     allPins[pin_n++] = new Pin(x - mid, y + size - six);
     y += size;
 }
-y += six;
-x = MID_WIDTH - (n * mid - mid);
-for (let i = 0; i < n; i++) {
-    boxs[i] = new Box(x, y);
-    x += mid * 2;
-}
+//y += six;
+// x = MID_WIDTH - (n * mid - mid);
+// for (let i = 0; i < n; i++) {
+//     boxs[i] = new Box(x, y);
+//     x += mid * 2;
+// }
 
 paint();
 calculate();
@@ -255,24 +271,23 @@ calculate();
 async function calculate() {
     let resetBall: boolean = false;
     let nearBall: boolean = true;
-    let nearArea: number = HEIGHT / 6
+    let nearArea: number = HEIGHT / 4
+    let floor: number = HEIGHT - 150;
     while (true) {
         nearBall = false;
-        for (let i = 0; i < balls.length && !nearBall; i++) 
+        for (let i = 0; i < balls.length && !nearBall; i++)
             nearBall = balls[i].getY() < nearArea;
         if (!nearBall) {
             resetBall = false;
             for (let i = 0; i < balls.length && !resetBall; i++) {
                 if (balls[i].isRemoved()) {
                     resetBall = true;
-                    balls[i].setXY(MID_WIDTH, 50);
+                    balls[i].setXY(MID_WIDTH + Math.random() * 2 - 1, 50);
                     balls[i].setRemove(false);
-                    gun.countBall();
                 }
             }
             if (!resetBall) {
                 balls[balls.length] = new Ball(MID_WIDTH, 50);
-                gun.countBall();
             }
         }
         for (let ball of balls)
@@ -284,7 +299,7 @@ async function calculate() {
 
         for (let i = 0; i < (balls.length - 1); i++) {
             for (let j = i + 1; j < balls.length; j++) {
-                if (balls[i].isCollided(balls[j])) {
+                if (!balls[i].isRemoved() && !balls[j].isRemoved() && balls[i].isCollided(balls[j])) {
                     balls[i].reflect(balls[i].getCollideAngle(balls[j]));
                     balls[j].reflect(balls[j].getCollideAngle(balls[i]));
                 }
@@ -292,17 +307,16 @@ async function calculate() {
         }
 
         for (let ball of balls) {
-            for (let i = 0; i < n && !ball.isRemoved(); i++) {
-                if (ball.isCollided(boxs[i])) {
-                    boxs[i].countBall();
+            ball.countPathBox(boxs);
+            if (!ball.isRemoved()) {
+                ball.bounce(0, 0, WIDTH, HEIGHT);
+                ball.move();
+                if (ball.getY() > floor) 
                     ball.remove();
-                }
             }
-            ball.bounce(0, 0, WIDTH, HEIGHT);
-            ball.move();
         }
         paint();
-        await new Promise(r => setTimeout(r, 8));
+        await new Promise(r => setTimeout(r, 5));
     }
 }
 
@@ -341,9 +355,8 @@ function paint() {
     // for (let i = 0; i < pin_n; i++) {
     //     allPins[i].draw();
     // }
-    gun.draw();
-    for (let i = 0; i < n; i++)
-        boxs[i].draw();
+    for (let box of boxs)
+        box.draw();
     for (let ball of balls)
         if (!ball.isRemoved())
             ball.draw();

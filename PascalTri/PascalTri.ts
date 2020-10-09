@@ -8,8 +8,8 @@ const MID_HEIGHT = cv.height / 2;
 const COLORS = ['magenta', 'cyan', 'red', 'lime', 'yellow', 'orange', 'blue'];
 const PI2 = Math.PI * 2;
 const PI_2 = Math.PI / 2
-const GRAVITY = 0.2;
-const RESISTANCE = 0.5;
+const GRAVITY = 0.1;
+const RESISTANCE = 0.6;
 const n = 16;
 
 class Sprite {
@@ -76,7 +76,7 @@ class Ball extends Sprite {
     private path: boolean[] = new Array(n * n + n);
 
     constructor(x: number, y: number) {
-        super(x, y, COLORS[Ball.ID % 7], 13);
+        super(x, y, COLORS[Ball.ID % 7], 15);
         Ball.ID++;
         this.setDirection(this.direction);
     }
@@ -89,6 +89,8 @@ class Ball extends Sprite {
             this.gravity *= 1.01;
         }
         this.speed = Math.sqrt(this.dx * this.dx + this.dy * this.dy);
+        if (this.speed < 0.001)
+            this.gravity = GRAVITY;
         this.setDirection(this.getAngle(this.dx, this.dy));
         this.x += this.dx;
         this.y -= this.dy;
@@ -116,7 +118,7 @@ class Ball extends Sprite {
         if (this.dx != 0)
             this.dx *= RESISTANCE + Math.random() / 10;
         else
-            this.dx = Math.random() - 0.5; // ถ้าตกลงมาแนวดิ่งด้วยมุม +Pi/2 -Pi/2 ให้เบี่ยงออกซ้ายขวา + - 0.5
+            this.dx = Math.random() * 2 - 1; // ถ้าตกลงมาแนวดิ่งด้วยมุม +Pi/2 -Pi/2 ให้เบี่ยงออกซ้ายขวา +-1
         this.dy *= RESISTANCE + Math.random() / 10;
     }
     getCollideAngle(obj: Sprite): number {
@@ -271,7 +273,7 @@ calculate();
 async function calculate() {
     let resetBall: boolean = false;
     let nearBall: boolean = true;
-    let nearArea: number = HEIGHT / 4
+    let nearArea: number = HEIGHT / 4;
     let floor: number = HEIGHT - 150;
     while (true) {
         nearBall = false;
@@ -282,7 +284,7 @@ async function calculate() {
             for (let i = 0; i < balls.length && !resetBall; i++) {
                 if (balls[i].isRemoved()) {
                     resetBall = true;
-                    balls[i].setXY(MID_WIDTH + Math.random() * 2 - 1, 50);
+                    balls[i].setXY(MID_WIDTH, 50);
                     balls[i].setRemove(false);
                 }
             }
@@ -311,7 +313,7 @@ async function calculate() {
             if (!ball.isRemoved()) {
                 ball.bounce(0, 0, WIDTH, HEIGHT);
                 ball.move();
-                if (ball.getY() > floor) 
+                if (ball.getY() > floor)
                     ball.remove();
             }
         }

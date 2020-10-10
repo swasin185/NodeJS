@@ -69,8 +69,8 @@ class Ball extends Sprite {
     private static ID = 0;
     private dx: number;
     private dy: number;
-    private speed: number = 0;
-    private direction: number = 0;
+    private speed: number = 1;
+    private direction: number = -PI_2;
     private gravity = GRAVITY;
     private removed: boolean = false;
     private path: boolean[] = new Array(n * n + n);
@@ -86,7 +86,7 @@ class Ball extends Sprite {
             this.gravity = GRAVITY;
         } else {
             this.dy -= this.gravity;
-            this.gravity *= 1.01;
+//            this.gravity *= 1.01;
         }
         this.speed = Math.sqrt(this.dx * this.dx + this.dy * this.dy);
         if (this.speed < 0.001)
@@ -115,11 +115,13 @@ class Ball extends Sprite {
         else
             reflectAngle -= Math.PI;
         this.setDirection(reflectAngle);
-        if (this.dx != 0)
-            this.dx *= RESISTANCE + Math.random() / 10;
-        else
+        if (this.dx != 0) {
+            if (this.dx > 0.1 || this.dx < -0.1)
+                this.dx *= RESISTANCE + Math.random() / 10;
+        } else
             this.dx = Math.random() * 2 - 1; // ถ้าตกลงมาแนวดิ่งด้วยมุม +Pi/2 -Pi/2 ให้เบี่ยงออกซ้ายขวา +-1
-        this.dy *= RESISTANCE + Math.random() / 10;
+        if (this.dy > 0.1)
+            this.dy *= RESISTANCE + Math.random() / 10;
     }
     getCollideAngle(obj: Sprite): number {
         let dx = obj.getX() - this.x;
@@ -193,7 +195,7 @@ class Ball extends Sprite {
 
 class Pin extends Sprite {
     constructor(x: number, y: number) {
-        super(x, y, COLORS[Math.floor(Math.random() * COLORS.length)], 3);
+        super(x, y, COLORS[Math.floor(Math.random() * COLORS.length)], 4);
     }
 }
 
@@ -318,7 +320,7 @@ async function calculate() {
             }
         }
         paint();
-        await new Promise(r => setTimeout(r, 5));
+        await new Promise(r => setTimeout(r, 1));
     }
 }
 

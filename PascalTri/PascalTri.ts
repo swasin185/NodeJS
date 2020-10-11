@@ -69,7 +69,7 @@ class Ball extends Sprite {
     private static ID = 0;
     private dx: number;
     private dy: number;
-    private speed: number = 1;
+    private speed: number = 0;
     private direction: number = -PI_2;
     private gravity = GRAVITY;
     private removed: boolean = false;
@@ -86,7 +86,7 @@ class Ball extends Sprite {
             this.gravity = GRAVITY;
         } else {
             this.dy -= this.gravity;
-//            this.gravity *= 1.01;
+            //this.gravity *= 1.01;
         }
         this.speed = Math.sqrt(this.dx * this.dx + this.dy * this.dy);
         if (this.speed < 0.001)
@@ -116,12 +116,12 @@ class Ball extends Sprite {
             reflectAngle -= Math.PI;
         this.setDirection(reflectAngle);
         if (this.dx != 0) {
-            if (this.dx > 0.1 || this.dx < -0.1)
+            if (this.dx > 0.2 || this.dx < -0.2)
                 this.dx *= RESISTANCE + Math.random() / 10;
         } else
             this.dx = Math.random() * 2 - 1; // ถ้าตกลงมาแนวดิ่งด้วยมุม +Pi/2 -Pi/2 ให้เบี่ยงออกซ้ายขวา +-1
-        if (this.dy > 0.1)
-            this.dy *= RESISTANCE + Math.random() / 10;
+        if (this.dy > 0.2)
+            this.dy *= RESISTANCE;
     }
     getCollideAngle(obj: Sprite): number {
         let dx = obj.getX() - this.x;
@@ -159,6 +159,12 @@ class Ball extends Sprite {
             /* r is ratio of collide difference and ball distance */
             let r = radius2 - ballDistance;
             if (r > 0 && !(obj instanceof Box)) {
+                if (obj instanceof Ball) {
+                    // merge speed;
+                    let s = (this.speed + obj.speed) * RESISTANCE;
+                    this.speed = s;
+                    obj.speed = s;
+                }
                 let theta = this.getAngle(dx, dy) //this.getCollideAngle(obj);
                 this.x -= r * Math.cos(theta);
                 this.y += r * Math.sin(theta);
@@ -204,16 +210,20 @@ class Box extends Sprite {
     private id: number = Box.ID++;
     private size: number;
     private count: number = 0;
+    pascal: number = 0;
     constructor(x: number, y: number) {
         super(x, y, 'black', 5);
         this.size = this.radius * 2;
     }
     draw(): void {
         // cx.fillStyle = this.color;
-        cx.strokeStyle = 'lime';
+        cx.strokeStyle = 'grey';
         // cx.fillRect(this.x - this.radius, this.y, this.size, this.size);
         // cx.strokeRect(this.x - this.radius, this.y, this.size, this.size);
-        cx.strokeText(String(this.count), this.x - Math.log10(this.count) * 4, this.y);
+
+        cx.strokeText(String(this.pascal), this.x - (Math.log10(this.pascal) + 1) * 3, this.y - 20);
+        cx.strokeStyle = 'lime';
+        cx.strokeText(String(this.count), this.x - (Math.log10(this.count) + 1) * 3, this.y);
         // cx.strokeStyle = 'yellow';
         // cx.strokeText(String(this.id), this.x - 10, this.y + this.radius * 3);
     }
@@ -229,17 +239,44 @@ class Box extends Sprite {
 
 var allPins: Pin[] = new Array((n * n + n) / 2);
 var pin_n: number = 0;
-var boxs: Box[] = new Array(n);
+var boxs: Box[] = new Array((n * n + n) / 2);
 var balls: Ball[] = new Array(0);
-
-// for (let i = 2; i < 5; i++) {
-//     balls[i] = new Ball(Math.random() * WIDTH, Math.random() * HEIGHT);
-//     balls[i].setSpeed(Math.random() * 3);
-//     balls[i].setDirection(Math.random() * Math.PI * 2);
-// }
-
 // การทำงานเริ่มต้น
 // ----------------------------------------------------------------------------
+
+var pArr: number[] = new Array((n * n + n) / 2);
+pArr.fill(0);
+pArr[0] = 1;
+let a = 0;
+for (let i = 0; i < n - 1; i++) {
+    for (let j = 0; j <= i; j++) {
+        let l = i * (i + 3) / 2 + j + 1;
+        let r = i * (i + 3) / 2 + j + 2;
+        pArr[l] += pArr[a];
+        pArr[r] += pArr[a];
+        a++;
+    }
+}
+
+a = 0;
+console.log("Pascal's Triangle ");
+for (let i = 0; i < n; i++) {
+    let s: string = '';
+    for (let j = 0; j <= n - i - 1; j++) {
+        s += '\t' + pArr[(j * (j + 3) / 2 + i * (i + 1) / 2 + i * j)];
+    }
+    console.log(s)
+}
+
+a = 0;
+for (let i = 0; i < n; i++) {
+    let s: string = Math.pow(2, i) + '\t' + i;
+    for (let j = 0; j <= i; j++) {
+        s += '\t' + round((pArr[a++] / Math.pow(2, i) * 100));
+    }
+    console.log(s)
+}
+
 let size = 45;
 let mid = size / 2;
 let x = MID_WIDTH;
@@ -254,7 +291,9 @@ for (let i = 0; i < n; i++) {
     allPins[pin_n++] = new Pin(x - mid, y + size);
     allPins[pin_n++] = new Pin(x - mid, y + size - six);
     for (let j = 0; j <= i; j++) {
-        boxs[bx++] = new Box(x, y + size);
+        boxs[bx] = new Box(x, y + size);
+        boxs[bx].pascal = pArr[bx];
+        bx++;
         allPins[pin_n++] = new Pin(x + mid, y + size);
         x += mid * 2;
     }
@@ -267,7 +306,6 @@ for (let i = 0; i < n; i++) {
 //     boxs[i] = new Box(x, y);
 //     x += mid * 2;
 // }
-
 paint();
 calculate();
 // ฟังก์ชั่น
@@ -320,7 +358,7 @@ async function calculate() {
             }
         }
         paint();
-        await new Promise(r => setTimeout(r, 1));
+        await new Promise(r => setTimeout(r, 4));
     }
 }
 
@@ -371,8 +409,8 @@ function round(x: number): number {
 }
 
 function clickXY(e: MouseEvent) {
-    for (let ball of balls) {
-        if (ball.isClickIn(e.offsetX, e.offsetY))
-            console.log(ball);
+    for (let box of boxs) {
+        if (box.isClickIn(e.offsetX, e.offsetY))
+            console.log(box);
     }
 }

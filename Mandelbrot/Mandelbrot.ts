@@ -90,32 +90,32 @@ function calculate() {
     center_image = Number(boxImage.value);
     center = new ComplexNumber(center_real, center_image);
 
-    let frontier = 2;
-    let C: ComplexNumber;
+    let frontier = Math.PI;
+    let C: ComplexNumber = new ComplexNumber(-0.5, -0.5);
     let Zn: ComplexNumber;
     let im: number;
     let re: number;
     let n: number = 0;
     let coor: number = 0;
+    let re0 = 0;
+    let im0 = 0;
+
     for (let y = 0; y < HEIGHT; y++) {
         im = Math.round((y - MID_HEIGHT) * boundary / HEIGHT * ComplexNumber.PRECISION) / ComplexNumber.PRECISION + center_image;
         for (let x = 0; x < WIDTH; x++) {
             re = Math.round((x - MID_WIDTH) * boundary / WIDTH * ComplexNumber.PRECISION) / ComplexNumber.PRECISION + center_real;
             C = new ComplexNumber(re, im);
-            //C.add(center);
-            let re0 = C.getReal();
-            let im0 = C.getImage();
-            Zn = new ComplexNumber(re0, im0);
+            Zn = new ComplexNumber(re, im);
             n = 1;
             while (n < MAX_N && Zn.absolute() < frontier) {
+                re0 = Zn.getReal();
+                im0 = Zn.getImage();
                 Zn.power2();
                 Zn.add(C);
                 if (Zn.getReal() == re0 && Zn.getImage() == im0)
                     n = MAX_N;
                 else
                     n++;
-                re0 = Zn.getReal();
-                im0 = Zn.getImage();
             }
             n--;
             coor = (y * WIDTH + x) * 4;

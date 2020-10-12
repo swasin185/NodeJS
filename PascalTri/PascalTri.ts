@@ -217,11 +217,11 @@ class Box extends Sprite {
     }
     draw(): void {
         // cx.fillStyle = this.color;
-        cx.strokeStyle = 'grey';
+        //cx.strokeStyle = 'grey';
         // cx.fillRect(this.x - this.radius, this.y, this.size, this.size);
         // cx.strokeRect(this.x - this.radius, this.y, this.size, this.size);
 
-        cx.strokeText(String(this.pascal), this.x - (Math.log10(this.pascal) + 1) * 3, this.y - 20);
+        //cx.strokeText(String(this.pascal), this.x - (Math.log10(this.pascal) + 1) * 3, this.y - 20);
         cx.strokeStyle = 'lime';
         cx.strokeText(String(this.count), this.x - (Math.log10(this.count) + 1) * 3, this.y);
         // cx.strokeStyle = 'yellow';
@@ -248,12 +248,11 @@ var pArr: number[] = new Array((n * n + n) / 2);
 pArr.fill(0);
 pArr[0] = 1;
 let a = 0;
-for (let i = 0; i < n - 1; i++) {
-    for (let j = 0; j <= i; j++) {
-        let l = i * (i + 3) / 2 + j + 1;
-        let r = i * (i + 3) / 2 + j + 2;
+for (let i = 1; i < n; i++) {
+    for (let j = 0; j < i; j++) {
+        let l = i * (i + 1) / 2 + j;
         pArr[l] += pArr[a];
-        pArr[r] += pArr[a];
+        pArr[l + 1] += pArr[a];
         a++;
     }
 }
@@ -262,18 +261,16 @@ a = 0;
 console.log("Pascal's Triangle ");
 for (let i = 0; i < n; i++) {
     let s: string = '';
-    for (let j = 0; j <= n - i - 1; j++) {
-        s += '\t' + pArr[(j * (j + 3) / 2 + i * (i + 1) / 2 + i * j)];
-    }
+    for (let j = 0; j <= n - i - 1; j++)
+        s += '\t' + pArr[(j * j + j) / 2 + (i * i + i) / 2 + (i + 1) * j];
     console.log(s)
 }
 
 a = 0;
 for (let i = 0; i < n; i++) {
     let s: string = Math.pow(2, i) + '\t' + i;
-    for (let j = 0; j <= i; j++) {
+    for (let j = 0; j <= i; j++)
         s += '\t' + round((pArr[a++] / Math.pow(2, i) * 100));
-    }
     console.log(s)
 }
 
@@ -308,13 +305,14 @@ for (let i = 0; i < n; i++) {
 // }
 paint();
 calculate();
+
 // ฟังก์ชั่น
 // ----------------------------------------------------------------------------
 async function calculate() {
     let resetBall: boolean = false;
     let nearBall: boolean = true;
     let nearArea: number = HEIGHT / 4;
-    let floor: number = HEIGHT - 150;
+    let floor: number = HEIGHT - 50;
     while (true) {
         nearBall = false;
         for (let i = 0; i < balls.length && !nearBall; i++)
@@ -394,9 +392,8 @@ function paintLine() {
 function paint() {
     cx.clearRect(0, 0, cv.width, cv.height);
     // paintLine();
-    // for (let i = 0; i < pin_n; i++) {
+    // for (let i = 0; i < pin_n; i++)
     //     allPins[i].draw();
-    // }
     for (let box of boxs)
         box.draw();
     for (let ball of balls)

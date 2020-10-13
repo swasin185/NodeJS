@@ -138,7 +138,12 @@ function clickXY(event: MouseEvent) {
     //console.log(center_real + " + " + center_image + "i");
     boxReal.value = String(center_real + Math.round((x - MID_WIDTH) * boundary / WIDTH * ComplexNumber.PRECISION) / ComplexNumber.PRECISION);
     boxImage.value = String(center_image - -Math.round((y - MID_HEIGHT) * boundary / HEIGHT * ComplexNumber.PRECISION) / ComplexNumber.PRECISION);
-    paint();
+    if (event.button == 0)
+        boundary /= 10;
+    else
+        boundary *= 10;
+    boxBoundary.value = String(boundary);
+    calculate();
 }
 
 function paint() {
@@ -161,3 +166,4 @@ function paint() {
     ctx.lineTo(MID_WIDTH, MID_HEIGHT + 5);
     ctx.stroke();
 }
+

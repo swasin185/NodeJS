@@ -1,6 +1,6 @@
 /* Class ---------------------------------------------------------------------*/
 class ComplexNumber {
-    public static PRECISION: number = 1E16;
+    public static PRECISION: number = 1E12;
     private re: number = 0.0;
     private im: number = 0.0;
     public constructor(re: number, im: number) {
@@ -54,20 +54,15 @@ const MID_HEIGHT = canvas.height / 2;
 const MAX_N = 51;
 
 const PALETTE: number[][] = new Array(MAX_N);
-
-for (let i = 0; i < 10; i++) {
+let level = 0;
+let x = Math.floor(Math.random() * 3);
+for (let i = 0; i < MAX_N; i++) {
     PALETTE[i] = new Array(3);
-    PALETTE[i][0] = i * 10; // Red
-    PALETTE[i][1] = PALETTE[i][0]; // Blue
-    PALETTE[i][2] = PALETTE[i][0]; // Green
+    level = i * 5;
+    PALETTE[i][x + i % 3] = level;
+    PALETTE[i][(x + i + 1) % 3] = Math.floor(Math.random() * level / 2 + level / 2);
+    PALETTE[i][(x + i + 2) % 3] = Math.floor(Math.random() * level / 2 + level / 2);
 }
-for (let i = 10; i < PALETTE.length; i++) {
-    PALETTE[i] = new Array(3);
-    PALETTE[i][0] = Math.floor(Math.random() * 255); // Red
-    PALETTE[i][1] = Math.floor(Math.random() * 255); // Blue
-    PALETTE[i][2] = Math.floor(Math.random() * 255); // Green
-}
-//console.log(PALETTE);
 
 var imgData = ctx.createImageData(WIDTH, HEIGHT); // width x height
 var data = imgData.data;

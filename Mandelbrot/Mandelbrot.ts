@@ -1,42 +1,43 @@
 /* Class ---------------------------------------------------------------------*/
+/** !!! Big from cdn ปัดเศษ ต่างจาก Big บน node.js */
 class ComplexNumber {
     public static PRECISION: number = 1E12;
-    private re = 0;
-    private im = 0;
+    private re;
+    private im;
     public constructor(re: number, im: number) {
-        this.re = re;
-        this.im = im;
-        // this.re = new Big(re);
-        // this.im = new Big(im);
+        // this.re = re;
+        // this.im = im;
+        this.re = new Big(re);
+        this.im = new Big(im);
     }
     public absolute(): number {
         // return this.re.pow(2).add(this.im.pow(2)).sqrt().toNumber();
-        // return this.re.abs().add(this.im.abs()).toNumber();
-        return Math.hypot(this.re, this.im); // to too complicated for Mandelbrot
+        return this.re.abs().add(this.im.abs()).toNumber();
+        // return Math.hypot(this.re, this.im); // to too complicated for Mandelbrot
         // return Math.abs(this.re) + Math.abs(this.im); // too easy
     }
 
     public add(x: ComplexNumber): void {
-        this.re = Math.round((this.re + x.re) * ComplexNumber.PRECISION) / ComplexNumber.PRECISION;
-        this.im = Math.round((this.im + x.im) * ComplexNumber.PRECISION) / ComplexNumber.PRECISION;
-        // this.re = this.re.add(x.re);
-        // this.im = this.im.add(x.im);
+        // this.re = Math.round((this.re + x.re) * ComplexNumber.PRECISION) / ComplexNumber.PRECISION;
+        // this.im = Math.round((this.im + x.im) * ComplexNumber.PRECISION) / ComplexNumber.PRECISION;
+        this.re = this.re.add(x.re).round(20, 1);
+        this.im = this.im.add(x.im).round(20, 1);
     }
 
-    public getImage(): number {
+    public getImage(): any {
         return this.im;
     }
-    public getReal(): number {
+    public getReal(): any {
         return this.re;
     }
 
     public multiply(x: ComplexNumber): void {
-        let re = (this.re * x.re) - (this.im * x.im);
-        let im = (this.re * x.im) + (this.im * x.re);
-        this.re = Math.round(re * ComplexNumber.PRECISION) / ComplexNumber.PRECISION;
-        this.im = Math.round(im * ComplexNumber.PRECISION) / ComplexNumber.PRECISION;
-        // this.re = this.re.mul(x.re).minus(this.im.mul(x.im));
-        // this.im = this.re.mul(x.im).add(this.im.mul(x.re));
+        // let re = (this.re * x.re) - (this.im * x.im);
+        // let im = (this.re * x.im) + (this.im * x.re);
+        // this.re = Math.round(re * ComplexNumber.PRECISION) / ComplexNumber.PRECISION;
+        // this.im = Math.round(im * ComplexNumber.PRECISION) / ComplexNumber.PRECISION;
+        this.re = this.re.mul(x.re).round(20,1).minus(this.im.mul(x.im).round(20, 1));
+        this.im = this.re.mul(x.im).round(20,1).add(this.im.mul(x.re).round(20, 1));
     }
 
     public power2(): void {
@@ -77,12 +78,10 @@ var boundary: number;
 var center_real: number;
 var center_image: number;
 var center: ComplexNumber;
-
 // การทำงานเริ่มต้น
 // ----------------------------------------------------------------------------
 paint();
 calculate();
-
 
 // var bigA = new Big(1e-20);
 // var bigB= new Big(2e-21);

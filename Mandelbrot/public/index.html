@@ -21,26 +21,28 @@
 				<table>
 					<tr>
 						<td>จุดกึ่งกลาง + Real :</td>
-						<td><input id="realValue" type="text" value="-0.75"
+						<!-- -0.75 -->
+						<td><input id="realValue" type="text" value="-1.36"
 								style="width: 120px; text-align: right;"></input></td>
 					</tr>
 					<tr>
 						<td>จุดกึ่งกลาง + Imaginary :</td>
-						<td><input id="imageValue" type="text" value="0.0"
+						<td><input id="imageValue" type="text" value="-0.07"
 								style="width: 120px; text-align: right;"></input></td>
 					</tr>
 					<tr>
 						<td>ขนาด / 1K pixel :</td>
-						<td><input id="boundary" type="text" value="3.2"
+						<td><input id="boundary" type="text" value="0.5"
 								style="width: 120px; text-align: right;"></input></td>
 					</tr>
 				</table>
 			</td>
-			<td><canvas id="cpxCanvas" width="1000" height="1000" style="border:1px solid #000000;"
+			<td><canvas id="cpxCanvas" width="1000px" height="1000px" style="border:1px solid #000000;"
 					onmousedown="clickXY(event);"></canvas>
 			</td>
 		</tr>
 	</table>
+	<script src='https://cdn.jsdelivr.net/npm/big.js@6.0.0/big.min.js'></script>
 	<script src="script.js"></script>
 </body>
 

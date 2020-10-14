@@ -1,26 +1,31 @@
 /* Class ---------------------------------------------------------------------*/
 class ComplexNumber {
     public static PRECISION: number = 1E12;
-    private re: number = 0.0;
-    private im: number = 0.0;
+    private re = 0;
+    private im = 0;
     public constructor(re: number, im: number) {
         this.re = re;
         this.im = im;
+        // this.re = new Big(re);
+        // this.im = new Big(im);
     }
     public absolute(): number {
+        // return this.re.pow(2).add(this.im.pow(2)).sqrt().toNumber();
+        // return this.re.abs().add(this.im.abs()).toNumber();
         return Math.hypot(this.re, this.im); // to too complicated for Mandelbrot
-        //return Math.abs(this.re) + Math.abs(this.im);
+        // return Math.abs(this.re) + Math.abs(this.im); // too easy
     }
 
     public add(x: ComplexNumber): void {
         this.re = Math.round((this.re + x.re) * ComplexNumber.PRECISION) / ComplexNumber.PRECISION;
         this.im = Math.round((this.im + x.im) * ComplexNumber.PRECISION) / ComplexNumber.PRECISION;
+        // this.re = this.re.add(x.re);
+        // this.im = this.im.add(x.im);
     }
 
     public getImage(): number {
         return this.im;
     }
-
     public getReal(): number {
         return this.re;
     }
@@ -30,12 +35,13 @@ class ComplexNumber {
         let im = (this.re * x.im) + (this.im * x.re);
         this.re = Math.round(re * ComplexNumber.PRECISION) / ComplexNumber.PRECISION;
         this.im = Math.round(im * ComplexNumber.PRECISION) / ComplexNumber.PRECISION;
+        // this.re = this.re.mul(x.re).minus(this.im.mul(x.im));
+        // this.im = this.re.mul(x.im).add(this.im.mul(x.re));
     }
 
     public power2(): void {
         this.multiply(this);
     }
-
 }
 
 // ประกาศตัวแปร Global 
@@ -74,11 +80,19 @@ var center: ComplexNumber;
 
 // การทำงานเริ่มต้น
 // ----------------------------------------------------------------------------
+paint();
 calculate();
+
+
+// var bigA = new Big(1e-20);
+// var bigB= new Big(2e-21);
+// var bigC = bigA.add(bigB);
+// console.log(bigA.toString(), '+', bigB.toString(), '=', bigC.toString())
 
 // ฟังก์ชั่น
 // ----------------------------------------------------------------------------
 function calculate() {
+    console.log('calculate');
     let time: number = (new Date()).getTime();
     boundary = Number(boxBoundary.value);
     center_real = Number(boxReal.value);
@@ -97,6 +111,7 @@ function calculate() {
 
     for (let y = 0; y < HEIGHT; y++) {
         im = Math.round((y - MID_HEIGHT) * boundary / HEIGHT * ComplexNumber.PRECISION) / ComplexNumber.PRECISION + center_image;
+        console.log(y / HEIGHT * 100, '%');
         for (let x = 0; x < WIDTH; x++) {
             re = Math.round((x - MID_WIDTH) * boundary / WIDTH * ComplexNumber.PRECISION) / ComplexNumber.PRECISION + center_real;
             C = new ComplexNumber(re, im);

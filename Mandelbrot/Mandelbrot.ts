@@ -1,43 +1,33 @@
 /* Class ---------------------------------------------------------------------*/
-/** !!! Big from cdn ปัดเศษ ต่างจาก Big บน node.js */
 class ComplexNumber {
-    public static PRECISION: number = 1E12;
-    private re;
-    private im;
+    public static PRECISION: number = 1E15;
+    private re: number;
+    private im: number;
     public constructor(re: number, im: number) {
-        // this.re = re;
-        // this.im = im;
-        this.re = new Big(re);
-        this.im = new Big(im);
+        this.re = re;
+        this.im = im;
     }
     public absolute(): number {
-        // return this.re.pow(2).add(this.im.pow(2)).sqrt().toNumber();
-        return this.re.abs().add(this.im.abs()).toNumber();
-        // return Math.hypot(this.re, this.im); // to too complicated for Mandelbrot
-        // return Math.abs(this.re) + Math.abs(this.im); // too easy
+        return Math.hypot(this.re, this.im); 
     }
 
     public add(x: ComplexNumber): void {
-        // this.re = Math.round((this.re + x.re) * ComplexNumber.PRECISION) / ComplexNumber.PRECISION;
-        // this.im = Math.round((this.im + x.im) * ComplexNumber.PRECISION) / ComplexNumber.PRECISION;
-        this.re = this.re.add(x.re).round(20, 1);
-        this.im = this.im.add(x.im).round(20, 1);
+        this.re = Math.round((this.re + x.re) * ComplexNumber.PRECISION) / ComplexNumber.PRECISION;
+        this.im = Math.round((this.im + x.im) * ComplexNumber.PRECISION) / ComplexNumber.PRECISION;
     }
 
-    public getImage(): any {
+    public getImage(): number {
         return this.im;
     }
-    public getReal(): any {
+    public getReal(): number {
         return this.re;
     }
 
     public multiply(x: ComplexNumber): void {
-        // let re = (this.re * x.re) - (this.im * x.im);
-        // let im = (this.re * x.im) + (this.im * x.re);
-        // this.re = Math.round(re * ComplexNumber.PRECISION) / ComplexNumber.PRECISION;
-        // this.im = Math.round(im * ComplexNumber.PRECISION) / ComplexNumber.PRECISION;
-        this.re = this.re.mul(x.re).round(20,1).minus(this.im.mul(x.im).round(20, 1));
-        this.im = this.re.mul(x.im).round(20,1).add(this.im.mul(x.re).round(20, 1));
+        let re = (this.re * x.re) - (this.im * x.im);
+        let im = (this.re * x.im) + (this.im * x.re);
+        this.re = Math.round(re * ComplexNumber.PRECISION) / ComplexNumber.PRECISION;
+        this.im = Math.round(im * ComplexNumber.PRECISION) / ComplexNumber.PRECISION;
     }
 
     public power2(): void {
@@ -105,14 +95,17 @@ function calculate() {
     let re: number;
     let n: number = 0;
     let coor: number = 0;
-    let re0 = 0;
-    let im0 = 0;
-
+    let re0: number = 0;
+    let im0: number = 0;
+    let percent = Math.round(WIDTH * HEIGHT / 100);
+    let i = 0;
     for (let y = 0; y < HEIGHT; y++) {
-        im = Math.round((y - MID_HEIGHT) * boundary / HEIGHT * ComplexNumber.PRECISION) / ComplexNumber.PRECISION + center_image;
-        console.log(y / HEIGHT * 100, '%');
+        im = Math.round(((y - MID_HEIGHT) * boundary / HEIGHT + center_image) * ComplexNumber.PRECISION) / ComplexNumber.PRECISION;
         for (let x = 0; x < WIDTH; x++) {
-            re = Math.round((x - MID_WIDTH) * boundary / WIDTH * ComplexNumber.PRECISION) / ComplexNumber.PRECISION + center_real;
+            i++;
+            if (i % percent == 0)
+                console.log(i / percent + ' %');
+            re = Math.round(((x - MID_WIDTH) * boundary / WIDTH + center_real) * ComplexNumber.PRECISION) / ComplexNumber.PRECISION;
             C = new ComplexNumber(re, im);
             Zn = new ComplexNumber(re, im);
             n = 1;
@@ -148,9 +141,9 @@ function clickXY(event: MouseEvent) {
     boxReal.value = String(center_real + Math.round((x - MID_WIDTH) * boundary / WIDTH * ComplexNumber.PRECISION) / ComplexNumber.PRECISION);
     boxImage.value = String(center_image - -Math.round((y - MID_HEIGHT) * boundary / HEIGHT * ComplexNumber.PRECISION) / ComplexNumber.PRECISION);
     if (event.button == 0)
-        boundary /= 10;
+        boundary /= 2;
     else
-        boundary *= 10;
+        boundary *= 2;
     boxBoundary.value = String(boundary);
     calculate();
 }

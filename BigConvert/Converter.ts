@@ -21,30 +21,41 @@ function calculate() {
     let x = input.substring(0, point);
     let y = input.substring(point, input.length);
     let value = new Big(0);
+    console.log(x);
     for (let i = 0; i < x.length; i++) {
+        console.log(value.toFixed(), 'x', base, '+', valueOf(x[i], base));
         value = value.mul(base);
         value = value.add(valueOf(x[i], base));
     }
+    console.log('value=', value.toFixed());
     let fraction = new Big(0);
+    console.log(y);
     for (let i = y.length - 1; i > 0; i--) {
+        console.log(fraction.toFixed(), '+', valueOf(y[i], base), '/', base);
         fraction = fraction.add(valueOf(y[i], base));
         fraction = fraction.div(base);
     }
+    console.log('fraction=', fraction.toFixed());
     value = value.add(fraction);
     console.log('value10 = ', value.toFixed());
 
     base = Number(baseConvert.value);
+    console.log('convert...');
 
     let a = value.round(0, 0);
     let b = value.minus(a);
-    x = '0';
+    x = '';
+    console.log(a.toFixed());
     while (a.gt(0) && x.length < Big.DP) {
+        console.log(a.mod(base).toNumber(), '\t', a.toFixed(), '/', base);
         x = digits[a.mod(base).toNumber()] + x;
         a = a.div(base).round(0, 0);
     }
-
+    console.log(x)
     y = '.';
+    console.log(b.toFixed());
     while (b.gt(0) && y.length < Big.DP) {
+        console.log(b.toFixed(), 'x', base);
         b = b.mul(base); // fraction(mod 1) x base
         y += digits[b.round(0, 0).toNumber()];
         b = b.mod(1);
@@ -54,6 +65,7 @@ function calculate() {
     else if (b.gt(0)) {
         y += '...';
     }
+    console.log(y)
     numConvert.value = x + y;
 }
 
@@ -62,5 +74,9 @@ function valueOf(digit: string, base: number): number {
     for (let i = 0; i < digits.length && found == -1; i++)
         if (digit.toUpperCase() == digits[i] && i <= base)
             found = i;
+
+    if (found == -1 && digit != '.')
+        throw new Error("Digit Error!!");
+
     return found;
 }

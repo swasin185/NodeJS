@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Base Converter</title>
+</head>
+
+<body bgcolor="orange">
+	<center>
+		<table style="padding:5px;">
+			<tr>
+				<td>Input Value : </td>
+				<td>
+					<input id="numInput" type="text" value=""
+						style="width: 400px; text-align: right;"></input>
+				</td>
+				<td>Base: </td>
+				<td><input id="baseInput" type="number" value="10" step="1" min="2" max="36"
+						style="width: 40px; text-align: right;"></input></td>
+			</tr>
+			<tr>
+				<td colspan="4">
+					<hr>
+				</td>
+			</tr>
+			<tr>
+				<td>Convert Value : </td>
+				<td><input id="numConvert" type="text" value="" readonly="true"
+						style="width: 400px; text-align: right; background-color: yellow;"></input></td>
+				<td>Base : </td>
+				<td><input id="baseConvert" type="number" value="2" step="1" min="2" max="36"
+						style="width: 40px; text-align: right;"></input></td>
+			</tr>
+			<tr>
+				<td> </td>
+				<td>
+					<hr>
+					<input type="Button" value="Calculate" onclick="calculate()"></input>
+				</td>
+			</tr>
+		</table>
+	</center>
+
+	<script src='https://cdn.jsdelivr.net/npm/big.js@6.0.0/big.min.js'></script>
+	<script src="script.js"></script>
+</body>
+
+</html>

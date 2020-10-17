@@ -1,0 +1,10 @@
+{
+  "name": "bigconverter",
+
+  "scripts": {
+    "build": "tsc Converter.ts & uglifyjs Converter.js -c -m -o ./script.js & del Converter.js"
+  },
+  "devDependencies": {
+    "@types/big.js": "^6.0.0"
+  }
+}

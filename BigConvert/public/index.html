@@ -9,7 +9,7 @@
 <style>
 	body {
 		background-color: black;
-		color:greenyellow;
+		color: greenyellow;
 		height: 100%;
 		width: 100%;
 	}
@@ -51,11 +51,12 @@
 		<tr>
 			<td>Input Value : </td>
 			<td>
-				<input class="txt" id="numInput" type="text" value="" style="width: 500px; text-align: right;"></input>
+				<input class="txt" id="numInput" type="text" value="" 
+				style="width: 500px; text-align: right;"></input>
 			</td>
 			<td>Base: </td>
 			<td><input class="txt" id="baseInput" type="number" value="10" step="1" min="2" max="36"
-					style="width: 50px; text-align: right;"></input></td>
+					style="width: 60px; text-align: right;"></input></td>
 		</tr>
 		<tr>
 			<td colspan="4">
@@ -65,10 +66,14 @@
 		<tr>
 			<td>Convert Value : </td>
 			<td><input class="txt" id="numConvert" type="text" value="" readonly="true"
-					style="width: 500px; text-align: right; background-color: yellow;"></input></td>
+					style="width: 500px; text-align: right; background-color: yellow;"></input>
+				<br>
+				<input class="txt" id="fracConvert" type="text" value="" readonly="true"
+					style="width: 500px; text-align: right; background-color: cyan;"></input></td>
+
 			<td>Base : </td>
 			<td><input class="txt" id="baseConvert" type="number" value="2" step="1" min="2" max="36"
-					style="width: 50px; text-align: right;"></input></td>
+					style="width: 60px; text-align: right;"></input></td>
 		</tr>
 		<tr>
 			<td colspan="4" align="center">

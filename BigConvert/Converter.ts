@@ -2,6 +2,7 @@ const baseInput = document.getElementById("baseInput") as HTMLInputElement;
 const numInput = document.getElementById("numInput") as HTMLInputElement;
 const baseConvert = document.getElementById("baseConvert") as HTMLInputElement;
 const numConvert = document.getElementById("numConvert") as HTMLInputElement;
+const fracConvert = document.getElementById("fracConvert") as HTMLInputElement;
 
 Big.DP = 50;
 
@@ -51,32 +52,44 @@ function calculate() {
         x = digits[a.mod(base).toNumber()] + x;
         a = a.div(base).round(0, 0);
     }
-    console.log(x)
+    console.log(x);
+    let z = '';
+    for (let i = x.length - 1; i >= 0; i--) {
+        z = x[i] + z;
+        if ((x.length - i) % 4 == 0)
+            z = ' ' + z;
+    }
+    if (z == '')
+        x = '0';
+    else
+        x = z;
+        
     y = '.';
     console.log(b.toFixed());
+    let i = 0;
     while (b.gt(0) && y.length < Big.DP) {
+        i++;
         console.log(b.toFixed(), 'x', base);
         b = b.mul(base); // fraction(mod 1) x base
         y += digits[b.round(0, 0).toNumber()];
+        if (i % 4 == 0)
+            y += ' ';
         b = b.mod(1);
     }
-    if (y == '.')
-        y = '';
-    else if (b.gt(0)) {
+    if (b.gt(0)) {
         y += '...';
     }
     console.log(y)
-    numConvert.value = x + y;
+    numConvert.value = x;
+    fracConvert.value = y;
 }
 
 function valueOf(digit: string, base: number): number {
     let found = - 1;
     for (let i = 0; i < digits.length && found == -1; i++)
-        if (digit.toUpperCase() == digits[i] && i <= base)
+        if (digit.toUpperCase() == digits[i] && i < base)
             found = i;
-
     if (found == -1 && digit != '.')
         throw new Error("Digit Error!!");
-
     return found;
 }

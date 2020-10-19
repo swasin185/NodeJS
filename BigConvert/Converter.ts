@@ -4,6 +4,12 @@ const baseConvert = document.getElementById("baseConvert") as HTMLInputElement;
 const numConvert = document.getElementById("numConvert") as HTMLInputElement;
 const fracConvert = document.getElementById("fracConvert") as HTMLInputElement;
 
+const aText = document.getElementById("a") as HTMLInputElement;
+const bText = document.getElementById("b") as HTMLInputElement;
+const gcdText = document.getElementById("gcd") as HTMLInputElement;
+
+
+
 Big.DP = 50;
 
 const digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
@@ -92,4 +98,23 @@ function valueOf(digit: string, base: number): number {
     if (found == -1 && digit != '.')
         throw new Error("Digit Error!!");
     return found;
+}
+
+function gcd() {
+    let a = new Big(aText.value);
+    let b = new Big(bText.value);
+    let gcd = b;
+    if (b.gt(a))  {
+        b = a;
+        a = gcd;
+        gcd = b;
+    }
+    //gcd = a.mod(b);
+    while (!b.eq(0)) {
+        gcd = a.mod(b);
+        a = b;
+        b = gcd;
+        console.log(a.toFixed(), b.toFixed());
+    }
+    gcdText.value = a.toFixed().toString();
 }

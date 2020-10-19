@@ -82,7 +82,42 @@
 			</td>
 		</tr>
 	</table>
-
+	<hr>
+	<h1 style="text-align: center; color:greenyellow;">
+		GCD Calculate!
+	</h1>
+	<table style="padding:5px;" class="center">
+		<tr>
+			<td>a : </td>
+			<td>
+				<input class="txt" id="a" type="text" value="" 
+				style="width: 300px; text-align: right;"></input>
+			</td>
+		</tr>
+		<tr>
+			<td>b : </td>
+			<td>
+				<input class="txt" id="b" type="text" value="" 
+				style="width: 300px; text-align: right;"></input>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="4">
+				<hr>
+			</td>
+		</tr>
+		<tr>
+			<td>GCD Value : </td>
+			<td><input class="txt" id="gcd" type="text" value="" readonly="true"
+					style="width: 300px; text-align: right; background-color: yellow;"></input>
+		</tr>
+		<tr>
+			<td colspan="4" align="center">
+				<hr>
+				<input type="Button" class="button" value="Calculate" onclick="gcd()"></input>
+			</td>
+		</tr>
+	</table>
 	<script src='https://cdn.jsdelivr.net/npm/big.js@6.0.0/big.min.js'></script>
 	<script src="script.js"></script>
 </body>

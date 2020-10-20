@@ -102,8 +102,10 @@ function valueOf(digit: string, base: number): number {
 
 function gcd() {
     console.log('---------------- GCD -----------------');
-    let a = new Big(aText.value);
-    let b = new Big(bText.value);
+    let A = new Big(aText.value);
+    let B = new Big(bText.value);
+    let a = A;
+    let b = B;
     let gcd = b;
     if (b.gt(a)) {
         b = a;
@@ -113,17 +115,18 @@ function gcd() {
     let d = Big(0);
     let r = '';
     while (!b.eq(0)) {
-        if (r == '' && a.div(b).gt(b)) {
-            let A = new Big(aText.value);
-            let B = new Big(bText.value);
+        if (r == '' && a.div(b).gt(b.mul(1000))) {
             r = A.div(a).round(0, 0).toFixed() + '/' + B.div(a).round(0, 0).toFixed();
         }
-        console.log(a.toFixed(), b.toFixed(), '/', d.round(0, 0).toFixed());
+        console.log(a.toFixed(), b.toFixed());
         gcd = a.mod(b);
         a = b;
         b = gcd;
 
     }
     gcdText.value = a.toFixed().toString();
+    if (r == '') {
+        r = A.div(a).round(0, 0).toFixed() + '/' + B.div(a).round(0, 0).toFixed();
+    }
     ratio.value = r;
 }

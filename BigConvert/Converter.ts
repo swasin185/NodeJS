@@ -7,6 +7,7 @@ const fracConvert = document.getElementById("fracConvert") as HTMLInputElement;
 const aText = document.getElementById("a") as HTMLInputElement;
 const bText = document.getElementById("b") as HTMLInputElement;
 const gcdText = document.getElementById("gcd") as HTMLInputElement;
+const ratio = document.getElementById("ratio") as HTMLInputElement;
 
 
 
@@ -18,6 +19,7 @@ const digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
     'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
 
 function calculate() {
+    console.log('-------------- CONVERT ----------------');
     let base = Number(baseInput.value);
     let input = numInput.value;
     let point = input.length;
@@ -47,8 +49,6 @@ function calculate() {
     console.log('value10 = ', value.toFixed());
 
     base = Number(baseConvert.value);
-    console.log('convert...');
-
     let a = value.round(0, 0);
     let b = value.minus(a);
     x = '';
@@ -69,7 +69,7 @@ function calculate() {
         x = '0';
     else
         x = z;
-        
+
     y = '.';
     console.log(b.toFixed());
     let i = 0;
@@ -101,20 +101,29 @@ function valueOf(digit: string, base: number): number {
 }
 
 function gcd() {
+    console.log('---------------- GCD -----------------');
     let a = new Big(aText.value);
     let b = new Big(bText.value);
     let gcd = b;
-    if (b.gt(a))  {
+    if (b.gt(a)) {
         b = a;
         a = gcd;
         gcd = b;
     }
-    //gcd = a.mod(b);
+    let d = Big(0);
+    let r = '';
     while (!b.eq(0)) {
+        if (r == '' && a.div(b).gt(b)) {
+            let A = new Big(aText.value);
+            let B = new Big(bText.value);
+            r = A.div(a).round(0, 0).toFixed() + '/' + B.div(a).round(0, 0).toFixed();
+        }
+        console.log(a.toFixed(), b.toFixed(), '/', d.round(0, 0).toFixed());
         gcd = a.mod(b);
         a = b;
         b = gcd;
-        console.log(a.toFixed(), b.toFixed());
+
     }
     gcdText.value = a.toFixed().toString();
+    ratio.value = r;
 }

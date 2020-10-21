@@ -1,0 +1,7 @@
+{
+  "name": "timescircle",
+
+  "scripts": {
+    "build": "tsc TimesCircle.ts & uglifyjs TimesCircle.js -c -m -o ./public/script.js & del TimesCircle.js"
+  }
+}

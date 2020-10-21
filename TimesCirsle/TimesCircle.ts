@@ -10,7 +10,6 @@ let n = 360;
 let pointX: number[] = new Array(n);
 let pointY: number[] = new Array(n);
 
-
 let angle = 0;
 for (let i = 0; i < n; i++) {
     angle = PI2 * (i / n);
@@ -18,11 +17,14 @@ for (let i = 0; i < n; i++) {
     pointY[i] = x0 - x0 * Math.sin(angle);
 }
 
+const COLORS = ['magenta', 'cyan', 'red', 'lime', 'yellow', 'orange', 'blue', 'green', 'crimson', 'coral', 'gold'];
+
 paint();
 
 function line(a: number, b: number) {
     a = a % n;
     b = b % n;
+    cx.strokeStyle = COLORS[Math.round(b % 10)];
     cx.beginPath();
     cx.moveTo(pointX[a], pointY[a]);
     cx.lineTo(pointX[b], pointY[b]);

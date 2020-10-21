@@ -48,8 +48,8 @@ const WIDTH = canvas.width;
 const HEIGHT = canvas.height;
 const MID_WIDTH = canvas.width / 2;
 const MID_HEIGHT = canvas.height / 2;
-const MAX_N = 51;
 
+const MAX_N = 51;
 const PALETTE: number[][] = new Array(MAX_N);
 let level = 0;
 let x = Math.floor(Math.random() * 3);

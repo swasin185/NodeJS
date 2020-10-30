@@ -4,9 +4,10 @@ import Big from "big.js";
 
 class Prime {
     private static fileName = 'prime.txt';
-    private static one = new Big(1);
+    public static ONE = new Big(1);
     private static primeArray: Big[] = [Big(2), Big(3), Big(5), Big(7), Big(11), Big(13), Big(17), Big(19), Big(23)];
     private static n: number = Prime.primeArray.length;
+    private static n_old = 0;
     public static readFile(): void {
         let fs = require("fs");
         try {
@@ -14,46 +15,31 @@ class Prime {
             let p = readData.split('\n');
             if (Prime.n < p.length - 1) {
                 Prime.n = p.length - 1;
+                Prime.n_old = Prime.n;
                 Prime.primeArray = new Array(Prime.n);
                 for (let i = 0; i < Prime.n; i++)
                     Prime.primeArray[i] = new Big(p[i]);
             }
-            console.log('read prime file')
+            console.log('read prime file', Prime.getLength(), Prime.getPrime(Prime.getLength() - 1).toFixed());
         } catch (err) {
             console.log(Prime.fileName + ' Error! ' + err);
         }
-
     }
 
     public static saveFile(): void {
-        let fs = require("fs");
-        let data: string = '';
-        for (let i = 0; i < Prime.n; i++)
-            data += Prime.primeArray[i].toFixed() + '\n';
-        fs.writeFileSync(Prime.fileName, data, 'utf-8');
-        console.log('save to prime file')
+        if (Prime.n != Prime.n_old) {
+            let fs = require("fs");
+            let data: string = '';
+            for (let i = 0; i < Prime.n; i++)
+                data += Prime.primeArray[i].toFixed() + '\n';
+            fs.writeFileSync(Prime.fileName, data, 'utf-8');
+            console.log('save to prime file', Prime.getLength(), Prime.getPrime(Prime.getLength() - 1).toFixed());
+        } else {
+            console.log('Prime file is not modified');
+        }
     }
 
-    public static isPrime(x: Big): Big {
-        let sqrt: Big = x.sqrt();
-        let lastPrime = Prime.primeArray[this.n - 1];
-        let oldSize = Prime.n;
-        while (lastPrime.lt(sqrt)) {
-            lastPrime = lastPrime.add(1);
-            if (Prime.isPrime(lastPrime).eq(Prime.one)) {
-                if (Prime.primeArray.length == Prime.n) {
-                    let oldArray = Prime.primeArray;
-                    Prime.primeArray = new Array(Prime.n * 2);
-                    for (let i=0; i < oldArray.length; i++)
-                        Prime.primeArray[i] = oldArray[i];
-                }
-                Prime.primeArray[Prime.n++] = lastPrime;
-            }
-        }
-
-        if (oldSize != Prime.n)
-            Prime.saveFile();
-
+    private static searchPrime(x: Big): boolean {
         let i = 0;
         // Binary Search
         let found = -1
@@ -61,8 +47,8 @@ class Prime {
         let hi = Prime.n - 1;
         let mid = 0;
         while (lo <= hi && found == -1) {
+            i++;
             mid = Math.floor((hi + lo) / 2);
-            console.log('search', ++i, lo, hi, Prime.primeArray[mid].toFixed());
             if (x.eq(Prime.primeArray[mid]))
                 found = mid;
             else
@@ -71,25 +57,42 @@ class Prime {
                 else
                     lo = mid + 1;
         }
-
+        console.log('Array Searching...', i);
         if (found > -1) {
-            console.log(x.toFixed(), "found in prime");
-            i = Prime.n;
+            console.log(x.toFixed(), "is founded");
         } else {
-            console.log(x.toFixed(), "NOT found in prime");
-            i = 0;
+            console.log(x.toFixed(), "is not found!");
         }
+        return found != -1;
+    }
 
-        let prime: Big = Prime.primeArray[i];
-        while (i < this.n && prime.lt(sqrt) && !x.mod(prime).eq(0)) {
-            console.log(x.toFixed(), "can not be devided by", prime.toFixed());
-            prime = Prime.primeArray[++i];
+    public static isPrime(x: Big): Big {
+        let dividend = Prime.one;
+        if (!Prime.searchPrime(x)) {
+            let sqrt: Big = x.sqrt();
+            let lastPrime = Prime.primeArray[this.n - 1];
+            while (lastPrime.lt(sqrt)) {
+                lastPrime = lastPrime.add(1);
+                if (Prime.isPrime(lastPrime).eq(Prime.one)) {
+                    if (Prime.primeArray.length == Prime.n) {
+                        let oldArray = Prime.primeArray;
+                        Prime.primeArray = new Array(Prime.n * 2);
+                        for (let i = 0; i < oldArray.length; i++)
+                            Prime.primeArray[i] = oldArray[i];
+                    }
+                    Prime.primeArray[Prime.n++] = lastPrime;
+                }
+            }
+            let i = 0;
+            dividend = Prime.primeArray[i];
+            while (i < this.n && dividend.lt(sqrt) && !x.mod(dividend).eq(0)) {
+                //console.log(x.toFixed(), "can not be devided by", dividend.toFixed());
+                dividend = Prime.primeArray[++i];
+            }
+            if (i >= Prime.n || dividend.gt(sqrt))
+                dividend = Prime.one;
         }
-
-        if (i >= Prime.n || prime.gt(sqrt))
-            return Prime.one;
-        else
-            return prime;
+        return dividend;
     }
     public static getPrime(i: number): Big {
         return Prime.primeArray[i];
@@ -100,6 +103,7 @@ class Prime {
 }
 
 Prime.readFile();
-console.log('last prime =', Prime.getLength(), Prime.getPrime(Prime.getLength() - 1).toFixed());
-let x = Big(152855);
+let x = Big(1528543);
 console.log('x =', x.toFixed(), 'is divided by', Prime.isPrime(x).toFixed());
+
+Prime.saveFile();

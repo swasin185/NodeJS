@@ -5,8 +5,10 @@ import Big from "big.js";
 class Prime {
     private static fileName = 'prime.txt';
     public static ONE = new Big(1);
+
     private static primeArray: Big[] = [Big(2), Big(3), Big(5), Big(7), Big(11), Big(13), Big(17), Big(19), Big(23)];
     private static n: number = Prime.primeArray.length;
+
     private static n_old = 0;
     public static readFile(): void {
         let fs = require("fs");
@@ -35,64 +37,44 @@ class Prime {
             fs.writeFileSync(Prime.fileName, data, 'utf-8');
             console.log('save to prime file', Prime.getLength(), Prime.getPrime(Prime.getLength() - 1).toFixed());
         } else {
-            console.log('Prime file is not modified');
+            // console.log('Prime file is not modified');
         }
     }
 
-    private static searchPrime(x: Big): boolean {
-        let i = 0;
-        // Binary Search
+    public static isPrime(x: Big): boolean {
         let found = -1
-        let lo = 0;
         let hi = Prime.n - 1;
-        let mid = 0;
-        while (lo <= hi && found == -1) {
-            i++;
-            mid = Math.floor((hi + lo) / 2);
-            if (x.eq(Prime.primeArray[mid]))
-                found = mid;
-            else
-                if (x.lt(Prime.primeArray[mid]))
-                    hi = mid - 1;
+        if (x.lte(Prime.primeArray[hi])) {
+            let lo = 0;
+            let mid = 0;
+            while (lo <= hi && found == -1) {  // Binary Search
+                mid = Math.floor((hi + lo) / 2);
+                if (x.eq(Prime.primeArray[mid]))
+                    found = mid;
                 else
-                    lo = mid + 1;
-        }
-        console.log('Array Searching...', i);
-        if (found > -1) {
-            console.log(x.toFixed(), "is founded");
-        } else {
-            console.log(x.toFixed(), "is not found!");
+                    if (x.lt(Prime.primeArray[mid]))
+                        hi = mid - 1;
+                    else
+                        lo = mid + 1;
+            }
         }
         return found != -1;
     }
 
-    public static isPrime(x: Big): Big {
-        let dividend = Prime.one;
-        if (!Prime.searchPrime(x)) {
+    public static findDivisor(x: Big): Big {
+        let divisor = Prime.ONE;
+        if (!Prime.isPrime(x)) { // if not prime find divisor
             let sqrt: Big = x.sqrt();
-            let lastPrime = Prime.primeArray[this.n - 1];
-            while (lastPrime.lt(sqrt)) {
-                lastPrime = lastPrime.add(1);
-                if (Prime.isPrime(lastPrime).eq(Prime.one)) {
-                    if (Prime.primeArray.length == Prime.n) {
-                        let oldArray = Prime.primeArray;
-                        Prime.primeArray = new Array(Prime.n * 2);
-                        for (let i = 0; i < oldArray.length; i++)
-                            Prime.primeArray[i] = oldArray[i];
-                    }
-                    Prime.primeArray[Prime.n++] = lastPrime;
-                }
-            }
+            Prime.createPrimeArray(sqrt);
             let i = 0;
-            dividend = Prime.primeArray[i];
-            while (i < this.n && dividend.lt(sqrt) && !x.mod(dividend).eq(0)) {
-                //console.log(x.toFixed(), "can not be devided by", dividend.toFixed());
-                dividend = Prime.primeArray[++i];
+            divisor = Prime.primeArray[i];
+            while (i < Prime.n && divisor.lt(sqrt) && !x.mod(divisor).eq(0)) {
+                divisor = Prime.primeArray[++i];
             }
-            if (i >= Prime.n || dividend.gt(sqrt))
-                dividend = Prime.one;
+            if (i >= Prime.n || divisor.gt(sqrt))
+                divisor = Prime.ONE;
         }
-        return dividend;
+        return divisor;
     }
     public static getPrime(i: number): Big {
         return Prime.primeArray[i];
@@ -100,10 +82,92 @@ class Prime {
     public static getLength(): number {
         return this.n;
     }
+
+    private static diffArray: number[];
+    public static calcDiffArray() {
+        Prime.diffArray = new Array(100);
+        Prime.diffArray.fill(0);
+        let diff = 0;
+        for (let i = 1; i < Prime.n; i++) {
+            diff = Prime.primeArray[i].sub(Prime.primeArray[i - 1]).toNumber();
+            diff = Math.floor(diff / 2);
+            Prime.diffArray[diff]++;
+        }
+        console.log("Prime Distance")
+        console.log(Prime.diffArray);
+    }
+
+    public static createPrimeArray(x: Big) {
+        let lastPrime: Big = Prime.primeArray[Prime.n - 1];
+        if (lastPrime.lt(x)) {
+            let time: number = (new Date()).getTime();
+            let y = lastPrime;
+            while (lastPrime.lt(x)) {
+                y = y.add(1);
+                if (Prime.findDivisor(y).eq(Prime.ONE)) {
+                    if (Prime.primeArray.length == Prime.n) {
+                        let oldArray = Prime.primeArray;
+                        Prime.primeArray = new Array(Prime.n * 2);
+                        console.log("Extend array size = ", Prime.primeArray.length);
+                        for (let i = 0; i < oldArray.length; i++)
+                            Prime.primeArray[i] = oldArray[i];
+                    }
+                    // console.log(Prime.n, '\t', ' prime\t=\t', y.toFixed());
+                    lastPrime = y;
+                    Prime.primeArray[Prime.n++] = lastPrime;
+                    if (Prime.n % 1000 == 0) {
+                        console.log('primes count =', Prime.n)
+                    }
+                }
+            }
+            time = ((new Date()).getTime() - time) / 1000;
+            console.log("Calculate time = ", time, ' seconds');
+        }
+    }
+
+    public static goldbachConjecture() {
+        console.log("Goldbach's conjecture");
+        let size = 22;
+        let head: string = '';
+        for (let i = 1; i < size * 2 / 3; i++) {
+            head += '\t' + Prime.getPrime(i).toFixed();
+        }
+        console.log(head);
+        for (let i = 1; i < size; i++) {
+            let row: string = Prime.getPrime(i).toFixed();
+            for (let j = 1; j <= i * 2 / 3; j++) {
+                row += '\t' + Prime.getPrime(i).add(Prime.getPrime(j)).toFixed();
+            }
+            console.log(row);
+        }
+    }
+
+    private static histogram: number[] = new Array(20);
+    public static primeHistogram() {
+        Prime.histogram.fill(0);
+        let interval = Math.floor(Prime.primeArray[Prime.n - 1].toNumber() / Prime.histogram.length);
+        let c = 0;
+        let x = 0;
+        let z = new Big(interval);
+        for (let i = 0; i < Prime.n; i++) {
+            if (Prime.primeArray[i].gt(z)) {
+                Prime.histogram[c] = i - x;
+                x = i;
+                c++;
+                z = new Big(interval).mul(c + 1);
+            }
+        }
+        console.log('Histogram');
+        console.log(Prime.histogram)
+    }
 }
 
 Prime.readFile();
-let x = Big(1528543);
-console.log('x =', x.toFixed(), 'is divided by', Prime.isPrime(x).toFixed());
+
+Prime.createPrimeArray(Big('1000000'));
+
+Prime.calcDiffArray();
+
+Prime.primeHistogram();
 
 Prime.saveFile();

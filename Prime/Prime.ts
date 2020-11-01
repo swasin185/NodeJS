@@ -22,7 +22,7 @@ class Prime {
                 for (let i = 0; i < Prime.n; i++)
                     Prime.primeArray[i] = new Big(p[i]);
             }
-            console.log('read prime file', Prime.getLength(), Prime.getPrime(Prime.getLength() - 1).toFixed());
+            console.log('read prime file', Prime.getLength(), Prime.getLastPrime().toFixed());
         } catch (err) {
             console.log(Prime.fileName + ' Error! ' + err);
         }
@@ -35,7 +35,7 @@ class Prime {
             for (let i = 0; i < Prime.n; i++)
                 data += Prime.primeArray[i].toFixed() + '\n';
             fs.writeFileSync(Prime.fileName, data, 'utf-8');
-            console.log('save to prime file', Prime.getLength(), Prime.getPrime(Prime.getLength() - 1).toFixed());
+            console.log('save to prime file', Prime.getLength(), Prime.getLastPrime().toFixed());
         } else {
             // console.log('Prime file is not modified');
         }
@@ -79,6 +79,10 @@ class Prime {
     public static getPrime(i: number): Big {
         return Prime.primeArray[i];
     }
+    public static getLastPrime() {
+        return Prime.primeArray[Prime.n - 1];
+    }
+
     public static getLength(): number {
         return this.n;
     }
@@ -93,12 +97,12 @@ class Prime {
             diff = Math.floor(diff / 2);
             Prime.diffArray[diff]++;
         }
-        console.log("Prime Distance")
+        console.log("Prime Gap")
         console.log(Prime.diffArray);
     }
 
     public static createPrimeArray(x: Big) {
-        let lastPrime: Big = Prime.primeArray[Prime.n - 1];
+        let lastPrime: Big = Prime.getLastPrime();
         if (lastPrime.lt(x)) {
             let time: number = (new Date()).getTime();
             let y = lastPrime;
@@ -145,26 +149,27 @@ class Prime {
     private static histogram: number[] = new Array(20);
     public static primeHistogram() {
         Prime.histogram.fill(0);
-        let interval = Math.floor(Prime.primeArray[Prime.n - 1].toNumber() / Prime.histogram.length);
+        let interval = Math.floor(Prime.getLastPrime().toNumber() / Prime.histogram.length);
         let c = 0;
         let x = 0;
         let z = new Big(interval);
         for (let i = 0; i < Prime.n; i++) {
             if (Prime.primeArray[i].gt(z)) {
-                Prime.histogram[c] = i - x;
+                //Prime.histogram[c] = Math.round((i - x) / Prime.n * 10000) / 100;
+                Prime.histogram[c] = (i - x);
                 x = i;
                 c++;
                 z = new Big(interval).mul(c + 1);
             }
         }
-        console.log('Histogram');
+        console.log('Histogram interval=', interval, ' count=', Prime.n);
         console.log(Prime.histogram)
     }
 }
 
 Prime.readFile();
 
-Prime.createPrimeArray(Big('1000000'));
+Prime.createPrimeArray(Big('200000'));
 
 Prime.calcDiffArray();
 

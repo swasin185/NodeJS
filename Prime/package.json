@@ -1,0 +1,12 @@
+{
+  "name": "prime",
+  "scripts": {
+    "build": "tsc PrimeAnalysis.ts & uglifyjs PrimeAnalysis.js -c -m -o ./public/PrimeAnalysis.js & del PrimeAnalysis.js"
+  },
+  "dependencies": {
+    "big.js": "^6.0.2"
+  },
+  "devDependencies": {
+    "@types/big.js": "^6.0.0"
+  }
+}

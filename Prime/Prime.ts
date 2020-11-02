@@ -88,17 +88,25 @@ class Prime {
     }
 
     private static diffArray: number[];
-    public static calcDiffArray() {
-        Prime.diffArray = new Array(100);
-        Prime.diffArray.fill(0);
+    private static diffFile = 'primegap.txt';
+    public static gapHistogram() {
+        console.log("Prime Gap")
+        Prime.diffArray = new Array(Prime.n);
         let diff = 0;
+        Prime.diffArray[0] = 0;
         for (let i = 1; i < Prime.n; i++) {
             diff = Prime.primeArray[i].sub(Prime.primeArray[i - 1]).toNumber();
             diff = Math.floor(diff / 2);
-            Prime.diffArray[diff]++;
+            Prime.diffArray[i] = diff;
         }
-        console.log("Prime Gap")
         console.log(Prime.diffArray);
+        let fs = require("fs");
+        let data: string = '';
+        for (let i = 0; i < Prime.n; i++)
+            data += Prime.diffArray[i].toFixed() + '\n';
+        fs.writeFileSync(Prime.diffFile, data, 'utf-8');
+        console.log('save to prime gap file');
+
     }
 
     public static createPrimeArray(x: Big) {
@@ -169,9 +177,9 @@ class Prime {
 
 Prime.readFile();
 
-Prime.createPrimeArray(Big('200000'));
+Prime.createPrimeArray(Big('1000000'));
 
-Prime.calcDiffArray();
+Prime.gapHistogram();
 
 Prime.primeHistogram();
 

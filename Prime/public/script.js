@@ -9,12 +9,14 @@ var storedText;
 fetch(url)
     .then(function (response) {
         response.text().then(function (text) {
-            let p = text.split('\n');
-            dataX = new Array(p.length - 1);
-            dataY = new Array(p.length - 1);
-            for (let i = 0; i < p.length - 1; i++) {
-                dataX[i] = Number(p[i]);
-                dataY[i] = i;
+            let data = text.split('\n');
+            dataX = new Array(data.length - 1);
+            dataY = new Array(data.length - 1);
+            let p = 0;
+            for (let i = 0; i < data.length - 1; i++) {
+                p = Number(data[i]);
+                dataX[i] = Math.cos(p) * p;
+                dataY[i] = Math.sin(p) * p;
             }
             chart1 = new Chart('chart1', dataX, dataY);
         });

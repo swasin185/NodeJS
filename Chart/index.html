@@ -1,17 +1,56 @@
 <!DOCTYPE html>
 <html>
 
-<body bgcolor="grey">
-    <canvas id="chart1" width="800" height="800" style="background-color:black;border:1px solid" onclick="chart1.clickXY(event);"></canvas>
-    <canvas id="chart2" width="800" height="800" style="background-color:black;border:1px solid" onclick="chart2.clickXY(event);"></canvas>
+<body bgcolor="black">
+    <canvas id="chart1" width="800" height="800" style="background-color:darkred;border:1px solid"
+        onclick="chart1.clickXY(event);"></canvas>
+    <canvas id="chart2" width="800" height="800" style="background-color:darkgreen;border:1px solid"
+        onclick="chart2.clickXY(event);"></canvas>
+    <canvas id="chart3" width="800" height="800" style="background-color:navy;border:1px solid"
+        onclick="chart3.clickXY(event);"></canvas>
+    <canvas id="chart4" width="800" height="800" style="background-color:darkorange;border:1px solid"
+        onclick="chart4.clickXY(event);"></canvas>
 </body>
 
 <script src="Chart.js"></script>
 <script>
-    var chart1 = new Chart('chart1', [], []);
-    chart1.createTestData1();
-    var chart2 = new Chart('chart2', [], []);
-    chart2.createTestData2();
+
+    let n = 500;
+    let xData = new Array(n);
+    let yData = new Array(n);
+    for (let i = 0; i < n; i++) {
+        xData[i] = Math.cos(2 * Math.PI * (i + 1) / n);
+        yData[i] = Math.sin(2 * Math.PI * (i + 1) / n);
+    }
+    var chart1 = new Chart('chart1', xData, yData);
+
+    n = 200;
+    xData = new Array(n);
+    yData = new Array(n);
+    for (let i = 0; i < n; i++) {
+        xData[i] = i - n / 2;
+        yData[i] = xData[i] * xData[i] * xData[i] / 2;
+
+    }
+    var chart2 = new Chart('chart2', xData, yData);
+
+    n = 200;
+    xData = new Array(n);
+    yData = new Array(n);
+    for (let i = 0; i < n; i++) {
+        xData[i] = i - n / 2;
+        yData[i] = Math.log(Math.abs(xData[i]) + 1);
+    }
+    var chart3 = new Chart('chart3', xData, yData);
+
+    n = 500;
+    xData = new Array(n);
+    yData = new Array(n);
+    for (let i = 0; i < n; i++) {
+        xData[i] = i - n / 2;
+        yData[i] = Math.sin(xData[i] * Math.PI * 4 / n);
+    }
+    var chart4 = new Chart('chart4', xData, yData);
 
 </script>
 

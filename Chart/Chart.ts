@@ -22,8 +22,8 @@ class Chart {
         this.cv = document.getElementById(canvasName) as HTMLCanvasElement;
         this.cx = this.cv.getContext("2d") as CanvasRenderingContext2D;
         this.imgData = this.cx.createImageData(this.cv.width, this.cv.height);
-        this.createChart(dataX, dataY);
         this.color = Chart.COLORS[Math.floor(Math.random() * 8)];
+        this.createChart(dataX, dataY);
     }
 
     public createChart(dataX: number[], dataY: number[]) {
@@ -68,29 +68,36 @@ class Chart {
         this.cx.closePath();
         this.cx.stroke();
 
-
         this.cx.strokeStyle = this.color;
         this.cx.beginPath();
+        this.cx.closePath();
         // let img = this.imgData.data;
         // let coor = 0;
         let x = 0;
         let y = 0;
+
         for (let i = 0; i < this.dataX.length; i++) {
             x = this.yAxis + this.dataX[i] * this.dx;
             y = this.xAxis - this.dataY[i] * this.dy;
-            this.cx.moveTo(x, y);
-            this.cx.lineTo(x + 1, y + 1);
+            // if (i == 0)
+            //     this.cx.moveTo(x, y);
+            // else
+            //     this.cx.lineTo(x, y);
+            this.cx.moveTo(x - 1, y);
+            this.cx.lineTo(x + 1, y);
+            this.cx.moveTo(x, y - 1);
+            this.cx.lineTo(x, y + 1);
 
-            // coor = Math.round(y * this.cv.width + x) * 4;
+            // coor = Math.round(y * this.cv.width * 0.9) + x * 4;
             // img[coor] = 255; // RED
             // img[++coor] = 255; // GREEN
             // img[++coor] = 128; // BLUE
             // img[++coor] = 255; // ALPHA
         }
-        this.cx.closePath();
+        //this.cx.closePath();
         this.cx.stroke();
 
-        // this.cx.putImageData(this.imgData, 0, 0);
+        //this.cx.putImageData(this.imgData, 0, 0);
     }
 
     public clickXY(event: MouseEvent) {
@@ -121,21 +128,12 @@ class Chart {
     }
 
     public createTestData2(): void {
-        let n = 800;
-        let x = 1;
-        let y = 0;
-
+        let n = 1000;
         this.dataX = new Array(n);
         this.dataY = new Array(n);
-        let i = 0;
-        while (x <= n) {
-            // y = Math.round(Math.random() * x);
-            // y = Math.log(x);
-            y = Math.pow(x, 2);
-            this.dataX[i] = x;
-            this.dataY[i] = y;
-            i++;
-            x++;
+        for (let i = 0; i < n; i++) {
+            this.dataX[i] = Math.cos(2 * Math.PI * (i + 1) / n);
+            this.dataY[i] = Math.sin(2 * Math.PI * (i + 1) / n);
         }
         this.createChart(this.dataX, this.dataY);
     }

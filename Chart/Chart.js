@@ -3,8 +3,8 @@ var Chart = /** @class */ (function () {
         this.cv = document.getElementById(canvasName);
         this.cx = this.cv.getContext("2d");
         this.imgData = this.cx.createImageData(this.cv.width, this.cv.height);
-        this.createChart(dataX, dataY);
         this.color = Chart.COLORS[Math.floor(Math.random() * 8)];
+        this.createChart(dataX, dataY);
     }
     Chart.prototype.createChart = function (dataX, dataY) {
         this.dataX = dataX;
@@ -47,6 +47,7 @@ var Chart = /** @class */ (function () {
         this.cx.stroke();
         this.cx.strokeStyle = this.color;
         this.cx.beginPath();
+        this.cx.closePath();
         // let img = this.imgData.data;
         // let coor = 0;
         var x = 0;
@@ -54,17 +55,23 @@ var Chart = /** @class */ (function () {
         for (var i = 0; i < this.dataX.length; i++) {
             x = this.yAxis + this.dataX[i] * this.dx;
             y = this.xAxis - this.dataY[i] * this.dy;
-            this.cx.moveTo(x, y);
-            this.cx.lineTo(x + 1, y + 1);
-            // coor = Math.round(y * this.cv.width + x) * 4;
+            // if (i == 0)
+            //     this.cx.moveTo(x, y);
+            // else
+            //     this.cx.lineTo(x, y);
+            this.cx.moveTo(x - 1, y);
+            this.cx.lineTo(x + 1, y);
+            this.cx.moveTo(x, y - 1);
+            this.cx.lineTo(x, y + 1);
+            // coor = Math.round(y * this.cv.width * 0.9) + x * 4;
             // img[coor] = 255; // RED
             // img[++coor] = 255; // GREEN
             // img[++coor] = 128; // BLUE
             // img[++coor] = 255; // ALPHA
         }
-        this.cx.closePath();
+        //this.cx.closePath();
         this.cx.stroke();
-        // this.cx.putImageData(this.imgData, 0, 0);
+        //this.cx.putImageData(this.imgData, 0, 0);
     };
     Chart.prototype.clickXY = function (event) {
         var x = event.offsetX - this.yAxis;
@@ -91,20 +98,12 @@ var Chart = /** @class */ (function () {
         this.createChart(this.dataX, this.dataY);
     };
     Chart.prototype.createTestData2 = function () {
-        var n = 800;
-        var x = 1;
-        var y = 0;
+        var n = 1000;
         this.dataX = new Array(n);
         this.dataY = new Array(n);
-        var i = 0;
-        while (x <= n) {
-            // y = Math.round(Math.random() * x);
-            // y = Math.log(x);
-            y = Math.pow(x, 2);
-            this.dataX[i] = x;
-            this.dataY[i] = y;
-            i++;
-            x++;
+        for (var i = 0; i < n; i++) {
+            this.dataX[i] = Math.cos(2 * Math.PI * (i + 1) / n);
+            this.dataY[i] = Math.sin(2 * Math.PI * (i + 1) / n);
         }
         this.createChart(this.dataX, this.dataY);
     };

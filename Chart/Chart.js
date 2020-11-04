@@ -45,6 +45,7 @@ var Chart = /** @class */ (function () {
         this.cx.lineTo(this.yAxis, this.cv.height);
         this.cx.closePath();
         this.cx.stroke();
+        this.cx.fillStyle = this.color;
         this.cx.strokeStyle = this.color;
         this.cx.beginPath();
         this.cx.closePath();
@@ -55,14 +56,11 @@ var Chart = /** @class */ (function () {
         for (var i = 0; i < this.dataX.length; i++) {
             x = this.yAxis + this.dataX[i] * this.dx;
             y = this.xAxis - this.dataY[i] * this.dy;
-            // if (i == 0)
-            //     this.cx.moveTo(x, y);
-            // else
-            //     this.cx.lineTo(x, y);
+            // this.cx.fillRect(x - 1, y - 1, 1, 1);
             this.cx.moveTo(x - 1, y);
-            this.cx.lineTo(x + 1, y);
+            this.cx.lineTo(x, y);
             this.cx.moveTo(x, y - 1);
-            this.cx.lineTo(x, y + 1);
+            this.cx.lineTo(x, y);
             // coor = Math.round(y * this.cv.width * 0.9) + x * 4;
             // img[coor] = 255; // RED
             // img[++coor] = 255; // GREEN

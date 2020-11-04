@@ -18,9 +18,11 @@
     let n = 500;
     let xData = new Array(n);
     let yData = new Array(n);
+    let theta = 0;
     for (let i = 0; i < n; i++) {
-        xData[i] = Math.cos(2 * Math.PI * (i + 1) / n);
-        yData[i] = Math.sin(2 * Math.PI * (i + 1) / n);
+        theta = 2 * Math.PI * i / n;
+        xData[i] = Math.cos(theta);
+        yData[i] = Math.sin(theta);
     }
     var chart1 = new Chart('chart1', xData, yData);
 

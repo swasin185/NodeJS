@@ -52,7 +52,7 @@ export default {
       params: {},
       mainForm: "",
       formTitle: "",
-      ssInfo: { comDB: "DB1", company: "? co.,ltd.", color: "lightgrey" }
+      ssInfo: { comDB: "DB3", company: "? co.,ltd.", color: "lightgrey" }
     };
   },
 

@@ -13,11 +13,27 @@ fetch(url)
             dataX = new Array(data.length - 1);
             dataY = new Array(data.length - 1);
             let p = 0;
+            // for (let i = 0; i < data.length - 1; i++) {
+            //     p = Number(data[i]);
+            //     dataX[i] = Math.cos(p) * p;
+            //     dataY[i] = Math.sin(p) * p;
+            // }
+            let iteration = 1000;
+            let x = 1;
             for (let i = 0; i < data.length - 1; i++) {
-                p = Number(data[i]);
-                dataX[i] = Math.cos(p) * p;
-                dataY[i] = Math.sin(p) * p;
+                x = Number(data[i]);
+                let z = x;
+                let j = 0;
+                while (z > 1 && j++ < iteration) {
+                    if (z % 2 == 0)
+                        z = z / 2;
+                    else
+                        z = z * 3 + 1;
+                }
+                dataX[i] = x;
+                dataY[i] = j;
             }
+        
             chart1 = new Chart('chart1', dataX, dataY);
         });
     });

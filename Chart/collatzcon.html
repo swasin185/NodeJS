@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Collatz's Conjecture 3n+1</title>
+</head>
+
+<body bgcolor="black">
+    <canvas id="chart1" width="1000" height="1000" style="background-color:navy;border:1px solid"
+        onclick="chart1.clickXY(event);"></canvas>
+</body>
+<script src="Chart.js"></script>
+<script>
+    let iteration = 999;
+    let n = 100000;
+    let xData = new Array(n);
+    let yData = new Array(n);
+    let i = 0;
+    let x = 1;
+    while (i < n && x < n) {
+        x += 1;
+        let z = x;
+        let j = 0;
+        while (z > 1 && j++ < iteration) {
+            if (z % 2 == 0)
+                z = z / 2;
+            else
+                z = z * 3 + 1;
+        }
+        xData[i] = x;
+        yData[i] = j;
+        i++;
+    }
+    console.log('calculate data =', i);
+    var chart1 = new Chart('chart1', xData, yData);
+</script>
+
+</html>

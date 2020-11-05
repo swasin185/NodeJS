@@ -33,8 +33,7 @@ app.get("/", (req, res) => {
 
 // const loginService = require("./services/login.js")
 // loginService(sess, app, baseURL)
-require("./services/login.js")(app, baseURL)
-require("./services/messenger.js")(app, baseURL)
+require("./services/math.js")(app, baseURL)
 
 // run command : PORT=XXXX node server.js
 const listenPort = process.env.PORT || 8000

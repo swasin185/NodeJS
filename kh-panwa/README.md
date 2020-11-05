@@ -3,11 +3,13 @@
 ## Project setup
 ```
 npm install
+npm update
+
 ```
 
 ### Compiles and hot-reloads for development
 ```
-npm run serve
+npm run db1
 ```
 
 ### Compiles and minifies for production

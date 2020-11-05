@@ -3,23 +3,26 @@ const Client = require("../src/client.js")
 var servicePortDB = undefined
 
 exports.getServiceDB = function (port) {
-    if (!servicePortDB) {
+    if (servicePortDB == undefined) {
         let i = 0
         while (i < this.ports.length && this.ports[i].port != port) {
             i++
         }
+        
         if (i < this.ports.length)
             servicePortDB = this.ports[i]
+        else
+            servicePortDB = this.ports[this.ports.length-1]
     }
     return servicePortDB
 }
 
 exports.ports = [
-    { port: '8001', db: 'DB1', name: 'DB1 - บริษัท SPA2020 จำกัด', color: 'blue' },
-    { port: '8002', db: 'DB2', name: 'DB2 - บริษัท SPA2020 จำกัด', color: 'green' },
-    { port: '8003', db: 'DB3', name: 'DB3 - บริษัท SPA2020 จำกัด', color: 'red' },
-    { port: '8004', db: 'DB4', name: 'DB4 - บริษัท SPA2020 จำกัด', color: 'orange' },
-    { port: '8005', db: 'DB5', name: 'DB5 - บริษัท SPA2020 จำกัด', color: 'yellow' }
+    { port: 8001, db: 'DB1', name: 'DB1 - บริษัท SPA2020 จำกัด', color: 'blue' },
+    { port: 8002, db: 'DB2', name: 'DB2 - บริษัท SPA2020 จำกัด', color: 'green' },
+    { port: 8003, db: 'DB3', name: 'DB3 - บริษัท SPA2020 จำกัด', color: 'red' },
+    { port: 8004, db: 'DB4', name: 'DB4 - บริษัท SPA2020 จำกัด', color: 'orange' },
+    { port: 8005, db: 'DB5', name: 'DB5 - บริษัท SPA2020 จำกัด', color: 'yellow' }
 ]
 
 exports.menuGroup = [

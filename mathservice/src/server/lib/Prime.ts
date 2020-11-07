@@ -78,13 +78,13 @@ export default class Prime {
     }
 
     public static isPrime(s: string): boolean {
-        let x = new Big(s);
-        return this.findDivisor(x).eq(1);
+        return this.findDivisor(new Big(s)).eq(1);
     }
 
     public static getPrime(i: number): Big {
         return Prime.primeArray[i];
     }
+
     public static getLastPrime() {
         return Prime.primeArray[Prime.n - 1];
     }
@@ -136,16 +136,15 @@ export default class Prime {
                 if (Prime.findDivisor(y).eq(Prime.ONE)) {
                     if (Prime.primeArray.length == Prime.n) {
                         let oldArray = Prime.primeArray;
-                        Prime.primeArray = new Array(Prime.n * 2);
+                        Prime.primeArray = new Array(Math.ceil(Prime.n * 1.5));
                         console.log("Extend array size = ", Prime.primeArray.length);
                         for (let i = 0; i < oldArray.length; i++)
                             Prime.primeArray[i] = oldArray[i];
                     }
-                    // console.log(Prime.n, '\t', ' prime\t=\t', y.toFixed());
                     lastPrime = y;
                     Prime.primeArray[Prime.n++] = lastPrime;
                     if (Prime.n % 1000 == 0) {
-                        console.log('primes count =', Prime.n)
+                        console.log('primes count to', Prime.n)
                     }
                 }
             }

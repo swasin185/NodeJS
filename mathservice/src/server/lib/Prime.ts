@@ -4,7 +4,7 @@ import Big from "big.js";
 import fs from "fs";
 
 export default class Prime {
-    private static fileName = 'prime.txt';
+    public static fileName = 'prime.txt';
     public static ONE = new Big(1);
 
     private static primeArray: Big[] = [Big(2), Big(3), Big(5), Big(7), Big(11), Big(13), Big(17), Big(19), Big(23)];
@@ -12,7 +12,6 @@ export default class Prime {
 
     private static n_old = 0;
     public static readFile(): void {
-        //let fs = require("fs");
         try {
             let readData = fs.readFileSync(Prime.fileName, 'utf-8');
             let p = readData.split('\n');
@@ -32,7 +31,6 @@ export default class Prime {
 
     public static saveFile(): void {
         if (Prime.n != Prime.n_old) {
-            //let fs = require("fs");
             let data: string = '';
             for (let i = 0; i < Prime.n; i++)
                 data += Prime.primeArray[i].toFixed() + '\n';

@@ -4,7 +4,7 @@
   "private": true,
   "type" : "module",
   "scripts": {
-    "serve": "nodemon dist/server/server.js",
+    "serve": "nodemon dist/server/Server.js",
     "build": "tsc"
   },
   "devDependencies": {

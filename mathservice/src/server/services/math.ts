@@ -35,6 +35,12 @@ export default (server: any, apiURL: string) => {
         res.json({ x: x.toString(), prime: Prime.isPrime(x) })
     })
 
+    server.get(apiURL + "primeFile", (req, res) => {
+        res.setHeader('Content-type', "text/plain");
+        res.setHeader('Content-disposition', 'attachment; filename=prime.txt');
+        res.sendFile(process.cwd() + '/' + Prime.fileName);
+    })
+
     server.get(apiURL + "gcd", (req, res) => {
         let queryObj = url.parse(req.url, true).query;
         let a = new Big('1');

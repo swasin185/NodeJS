@@ -2,9 +2,9 @@
   "name": "mathservice",
   "version": "0.1.0",
   "private": true,
-  "type" : "module",
+  "type": "module",
   "scripts": {
-    "serve": "nodemon dist/server/Server.js",
+    "serve": "nodemon dist/server/index.js",
     "build": "tsc"
   },
   "devDependencies": {

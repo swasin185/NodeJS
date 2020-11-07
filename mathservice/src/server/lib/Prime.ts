@@ -26,6 +26,7 @@ export default class Prime {
         } catch (err) {
             console.log(Prime.fileName + ' Error! ' + err);
             Prime.createPrimeArray("10000");
+            Prime.saveFile();
         }
     }
 
@@ -131,7 +132,7 @@ export default class Prime {
         if (lastPrime.lt(x)) {
             let y = lastPrime;
             while (lastPrime.lt(x)) {
-                y = y.add(1);
+                y = y.add(2);
                 if (Prime.findDivisor(y).eq(Prime.ONE)) {
                     if (Prime.primeArray.length == Prime.n) {
                         let oldArray = Prime.primeArray;

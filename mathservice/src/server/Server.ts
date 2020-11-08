@@ -6,7 +6,7 @@ import Prime from './lib/Prime.js';
 const listenPort = process.env.PORT || 8000
 const apiURL = "/api/"
 
-export class ServerREST {
+export class Server {
     private server = express();
     constructor() {
         this.server.use(bodyParser.json())              // รับส่งข้อมูลไฟล์ JSON 
@@ -25,15 +25,14 @@ export class ServerREST {
             res.send(text);
         });
         mathServ(this.server, apiURL);
-        process.on('exit', (code) => {
-            console.log('exit!')
-            Prime.saveFile();
-        });
     }
     public start(): void {
         this.server.listen(listenPort, () => {
             console.log('start Services Server PORT :' + listenPort)
         });
     }
+    public getExpress() : any {
+        return this.server;
+    }
 }
-const serve = new ServerREST().start();
+const serve = new Server().start();

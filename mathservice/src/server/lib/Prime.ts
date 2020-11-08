@@ -1,7 +1,7 @@
 // npm install big.js
 // npm install --save-dev @types/big.js
 import Big from "big.js";
-import fs from "fs";
+import * as fx from "fs";
 
 export default class Prime {
     public static fileName = 'prime.txt';
@@ -13,8 +13,8 @@ export default class Prime {
     private static n_old = 0;
     public static readFile(): void {
         try {
-            let readData = fs.readFileSync(Prime.fileName, 'utf-8');
-            let p = readData.split('\n');
+            const readData = fx.readFileSync(Prime.fileName, 'utf-8');
+            const p = readData.split('\n');
             if (Prime.n < p.length - 1) {
                 Prime.n = p.length - 1;
                 Prime.n_old = Prime.n;
@@ -35,7 +35,7 @@ export default class Prime {
             let data: string = '';
             for (let i = 0; i < Prime.n; i++)
                 data += Prime.primeArray[i].toFixed() + '\n';
-            fs.writeFileSync(Prime.fileName, data, 'utf-8');
+            fx.writeFileSync(Prime.fileName, data, 'utf-8');
             console.log('save to prime file', Prime.getLength(), Prime.getLastPrime().toFixed());
         } else {
             console.log('Prime file is not modified');
@@ -65,7 +65,7 @@ export default class Prime {
     public static findDivisor(x: Big): Big {
         let divisor = Prime.ONE;
         if (!Prime.searchPrime(x)) { // if not prime find divisor
-            let sqrt: Big = x.sqrt();
+            const sqrt: Big = x.sqrt();
             Prime.createPrimeArray(sqrt.toString());
             let i = 0;
             divisor = Prime.primeArray[i];
@@ -106,11 +106,10 @@ export default class Prime {
             Prime.diffArray[i] = diff;
         }
         console.log(Prime.diffArray);
-        let fs = require("fs");
         let data: string = '';
         for (let i = 0; i < Prime.n; i++)
             data += Prime.diffArray[i].toFixed() + '\n';
-        fs.writeFileSync(Prime.diffFile, data, 'utf-8');
+        fx.writeFileSync(Prime.diffFile, data, 'utf-8');
         console.log('save to prime gap file');
     }
 
@@ -127,7 +126,7 @@ export default class Prime {
     }
 
     public static createPrimeArray(n: string) {
-        let x: Big = new Big(n);
+        const x: Big = new Big(n);
         let lastPrime: Big = Prime.getLastPrime();
         if (lastPrime.lt(x)) {
             let y = lastPrime;
@@ -135,7 +134,7 @@ export default class Prime {
                 y = y.add(2);
                 if (Prime.findDivisor(y).eq(Prime.ONE)) {
                     if (Prime.primeArray.length == Prime.n) {
-                        let oldArray = Prime.primeArray;
+                        const oldArray = Prime.primeArray;
                         Prime.primeArray = new Array(Math.ceil(Prime.n * 1.5));
                         console.log("Extend array size = ", Prime.primeArray.length);
                         for (let i = 0; i < oldArray.length; i++)
@@ -153,7 +152,7 @@ export default class Prime {
 
     public static goldbachConjecture() {
         console.log("Goldbach's conjecture");
-        let size = 22;
+        const size = 22;
         let head: string = '';
         for (let i = 1; i < size * 2 / 3; i++) {
             head += '\t' + Prime.getPrime(i).toFixed();
@@ -171,7 +170,7 @@ export default class Prime {
     private static histogram: number[] = new Array(20);
     public static primeHistogram() {
         Prime.histogram.fill(0);
-        let interval = Math.floor(Prime.getLastPrime().toNumber() / Prime.histogram.length);
+        const interval = Math.floor(Prime.getLastPrime().toNumber() / Prime.histogram.length);
         let c = 0;
         let x = 0;
         let z = new Big(interval);

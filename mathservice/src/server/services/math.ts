@@ -7,8 +7,8 @@ export default (server: any, apiURL: string) => {
     console.log('Math Services register...');
 
     server.get(apiURL + "getPrimes", (req, res) => {
-        let queryObj = url.parse(req.url, true).query;
-        var n = Prime.getLength();
+        const queryObj = url.parse(req.url, true).query;
+        let n = Prime.getLength();
         if (queryObj && queryObj.n)
             n = Number(queryObj.n);
         if (n > Prime.getLength())
@@ -21,14 +21,14 @@ export default (server: any, apiURL: string) => {
         // console.log('new P = ', p);
         // Prime.createPrimeArray(String(p));
         //}
-        let allPrimes: any[] = new Array(n);
+        const allPrimes: any[] = new Array(n);
         for (let i = 0; i < n; i++)
             allPrimes[i] = { p: Prime.getPrime(i).toFixed() };
         res.json(allPrimes);
     })
 
     server.get(apiURL + "isPrime", (req, res) => {
-        let queryObj = url.parse(req.url, true).query;
+        const queryObj = url.parse(req.url, true).query;
         let x = '1';
         if (queryObj && queryObj.x)
             x = String(queryObj.x);
@@ -42,7 +42,7 @@ export default (server: any, apiURL: string) => {
     })
 
     server.get(apiURL + "gcd", (req, res) => {
-        let queryObj = url.parse(req.url, true).query;
+        const queryObj = url.parse(req.url, true).query;
         let a = new Big('1');
         let b = new Big('1');
         if (queryObj && queryObj.a)

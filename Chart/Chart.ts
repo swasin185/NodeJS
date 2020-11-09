@@ -58,8 +58,19 @@ class Chart {
     }
 
     public plot(): void {
-        this.cx.strokeStyle = "grey";
         this.cx.clearRect(0, 0, this.cv.width, this.cv.height);
+
+        this.cx.strokeStyle = "grey";
+        this.cx.beginPath();
+        let y = this.xAxis - this.minY * this.dy;
+        let x = this.yAxis + this.minX * this.dx;
+        const y2 = this.xAxis - this.maxY * this.dy;
+        const x2 = this.yAxis + this.maxX * this.dx;
+        this.cx.strokeRect(x, y, x2 - x, y2 - y);
+        this.cx.closePath();
+        this.cx.stroke();
+
+        this.cx.strokeStyle = "black";
         this.cx.beginPath();
         this.cx.moveTo(0, this.xAxis);
         this.cx.lineTo(this.cv.width, this.xAxis);
@@ -74,8 +85,6 @@ class Chart {
         this.cx.closePath();
         // let img = this.imgData.data;
         // let coor = 0;
-        let x = 0;
-        let y = 0;
         for (let i = 0; i < this.dataX.length; i++) {
             x = this.yAxis + this.dataX[i] * this.dx;
             y = this.xAxis - this.dataY[i] * this.dy;
@@ -93,9 +102,8 @@ class Chart {
             // img[++coor] = 128; // BLUE
             // img[++coor] = 255; // ALPHA
         }
-        //this.cx.closePath();
         this.cx.stroke();
-
+        
         //this.cx.putImageData(this.imgData, 0, 0);
     }
 

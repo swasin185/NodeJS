@@ -36,8 +36,17 @@ var Chart = /** @class */ (function () {
         console.log('min Y =', this.minY, 'max Y =', this.maxY);
     };
     Chart.prototype.plot = function () {
-        this.cx.strokeStyle = "grey";
         this.cx.clearRect(0, 0, this.cv.width, this.cv.height);
+        this.cx.strokeStyle = "grey";
+        this.cx.beginPath();
+        var y = this.xAxis - this.minY * this.dy;
+        var x = this.yAxis + this.minX * this.dx;
+        var y2 = this.xAxis - this.maxY * this.dy;
+        var x2 = this.yAxis + this.maxX * this.dx;
+        this.cx.strokeRect(x, y, x2 - x, y2 - y);
+        this.cx.closePath();
+        this.cx.stroke();
+        this.cx.strokeStyle = "black";
         this.cx.beginPath();
         this.cx.moveTo(0, this.xAxis);
         this.cx.lineTo(this.cv.width, this.xAxis);
@@ -51,8 +60,6 @@ var Chart = /** @class */ (function () {
         this.cx.closePath();
         // let img = this.imgData.data;
         // let coor = 0;
-        var x = 0;
-        var y = 0;
         for (var i = 0; i < this.dataX.length; i++) {
             x = this.yAxis + this.dataX[i] * this.dx;
             y = this.xAxis - this.dataY[i] * this.dy;
@@ -67,7 +74,6 @@ var Chart = /** @class */ (function () {
             // img[++coor] = 128; // BLUE
             // img[++coor] = 255; // ALPHA
         }
-        //this.cx.closePath();
         this.cx.stroke();
         //this.cx.putImageData(this.imgData, 0, 0);
     };

@@ -29,13 +29,13 @@
     n = 1000;
     xData = new Array(n);
     yData = new Array(n);
-	let y = 1;
-    for (let i = 0; i < n; i++) {
-        xData[i] = 1000*i+2;
-
-        yData[i] = (1/Math.log(xData[i]));
-
+    xData[0] = 0;
+    yData[0] = 0;
+    for (let i = 1; i < n; i++) {
+        xData[i] = xData[i-1]+0.005
+        yData[i] = Math.pow(1 / xData[i], xData[i]);
     }
+    console.log(yData);
     var chart2 = new Chart('chart2', xData, yData);
 
     n = 200;
@@ -52,7 +52,7 @@
     yData = new Array(n);
     for (let i = 0; i < n; i++) {
         xData[i] = i - n / 2;
-        yData[i] = Math.sin(xData[i] * Math.PI / 4)  + Math.sin(xData[i] * Math.PI * 2 / n) + Math.sin(xData[i] * Math.PI * 4 / n); 
+        yData[i] = Math.sin(xData[i] * Math.PI / 4) + Math.sin(xData[i] * Math.PI * 2 / n) + Math.sin(xData[i] * Math.PI * 4 / n);
     }
     var chart4 = new Chart('chart4', xData, yData);
 

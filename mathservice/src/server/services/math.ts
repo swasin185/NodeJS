@@ -1,5 +1,5 @@
 import Prime from '../lib/Prime.js'
-import url from 'url'
+
 import Big from 'big.js'
 
 export default (server: any, apiURL: string) => {
@@ -7,9 +7,9 @@ export default (server: any, apiURL: string) => {
   console.log('Math Services register...')
 
   server.get(apiURL + 'getPrimes', (req, res) => {
-    const queryObj = url.parse(req.url, true).query
+    const urlParams = new URLSearchParams(new URL('http:/' + req.url).search)
     let n = Prime.getLength()
-    if (queryObj && queryObj.n) { n = Number(queryObj.n) }
+    if (urlParams && urlParams.get('n')) { n = Number(urlParams.get('n')) }
     if (n > Prime.getLength()) { Prime.createPrimeArrayCount(n) }
     // { // calculate new prime for count = n
     // let p = Number(Prime.getLastPrime());
@@ -25,9 +25,9 @@ export default (server: any, apiURL: string) => {
   })
 
   server.get(apiURL + 'isPrime', (req, res) => {
-    const queryObj = url.parse(req.url, true).query
+    const urlParams = new URLSearchParams(new URL('http:/' + req.url).search)
     let x = '1'
-    if (queryObj && queryObj.x) { x = String(queryObj.x) }
+    if (urlParams && urlParams.get('x')) { x = String(urlParams.get('x')) }
     res.json({ x: x.toString(), prime: Prime.isPrime(x) })
   })
 
@@ -43,11 +43,11 @@ export default (server: any, apiURL: string) => {
   })
 
   server.get(apiURL + 'gcd', (req, res) => {
-    const queryObj = url.parse(req.url, true).query
+    const urlParams = new URLSearchParams(new URL('http:/' + req.url).search)
     let a = new Big('1')
     let b = new Big('1')
-    if (queryObj && queryObj.a) { a = new Big(String(queryObj.a)) }
-    if (queryObj && queryObj.b) { b = new Big(String(queryObj.b)) }
+    if (urlParams && urlParams.get('a')) { a = new Big(urlParams.get('a')) }
+    if (urlParams && urlParams.get('b')) { b = new Big(urlParams.get('b')) }
     let gcd = b
     if (b.gt(a)) {
       b = a
@@ -60,7 +60,7 @@ export default (server: any, apiURL: string) => {
       b = gcd
     }
     gcd = a
-    res.json({ a: String(queryObj.a), b: String(queryObj.b), gcd: gcd.toString() })
+    res.json({ a: urlParams.get('a'), b: urlParams.get('b'), gcd: gcd.toString() })
   })
 
   server.get(apiURL + 'logout', (req, res) => {

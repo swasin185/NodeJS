@@ -1,10 +1,13 @@
-var dataX;
-var dataY;
-var chart1;
+<!DOCTYPE html>
+<html>
 
-//var url = './prime.txt';
-var url = 'http://localhost:8000/api/primeFile';
-
+<body bgcolor="grey">
+    <canvas id="chart1" width="1600" height="800" style="background-color:brown;border:1px solid" onclick="chart1.clickXY(event);"></canvas>
+</body>
+<!--script src='https://cdn.jsdelivr.net/npm/big.js@6.0.0/big.min.js'></script-->
+<script src="http://localhost:8000/api/chart"></script>
+<script>
+url = 'http://localhost:8000/api/primeFile';
 fetch(url)
     .then(function (response) {
         response.text().then(function (text) {
@@ -12,22 +15,12 @@ fetch(url)
             dataX = new Array(data.length - 1);
             dataY = new Array(data.length - 1);
             let p = 0;
-            // for (let i = 0; i < data.length - 1; i++) {
-            //     p = Number(data[i]);
-            //     dataX[i] = Math.cos(p) * p;
-            //     dataY[i] = Math.sin(p) * p;
-            // }
             let iteration = 1000;
             let x = 1;
-			//let histPrime = new Array(32);
-			//histPrime.fill(0);
             for (let i = 0; i < data.length - 1; i++) {
                 x = Number(data[i]);
                 let z = x;
                 let j = 0;
-				//for (let k = 0; k<z.length && k < 10; k++)
-				//	if (z.charAt(k)=='1') 
-				//		j++;
                 while (z > 1 && j++ < iteration) {
                     if (z % 2 == 0)
                         z = z / 2;
@@ -38,12 +31,10 @@ fetch(url)
                 dataY[i] = j;
 				//histPrime[j] ++;
             }
-			
-			//console.log(histPrime);
-
             chart1 = new Chart('chart1', dataX, dataY);
         });
     });
 
+</script>
 
-
+</html>

@@ -1,7 +1,7 @@
 // npm install big.js
 // npm install --save-dev @types/big.js
-import Big from 'big.js'
-import * as fx from 'fs'
+import Big from 'big.js';
+import * as fx from 'fs';
 
 export default class Prime {
     public static fileName = 'prime.txt';
@@ -104,6 +104,15 @@ export default class Prime {
     }
 
     public static createPrimeArrayCount (n: number) {
+    // { // calculate new prime for count = n
+    // let p = Number(Prime.getLastPrime());
+    // let ratio = n / p * Math.log(p);
+    // let lp = Math.floor(Prime.getLength() * Math.log(p));
+    // p = Math.floor(lp * ratio);
+    // console.log('new P = ', p);
+    // Prime.createPrimeArray(String(p));
+    // }
+
       let time: number = (new Date()).getTime()
       let lp = Prime.getLastPrime()
       while (Prime.getLength() < n) {

@@ -1,4 +1,4 @@
-export default class Chart {
+class Chart {
     private static COLORS = ['magenta', 'cyan', 'lime', 'white', 'yellow', 'orange', 'pink'];
     private cv: HTMLCanvasElement;
     private cx: CanvasRenderingContext2D;

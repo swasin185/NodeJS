@@ -1,6 +1,5 @@
+import Converter from '../lib/Converter.js'
 import Prime from '../lib/Prime.js'
-
-import Big from 'big.js'
 
 export default (server: any, apiURL: string) => {
   Prime.readFile()
@@ -11,14 +10,6 @@ export default (server: any, apiURL: string) => {
     let n = Prime.getLength()
     if (urlParams && urlParams.get('n')) { n = Number(urlParams.get('n')) }
     if (n > Prime.getLength()) { Prime.createPrimeArrayCount(n) }
-    // { // calculate new prime for count = n
-    // let p = Number(Prime.getLastPrime());
-    // let ratio = n / p * Math.log(p);
-    // let lp = Math.floor(Prime.getLength() * Math.log(p));
-    // p = Math.floor(lp * ratio);
-    // console.log('new P = ', p);
-    // Prime.createPrimeArray(String(p));
-    // }
     const allPrimes: any[] = new Array(n)
     for (let i = 0; i < n; i++) { allPrimes[i] = { p: Prime.getPrime(i).toFixed() } }
     res.json(allPrimes)
@@ -39,28 +30,31 @@ export default (server: any, apiURL: string) => {
 
   server.get(apiURL + 'chart', (req, res) => {
     res.setHeader('Content-type', 'text/javscript')
+    res.setHeader('Content-disposition', 'attachment; filename=prime.txt')
     res.sendFile(process.cwd() + '/dist/client/lib/Chart.js')
   })
 
   server.get(apiURL + 'gcd', (req, res) => {
     const urlParams = new URLSearchParams(new URL('http:/' + req.url).search)
-    let a = new Big('1')
-    let b = new Big('1')
-    if (urlParams && urlParams.get('a')) { a = new Big(urlParams.get('a')) }
-    if (urlParams && urlParams.get('b')) { b = new Big(urlParams.get('b')) }
-    let gcd = b
-    if (b.gt(a)) {
-      b = a
-      a = gcd
-      gcd = b
+    if (urlParams && urlParams.get('a') && urlParams.get('b')) {
+      const a = urlParams.get('a')
+      const b = urlParams.get('b')
+      res.json({ a: a, b: b, gcd: Converter.gcd(a, b) })
+    } else {
+      res.status(500).json({ error: 'input error' })
     }
-    while (!b.eq(0)) {
-      gcd = a.mod(b)
-      a = b
-      b = gcd
+  })
+
+  server.get(apiURL + 'baseConvert', (req, res) => {
+    const urlParams = new URLSearchParams(new URL('http:/' + req.url).search)
+    if (urlParams && urlParams.get('x') && urlParams.get('baseIn') && urlParams.get('baseOut')) {
+      const x = urlParams.get('x')
+      const baseIn = Number(urlParams.get('baseIn'))
+      const baseOut = Number(urlParams.get('baseOut'))
+      res.json({ x: x, baseIn: baseIn, baseOut: baseOut, y: Converter.convert(x, baseIn, baseOut) })
+    } else {
+      res.status(500).json({ error: 'input error' })
     }
-    gcd = a
-    res.json({ a: urlParams.get('a'), b: urlParams.get('b'), gcd: gcd.toString() })
   })
 
   server.get(apiURL + 'logout', (req, res) => {

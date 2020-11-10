@@ -24,9 +24,9 @@ export default (server: any, apiURL: string) => {
 
   server.get(apiURL + 'goldbach', (req, res) => {
     const urlParams = new URLSearchParams(new URL('http:/' + req.url).search)
-    let x = 2
-    if (urlParams && urlParams.get('x')) { x = Number(urlParams.get('x')) }
-    res.json({ x: x, prime: Prime.goldbachConjecture(x) })
+    let x = '2'
+    if (urlParams && urlParams.get('x')) { x = urlParams.get('x') }
+    res.json({ x: x, goldbacx: Prime.goldbachConjecture(x) })
   })
 
   server.get(apiURL + 'primeFile', (req, res) => {

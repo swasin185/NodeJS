@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "serve": "nodemon dist/server/Server.js",
+    "serve": "tsc & nodemon dist/server/Server.js",
     "build": "tsc",
     "fix": "npx eslint --fix src/**/*.ts"
   },

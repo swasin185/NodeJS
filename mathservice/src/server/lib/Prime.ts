@@ -148,19 +148,46 @@ export default class Prime {
       }
     }
 
-    public static goldbachConjecture () {
-      console.log("Goldbach's conjecture")
-      const size = 22
-      let head: string = ''
-      for (let i = 1; i < size * 2 / 3; i++) {
-        head += '\t' + Prime.getPrime(i).toFixed()
-      }
-      console.log(head)
-      for (let i = 1; i < size; i++) {
-        let row: string = Prime.getPrime(i).toFixed()
-        for (let j = 1; j <= i * 2 / 3; j++) {
-          row += '\t' + Prime.getPrime(i).add(Prime.getPrime(j)).toFixed()
+    public static goldbachConjecture (n2 : number) {
+      const size = Math.round(n2 / 2)
+      let asc = ''
+      let des = ''
+      let k = 1
+      let lp = 1
+      for (let i = 0; Prime.getPrime(i).toNumber() < n2; i++) {
+        lp = i
+        while (k < Prime.getPrime(i).toNumber()) {
+          if (k < size) { asc += '-' } else { des = '-' + des }
+          k++
         }
+        if (k < size) { asc += 'V' } else { des = 'A' + des }
+        k++
+      }
+      while (k < n2) {
+        if (k < size) { asc += '-' } else { des = '-' + des }
+        k++
+      }
+      console.log('Goldbach\'s conjecture', n2)
+      console.log(asc)
+      console.log(des)
+
+      let i = 1
+      let row: string = ''
+      while (Prime.getPrime(i).toNumber() < size) {
+        row += '\t' + Prime.getPrime(i).toFixed()
+        i++
+      }
+      console.log(row)
+      let result : Big
+      const x = i
+      i = lp
+      while (i >= x) {
+        row = Prime.getPrime(i).toFixed()
+        for (let j = 1; Prime.getPrime(j).toNumber() < size; j++) {
+          result = Prime.getPrime(i).add(Prime.getPrime(j))
+          if (result.eq(n2)) { row += '\t' + result.toFixed() } else { row += '\t-' }
+        }
+        i--
         console.log(row)
       }
     }

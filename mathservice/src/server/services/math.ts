@@ -22,6 +22,13 @@ export default (server: any, apiURL: string) => {
     res.json({ x: x.toString(), prime: Prime.isPrime(x) })
   })
 
+  server.get(apiURL + 'goldbach', (req, res) => {
+    const urlParams = new URLSearchParams(new URL('http:/' + req.url).search)
+    let x = 2
+    if (urlParams && urlParams.get('x')) { x = Number(urlParams.get('x')) }
+    res.json({ x: x, prime: Prime.goldbachConjecture(x) })
+  })
+
   server.get(apiURL + 'primeFile', (req, res) => {
     res.setHeader('Content-type', 'text/plain')
     res.setHeader('Content-disposition', 'attachment; filename=prime.txt')

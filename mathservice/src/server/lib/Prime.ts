@@ -1,7 +1,5 @@
-// npm install big.js
-// npm install --save-dev @types/big.js
-import Big from 'big.js'
-import * as fx from 'fs'
+import Big from 'big.js';
+import fx from 'fs';
 
 export default class Prime {
   public static fileName = 'prime.txt';
@@ -11,7 +9,7 @@ export default class Prime {
   private static n: number = Prime.primeArray.length;
 
   private static nOld = 0;
-  public static readFile(): void {
+  public static readFile (): void {
     try {
       const readData = fx.readFileSync(Prime.fileName, 'utf-8')
       const p = readData.split('\n')
@@ -29,7 +27,7 @@ export default class Prime {
     }
   }
 
-  public static saveFile(): void {
+  public static saveFile (): void {
     if (Prime.n !== Prime.nOld) {
       let data: string = ''
       for (let i = 0; i < Prime.n; i++) { data += Prime.primeArray[i].toFixed() + '\n' }
@@ -40,7 +38,7 @@ export default class Prime {
     }
   }
 
-  private static searchMaxPrime(x: Big): number {
+  public static searchMaxPrime (x: Big): number {
     let found = -1
     let hi = Prime.n - 1
     if (x.lte(Prime.primeArray[hi])) {
@@ -49,7 +47,7 @@ export default class Prime {
       while (lo <= hi && found === -1) { // Binary Search
         mid = Math.floor((hi + lo) / 2)
         if (x.eq(Prime.primeArray[mid])) { found = mid } else
-          if (x.lt(Prime.primeArray[mid])) { hi = mid - 1 } else { lo = mid + 1 }
+        if (x.lt(Prime.primeArray[mid])) { hi = mid - 1 } else { lo = mid + 1 }
       }
       if (found === -1) {
         if (hi < mid) found = hi
@@ -59,11 +57,11 @@ export default class Prime {
     return found
   }
 
-  private static searchPrime(x: Big): boolean {
-    return Prime.primeArray[Prime.searchMaxPrime(x)].eq(x);
+  public static searchPrime (x: Big): boolean {
+    return x.gt(1) && Prime.primeArray[Prime.searchMaxPrime(x)].eq(x)
   }
 
-  public static findDivisor(x: Big): Big {
+  public static findDivisor (x: Big): Big {
     let divisor = Prime.ONE
     if (!Prime.searchPrime(x)) { // if not prime find divisor
       const sqrt: Big = x.sqrt()
@@ -76,25 +74,25 @@ export default class Prime {
     return divisor
   }
 
-  public static isPrime(s: string): boolean {
+  public static isPrime (s: string): boolean {
     return this.findDivisor(new Big(s)).eq(1)
   }
 
-  public static getPrime(i: number): Big {
+  public static getPrime (i: number): Big {
     return Prime.primeArray[i]
   }
 
-  public static getLastPrime() {
+  public static getLastPrime () {
     return Prime.primeArray[Prime.n - 1]
   }
 
-  public static getLength(): number {
+  public static getLength (): number {
     return this.n
   }
 
   private static diffArray: number[];
   private static diffFile = 'primegap.txt';
-  public static gapHistogram() {
+  public static gapHistogram () {
     console.log('Prime Gap')
     Prime.diffArray = new Array(Prime.n)
     let diff = 0
@@ -111,7 +109,7 @@ export default class Prime {
     console.log('save to prime gap file')
   }
 
-  public static createPrimeArrayCount(n: number) {
+  public static createPrimeArrayCount (n: number) {
     // { // calculate new prime for count = n
     // let p = Number(Prime.getLastPrime());
     // let ratio = n / p * Math.log(p);
@@ -132,7 +130,7 @@ export default class Prime {
     this.saveFile()
   }
 
-  public static createPrimeArray(n: string) {
+  public static createPrimeArray (n: string) {
     const x: Big = new Big(n)
     let lastPrime: Big = Prime.getLastPrime()
     if (lastPrime.lt(x)) {
@@ -156,100 +154,66 @@ export default class Prime {
     }
   }
 
-  public static goldbachConjecture(n: string): string[] {
-    let n2 = new Big(n)
+  public static conjGoldbach (n: string): string[] {
+    const n2 = new Big(n)
     if (n2.mod(2).gt(0) || n2.lte(4)) {
       return undefined
     }
-    console.log('Goldbach\'s conjecture', n2.toFixed())
-    //const goldbach: string[] = new Array(n2.div(10).round(0, 0).toNumber())
-    let goldbach: string[] = new Array(1)
     let len = 0
+    const goldbach: string[] = new Array(1)
     const half = n2.div(2)
-    const lp = Prime.searchMaxPrime(n2)
+    const lp = Prime.searchMaxPrime(n2.minus(2))
     let y = 1
     let result: Big
-    console.log(lp)
     for (let i = lp; Prime.primeArray[i].gte(half); i--) {
-      result = Prime.ONE // todo คำนวณคู่ prime ถัดไป จากผลลบ น่าจะทำงานได้เร็วกว่า
-      for (let j = y; Prime.primeArray[j].lt(half) && result.lt(n2); j++) {
-        result = Prime.primeArray[i].add(Prime.primeArray[j])
-        if (result.eq(n2)) 
-          goldbach[len++] = Prime.primeArray[i].toString()
-        if (!result.gt(n2)) 
-          y++
+      result = n2.minus(Prime.primeArray[i]) // คำนวณคู่บวก จากผลลบ
+      while (result.gt(Prime.primeArray[y])) y++ // หา prime ถัดไปที่ไม่น้อยกว่าผลลบ
+      if (result.eq(Prime.primeArray[y])) { // ถ้าผลลบ == prime เก็บผลลัพธ์
+        goldbach[len++] = Prime.primeArray[i].toString()
+        y++
       }
     }
-
-    let asc = ''
+    /*
+    const dash = '─'
+    let asc = '┌'
     let des = ''
-    let k = 1
-    for (let i = 0; Prime.primeArray[i].lt(n2); i++) {
-      while (Prime.primeArray[i].gt(k)) {
-        if (half.gt(k)) { asc += '.' } else { des = '.' + des }
-        k++
+    let p = 1
+    for (let k = 3; n2.gt(k); k++) {
+      while (Prime.primeArray[p].lt(k)) p++
+      if (n2.eq(k + 1)) des = '└' + des
+      else if (Prime.primeArray[p].eq(k)) {
+        if (half.gt(k)) asc += '┬'
+        else des = '┴' + des
+      } else {
+        if (half.gt(k)) {
+          if (k % 2 !== 0) asc += dash
+        } else {
+          if (k % 2 !== 0) des = dash + des
+        }
       }
-      if (half.gt(k)) { asc += 'V' } else { des = 'A' + des }
-      k++
-    }
-    while (n2.gt(k)) {
-      if (half.gt(k)) { asc += '.' } else { des = '.' + des }
-      k++
     }
 
-    console.log(asc)
-    console.log(des)
-    let i = 1
+    console.log()
+    console.log('\tGoldbach\'s conjecture', n2.toFixed())
+    console.log('\t' + asc + '  ' + half.minus(1).toFixed())
+    console.log('\t' + des + ' ' + half.toFixed())
+
     let row: string = ''
-    while (Prime.primeArray[i].lt(half)) {
-      row += '\t' + Prime.getPrime(i).toFixed()
-      i++
-    }
-    console.log(row)
-    i = lp
     y = 1
-    while (Prime.primeArray[i].gte(half)) {
-      row = Prime.getPrime(i).toFixed()
-      result = Prime.ONE
-      for (let j = 1; j < y; j++)
-        row += '\t'
-      for (let j = y; Prime.primeArray[j].lt(half) && result.lt(n2); j++) {
-        result = Prime.getPrime(i).add(Prime.getPrime(j))
-        if (result.eq(n2)) {
-          row += '\tO'
-          y++
-        } else if (result.gt(n2)) {
-          row += '\t+'
-        }
-        else {
-          row += '\t-'
-          y++
-        }
-      }
-      i--
+    for (let i = lp; Prime.primeArray[i].gte(half); i--) {
+      row = Prime.getPrime(i).toFixed() + '\t'
+      result = n2.minus(Prime.primeArray[i])
+      while (result.gt(Prime.primeArray[y])) { y++ }
+      if (result.eq(Prime.primeArray[y])) {
+        row += '├'
+        for (let j = 3; Prime.primeArray[y].gt(j); j += 2) row += dash
+        row += '┘' + Prime.primeArray[y].toFixed()
+        y++
+      } else { row += '│' }
       console.log(row)
     }
-
+    console.log(goldbach)
+    */
     return goldbach
-  }
-
-  private static histogram: number[] = new Array(20);
-  public static primeHistogram() {
-    Prime.histogram.fill(0)
-    const interval = Math.floor(Prime.getLastPrime().toNumber() / Prime.histogram.length)
-    let c = 0
-    let x = 0
-    let z = new Big(interval)
-    for (let i = 0; i < Prime.n; i++) {
-      if (Prime.primeArray[i].gt(z)) {
-        // Prime.histogram[c] = Math.round((i - x) / Prime.n * 10000) / 100;
-        Prime.histogram[c] = (i - x)
-        x = i
-        c++
-        z = new Big(interval).mul(c + 1)
-      }
-    }
-    console.log('Histogram interval=', interval, ' count=', Prime.n)
-    console.log(Prime.histogram)
   }
 }

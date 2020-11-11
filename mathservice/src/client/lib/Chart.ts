@@ -1,5 +1,5 @@
 class Chart {
-    private static COLORS = ['magenta', 'cyan', 'lime', 'white', 'yellow', 'orange', 'pink'];
+    private static COLORS = ['magenta', 'cyan', 'lime', 'white', 'yellow', 'orange', 'pink', 'red'];
     private cv: HTMLCanvasElement;
     private cx: CanvasRenderingContext2D;
     private dataX: number[];
@@ -23,6 +23,7 @@ class Chart {
       this.cx = this.cv.getContext('2d') as CanvasRenderingContext2D
       this.imgData = this.cx.createImageData(this.cv.width, this.cv.height)
       this.color = Chart.COLORS[Math.floor(Math.random() * 8)]
+      console.log(this.color)
       this.createChart(dataX, dataY)
     }
 

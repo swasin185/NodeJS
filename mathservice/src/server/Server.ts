@@ -14,9 +14,9 @@ export default class Server {
         next()
       })
 
-      this.server.use(express.static(process.cwd() + '/../dist'))
+      this.server.use(express.static(process.cwd() + '/dist/client'))
       this.server.get('/', (req, res) => {
-        res.sendFile(process.cwd() + '/dist/client/index.html')
+        res.sendFile(process.cwd() + '/dist/client/goldbach.html')
       })
       // this.server.get('/', (req, res) => {
       //   res.setHeader('Content-type', 'text/html')

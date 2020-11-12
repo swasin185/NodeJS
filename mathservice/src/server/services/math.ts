@@ -93,26 +93,23 @@ export default (server: any, apiURL: string) => {
     res.send(text)
   })
 
-  server.get(apiURL + 'goldbachGraph', (req, res) => {
+  server.get(apiURL + 'primeGraph', (req, res) => {
     const urlParams = new URLSearchParams(new URL('http:/' + req.url).search)
     let x = '2'
     if (urlParams && urlParams.get('x')) { x = urlParams.get('x') }
     const n = Number(x)
-    let gb : String[]
+    // let gb : String[]
     let line = ''
     let h = n / 2
     if (h % 2 !== 0) h++
-    for (let i = 6; i <= n; i += 2) {
-      gb = Prime.conjGoldbach(String(i))
-      // for (const y of gb) {
-      //   x = String(i - Number(y))
-      //   line += i + ' ' + x + '\n'
-      // }
-      x = String(gb.length)
-      line += i + ' ' + x + ' ' + gb[0] + ' ' + gb[gb.length - 1] + '\n'
+    let y = 0
+    for (let i = 0; i < n; i++) {
+    //      gb = Prime.conjGoldbach(String(i))
+      y = Prime.primePop(i + 1).toNumber()
+      line += Prime.getPrime(i) + ' ' + y + '\n'
     }
     res.setHeader('Content-type', 'text/plain')
-    res.setHeader('Content-disposition', 'attachment; filename=goldbachg.txt')
+    res.setHeader('Content-disposition', 'attachment; filename=gdata.txt')
     res.send(line)
   })
 

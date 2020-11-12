@@ -2,16 +2,16 @@
 <html>
 
 <head>
-    <title>Goldbach's Conjecture++</title>
+    <title>Prime Graph</title>
 </head>
 
 <body bgcolor="grey">
-    <canvas id="chart1" width="1600" height="800" style="background-color:indigo ;border:1px solid"
+    <canvas id="chart1" width="800" height="800" style="background-color:indigo ;border:1px solid"
         onclick="chart1.clickXY(event);"></canvas>
 </body>
 <script src="http://localhost:8000/api/chart"></script>
 <script>
-    url = 'http://localhost:8000/api/goldbachGraph?x=10000'
+    url = 'http://localhost:8000/api/primeGraph?x=2000';
     fetch(url)
         .then(function (response) {
             response.text().then(function (text) {
@@ -19,7 +19,7 @@
                 let dataX = new Array(data.length - 1);
                 let dataY = new Array(data.length - 1);
                 let xy
-                for (let i = 0; i < dataX.length; i++) {
+                for (let i = 0; i <dataX.length; i++) {
                     xy = data[i].split(' ')
                     dataX[i] = Number(xy[0])
                     dataY[i] = Number(xy[1])

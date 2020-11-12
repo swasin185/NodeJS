@@ -3,6 +3,7 @@ import fx from 'fs';
 
 export default class Prime {
   public static fileName = 'prime.txt';
+  public static ZERO = new Big(0);
   public static ONE = new Big(1);
 
   private static primeArray: Big[] = [Big(2), Big(3), Big(5), Big(7), Big(11), Big(13), Big(17), Big(19), Big(23)];
@@ -40,25 +41,29 @@ export default class Prime {
 
   public static searchMaxPrime (x: Big): number {
     let found = -1
-    let hi = Prime.n - 1
-    if (x.lte(Prime.primeArray[hi])) {
-      let lo = 0
-      let mid = 0
-      while (lo <= hi && found === -1) { // Binary Search
-        mid = Math.floor((hi + lo) / 2)
-        if (x.eq(Prime.primeArray[mid])) { found = mid } else
-        if (x.lt(Prime.primeArray[mid])) { hi = mid - 1 } else { lo = mid + 1 }
+    if (x.gt(1) && x.lte(Prime.getLastPrime())) {
+      let hi = Prime.n - 1
+      if (x.lte(Prime.primeArray[hi])) {
+        let lo = 0
+        let mid = 0
+        while (lo <= hi && found === -1) { // Binary Search
+          mid = Math.floor((hi + lo) / 2)
+          if (x.eq(Prime.primeArray[mid])) { found = mid } else
+          if (x.lt(Prime.primeArray[mid])) { hi = mid - 1 } else { lo = mid + 1 }
+        }
+        if (found === -1) {
+          if (hi < mid) found = hi
+          else found = mid
+        }
       }
-      if (found === -1) {
-        if (hi < mid) found = hi
-        else found = mid
-      }
+    } else {
+      found = Prime.n - 1
     }
     return found
   }
 
   public static searchPrime (x: Big): boolean {
-    return x.gt(1) && Prime.primeArray[Prime.searchMaxPrime(x)].eq(x)
+    return Prime.primeArray[Prime.searchMaxPrime(x)].eq(x)
   }
 
   public static findDivisor (x: Big): Big {
@@ -173,47 +178,61 @@ export default class Prime {
         y++
       }
     }
-    /*
-    const dash = '─'
-    let asc = '┌'
-    let des = ''
-    let p = 1
-    for (let k = 3; n2.gt(k); k++) {
-      while (Prime.primeArray[p].lt(k)) p++
-      if (n2.eq(k + 1)) des = '└' + des
-      else if (Prime.primeArray[p].eq(k)) {
-        if (half.gt(k)) asc += '┬'
-        else des = '┴' + des
-      } else {
-        if (half.gt(k)) {
-          if (k % 2 !== 0) asc += dash
-        } else {
-          if (k % 2 !== 0) des = dash + des
-        }
-      }
-    }
-
-    console.log()
-    console.log('\tGoldbach\'s conjecture', n2.toFixed())
-    console.log('\t' + asc + '  ' + half.minus(1).toFixed())
-    console.log('\t' + des + ' ' + half.toFixed())
-
-    let row: string = ''
-    y = 1
-    for (let i = lp; Prime.primeArray[i].gte(half); i--) {
-      row = Prime.getPrime(i).toFixed() + '\t'
-      result = n2.minus(Prime.primeArray[i])
-      while (result.gt(Prime.primeArray[y])) { y++ }
-      if (result.eq(Prime.primeArray[y])) {
-        row += '├'
-        for (let j = 3; Prime.primeArray[y].gt(j); j += 2) row += dash
-        row += '┘' + Prime.primeArray[y].toFixed()
-        y++
-      } else { row += '│' }
-      console.log(row)
-    }
-    console.log(goldbach)
-    */
     return goldbach
   }
+
+  public static sumReciprocal (n: number, x: Big): Big {
+    let sum = Prime.ZERO
+    if (n > 0 && x.abs().gte(Prime.primeArray[n - 1])) {
+      let line = ' '
+      let y
+      for (let i = 0; i < n; i++) {
+        y = x.div(Prime.primeArray[i]).round(0, 0)
+        sum = sum.add(y)
+        line += '+' + y
+        y = this.sumReciprocal(i, y.mul(-1))
+        sum = sum.add(y)
+        line += '+' + y
+      }
+      console.log(line, '->', sum.toFixed())
+    }
+    return sum
+  }
+
+  public static primePop (n: number): Big {
+    const max = Prime.primeArray[n - 1].mul(Prime.primeArray[n - 1])
+    let sum = Prime.ZERO
+    let recip = Prime.ZERO
+    console.log('n^2 = ', max.toFixed())
+    let minus = Prime.ZERO
+    for (let i = 0; i < n; i++) {
+      recip = max.div(Prime.primeArray[i]).round(0, 0)
+      console.log('+', recip.toFixed(), ' - ')
+      minus = Prime.sumReciprocal(i, recip)
+      sum = sum.add(recip.sub(minus))
+    }
+    const pp = max.sub(sum.sub(n - 1))
+    return pp
+  }
 }
+//  60  = 2 - 120   หาร 2 ลงตัว
+//  40  = 3 - 120   หาร 3 ลงตัว
+// -20  = 6 - 120   หาร 3x2 ลงตัว
+// +24  = 5 - 120   หาร 5 ลงตัว
+// -12  = 15 - 120  หาร 5x2 ลงตัว
+//  -8  = 15 - 120  หาร 5x3 ลงตัว
+// +17  = 7 - 119   หาร 7 ลงตัว
+//  -8  = 14 - 112  หาร 7x2 ลงตัว
+//  -5  = 21 - 105  หาร 7x3 ลงตัว
+//  -3  = 35 - 105  หาร 7x5 ลงตัว
+
+// -8 = 6 12 18 24 30 36 42 48
+// 9  = 5 10 15 20 25 30 35 40 45
+// -4 = 10 20 30 40
+// -3 = 15 30 45
+//  1 = 30
+// 7  = 7 14 21 28 35 42 49
+// -3 = 14 28 42
+// -2 = 21 42
+// -1 = 35
+//  1 = 42

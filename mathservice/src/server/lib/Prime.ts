@@ -199,50 +199,60 @@ export default class Prime {
     return sum
   }
 
-  public static primePop (n: number): Big {
-    const max = Prime.primeArray[n - 1].mul(Prime.primeArray[n - 1])
-    let sum = Prime.ZERO
-    let recip = Prime.ZERO
-    console.log('n^2 = ', max.toFixed())
-    let minus = Prime.ZERO
-    for (let i = 0; i < n; i++) {
-      recip = max.div(Prime.primeArray[i]).round(0, 0)
-      console.log('+', recip.toFixed(), ' - ')
-      minus = Prime.sumReciprocal(i, recip)
-      sum = sum.add(recip.sub(minus))
+  public static primePop (n: number): number {
+    const lp = Prime.primeArray[n - 1].toNumber()
+    const n2 = lp * lp
+    const m = Math.pow(2, n) / n2
+    let p = 0
+    console.log(lp, '****')
+    while (p <= n) {
+      console.log(Prime.primeArray[p].toFixed())
+      let c = 0
+      let mul = 1
+      let line = ''
+      for (let i = 0; i < p; i++) {
+        if (mul < lp) {
+          mul *= Prime.primeArray[i].toNumber()
+          c++
+          line += '|'
+        }
+        line += ' ' + Prime.primeArray[i].toString()
+      }
+      console.log(line, mul, c)
+      p++
     }
-    const pp = max.sub(sum.sub(n - 1))
-    return pp
+    return m
   }
 }
-// +2 ลงตัว      60  = 2 - 120   
-// +3 ลงตัว      40  = 3 - 120   
-// -3x2 ลงตัว   -20  = 6 - 120   
-// +5 ลงตัว     +24  = 5 - 120   
-// -5x2 ลงตัว   -12  = 15 - 120  
-// -5x3 ลงตัว    -8  = 15 - 120  
-// +5x3x2 ลงตัว  +4  = 30 60 90 120  
-// +7 ลงตัว     +17  = 7 - 119   
-// -7x2 ลงตัว    -8  = 14 - 112  
-// -7x3 ลงตัว    -5  = 21 42 63 84 105  
-// +7x3x2 ลงตัว  +2  = 42 84     
-// -7x5 ลงตัว    -3  = 35 70 105 
-// +7x5x2 ลงตัว  -3  = 35 70 105 
+// +2 ลงตัว      60  = 2 - 120
+// +3 ลงตัว      40  = 3 - 120
+// -3x2 ลงตัว   -20  = 6 - 120
+// +5 ลงตัว     +24  = 5 - 120
+// -5x2 ลงตัว   -12  = 15 - 120
+// -5x3 ลงตัว    -8  = 15 - 120
+// +5x3x2 ลงตัว  +4  = 30 60 90 120
+// +7 ลงตัว     +17  = 7 - 119
+// -7x2 ลงตัว    -8  = 14 - 112
+// -7x3 ลงตัว    -5  = 21 42 63 84 105
+// +7x3x2 ลงตัว  +2  = 42 84
+// -7x5 ลงตัว    -3  = 35 70 105
+// +7x5x2 ลงตัว  -3  = 35 70 105
 // +7x5x3           =  105
 // -7x5x3x2         =  210
-// +11
-// -11x2
-// -11x3
-// +11x3x2
-// -11x5
-// +11x5x2
-// +11x5x3
-// -11x5x3x2
-// -11x7
-// +11x7x2
-// +11x7x3
-// -11x7x3x2
-// +11x7x5
-// -11x7x5x2
-// +11x7x5x3x2
-
+/*
+1         00001+
+2         00010+
+21        00011-
+3         00100+
+31        00101-
+32        00110-
+321       00111+ x
+4         01000+
+41        01001-
+42        01010-
+421       01011+ x
+43        01100-
+431       01101+ x
+432       01110+ x
+4321      01111- x
+*/

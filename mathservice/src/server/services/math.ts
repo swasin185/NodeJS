@@ -105,7 +105,7 @@ export default (server: any, apiURL: string) => {
     let y = 0
     for (let i = 0; i < n; i++) {
     //      gb = Prime.conjGoldbach(String(i))
-      y = Prime.primePop(i + 1).toNumber()
+      y = Prime.primePop(i + 1)
       line += Prime.getPrime(i) + ' ' + y + '\n'
     }
     res.setHeader('Content-type', 'text/plain')

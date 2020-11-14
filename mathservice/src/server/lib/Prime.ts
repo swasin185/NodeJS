@@ -1,5 +1,6 @@
 import Big from 'big.js';
 import fx from 'fs';
+import BinaryArray from './BinaryArray.js';
 
 export default class Prime {
   public static fileName = 'prime.txt';
@@ -10,7 +11,7 @@ export default class Prime {
   private static n: number = Prime.primeArray.length;
 
   private static nOld = 0;
-  public static readFile(): void {
+  public static readFile (): void {
     try {
       const readData = fx.readFileSync(Prime.fileName, 'utf-8')
       const p = readData.split('\n')
@@ -28,7 +29,7 @@ export default class Prime {
     }
   }
 
-  public static saveFile(): void {
+  public static saveFile (): void {
     if (Prime.n !== Prime.nOld) {
       let data: string = ''
       for (let i = 0; i < Prime.n; i++) { data += Prime.primeArray[i].toFixed() + '\n' }
@@ -39,7 +40,7 @@ export default class Prime {
     }
   }
 
-  public static searchMaxPrime(x: Big): number {
+  public static searchMaxPrime (x: Big): number {
     let found = -1
     if (x.gt(1) && x.lte(Prime.getLastPrime())) {
       let hi = Prime.n - 1
@@ -49,7 +50,7 @@ export default class Prime {
         while (lo <= hi && found === -1) { // Binary Search
           mid = Math.floor((hi + lo) / 2)
           if (x.eq(Prime.primeArray[mid])) { found = mid } else
-            if (x.lt(Prime.primeArray[mid])) { hi = mid - 1 } else { lo = mid + 1 }
+          if (x.lt(Prime.primeArray[mid])) { hi = mid - 1 } else { lo = mid + 1 }
         }
         if (found === -1) {
           if (hi < mid) found = hi
@@ -62,11 +63,11 @@ export default class Prime {
     return found
   }
 
-  public static searchPrime(x: Big): boolean {
+  public static searchPrime (x: Big): boolean {
     return Prime.primeArray[Prime.searchMaxPrime(x)].eq(x)
   }
 
-  public static findDivisor(x: Big): Big {
+  public static findDivisor (x: Big): Big {
     let divisor = Prime.ONE
     if (!Prime.searchPrime(x)) { // if not prime find divisor
       const sqrt: Big = x.sqrt()
@@ -79,25 +80,25 @@ export default class Prime {
     return divisor
   }
 
-  public static isPrime(s: string): boolean {
+  public static isPrime (s: string): boolean {
     return this.findDivisor(new Big(s)).eq(1)
   }
 
-  public static getPrime(i: number): Big {
+  public static getPrime (i: number): Big {
     return Prime.primeArray[i]
   }
 
-  public static getLastPrime() {
+  public static getLastPrime () {
     return Prime.primeArray[Prime.n - 1]
   }
 
-  public static getLength(): number {
+  public static getLength (): number {
     return this.n
   }
 
   private static diffArray: number[];
   private static diffFile = 'primegap.txt';
-  public static gapHistogram() {
+  public static gapHistogram () {
     console.log('Prime Gap')
     Prime.diffArray = new Array(Prime.n)
     let diff = 0
@@ -114,7 +115,7 @@ export default class Prime {
     console.log('save to prime gap file')
   }
 
-  public static createPrimeArrayCount(n: number) {
+  public static createPrimeArrayCount (n: number) {
     // { // calculate new prime for count = n
     // let p = Number(Prime.getLastPrime());
     // let ratio = n / p * Math.log(p);
@@ -135,7 +136,7 @@ export default class Prime {
     this.saveFile()
   }
 
-  public static createPrimeArray(n: string) {
+  public static createPrimeArray (n: string) {
     const x: Big = new Big(n)
     let lastPrime: Big = Prime.getLastPrime()
     if (lastPrime.lt(x)) {
@@ -159,7 +160,7 @@ export default class Prime {
     }
   }
 
-  public static conjGoldbach(n: string): string[] {
+  public static conjGoldbach (n: string): string[] {
     const n2 = new Big(n)
     if (n2.mod(2).gt(0) || n2.lte(4)) {
       return undefined
@@ -181,7 +182,7 @@ export default class Prime {
     return goldbach
   }
 
-  public static sumReciprocal(n: number, x: Big): Big {
+  public static sumReciprocal (n: number, x: Big): Big {
     let sum = Prime.ZERO
     if (n > 0 && x.abs().gte(Prime.primeArray[n - 1])) {
       let line = ' '
@@ -199,36 +200,37 @@ export default class Prime {
     return sum
   }
 
-  public static primePop(n: number): number {
+  public static primePop (n: number): number {
     const lp = Prime.primeArray[n - 1].toNumber()
     const n2 = lp * lp
-    const m = Math.pow(2, n) / n2
-    let p = 0
-    console.log(lp, '****')
-    let c = 0
-    let mul = 1
-    let line: string
-    while (p < n) {
-      let perm = Math.pow(2, c) - 1
-      line = Prime.primeArray[p].toString()
-      console.log(line)
-      for (let i = 1; i <= perm; i++) { //ต้องหาวิธีวนลูบตามจำนวนบิต 1
-        line = Prime.primeArray[p].toString()
-        //line += 'x' + Prime.primeArray[i].toString()
-        line += (' -> ' + i.toString(2))
-        console.log(line)
+    let m = 0
+    console.log('***', lp, 'upto', n2)
+    const barr = new BinaryArray(n)
+    let line: string = ''
+    let x = 1
+    while (barr.next()) {
+      line = ''
+      x = 1
+      for (let i = 0; i < n && x <= n2; i++) {
+        if (barr.isExists(i + 1)) {
+          x *= Prime.primeArray[i].toNumber()
+          if (x > n2) {
+            line = '-'
+            barr.jump()
+          } else { line += 'x' + Prime.primeArray[i] }
+        }
       }
-      mul *= Prime.primeArray[p].toNumber()
-      if (mul < lp) {
-        c++
-      } else {
-        c = c
+      if (x <= n2) {
+        x = Math.floor(n2 / x)
+        if (barr.count() % 2 === 0) x = -x
+        m += x
+        console.log(barr.toString(), m, x, line)
       }
-      p++
     }
-    return m
+    return n2 - (m - n)
   }
 }
+
 // +2 ลงตัว      60  = 2 - 120
 // +3 ลงตัว      40  = 3 - 120
 // -3x2 ลงตัว   -20  = 6 - 120
@@ -241,27 +243,27 @@ export default class Prime {
 // -7x3 ลงตัว    -5  = 21 42 63 84 105
 // +7x3x2 ลงตัว  +2  = 42 84
 // -7x5 ลงตัว    -3  = 35 70 105
-// +7x5x2 ลงตัว  -3  = 70 
+// +7x5x2 ลงตัว  -3  = 70
 // +7x5x3           = 105
 // -7x5x3x2         = 210
 // 11               = 11 22 121
 // 11x2             = 22 44 66 88 110
-// 11x3             = 33 66 99 
-// 11x3x2           = 66 
+// 11x3             = 33 66 99
+// 11x3x2           = 66
 // 11x5             = 55 110
 // 11x5x2           = 110
-// 11x5x3         X = 
-// 11x5x3x2       X = 
-// 11x7             = 77 
-// 11x7x2         X = 
-// 11x7x3         X =  
-// 11x7x3x2       X =  
-// 11x7x5         X =  
-// 11x7x5x2       X =  
-// 11x7x5x3       X =  
-// 11x7x5x3x2     X =  
+// 11x5x3         X =
+// 11x5x3x2       X =
+// 11x7             = 77
+// 11x7x2         X =
+// 11x7x3         X =
+// 11x7x3x2       X =
+// 11x7x5         X =
+// 11x7x5x2       X =
+// 11x7x5x3       X =
+// 11x7x5x3x2     X =
 
-/* 
+/*
 1         00001+
 2         00010+
 21        00011-
@@ -274,7 +276,7 @@ export default class Prime {
 42        01010-
 421       01011+ x
 43        01100-
-431       01101+ 
-432       01110+ 
+431       01101+
+432       01110+
 4321      01111- x 7 5 3 2 210
 */

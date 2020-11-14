@@ -103,7 +103,7 @@ export default (server: any, apiURL: string) => {
     let h = n / 2
     if (h % 2 !== 0) h++
     let y = 0
-    for (let i = n - 1; i < n; i++) {
+    for (let i = 0; i < n; i++) {
     //      gb = Prime.conjGoldbach(String(i))
       y = Prime.primePop(i + 1)
       line += Prime.getPrime(i) + ' ' + y + '\n'

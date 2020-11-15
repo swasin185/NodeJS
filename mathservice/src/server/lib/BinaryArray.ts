@@ -1,6 +1,7 @@
 export default class BinaryArray {
   private static BITS = 8
   private static FULL = (1 << BinaryArray.BITS) - 1
+  private static LEFT = 1 << (BinaryArray.BITS - 1)
   private bits: number
   private arr: number[]
   public constructor(bits: number) {
@@ -27,8 +28,8 @@ export default class BinaryArray {
     for (let i = 0; i < this.arr.length && carry !== 0; i++) {
       if (carry !== 0) {
         for (let j = 0;
-          // 1-8    1-8      // 9-16   1-8        // 17-24  1-8
-          ((j <= (this.bits-1) % BinaryArray.BITS) || ((j < BinaryArray.BITS) && i !== (this.arr.length - 1))) && carry !== 0; j++) {
+          ((j <= (this.bits - 1) % BinaryArray.BITS) || ((j < BinaryArray.BITS) && i !== (this.arr.length - 1)))
+          && carry !== 0; j++) {
           carry &= this.arr[i]
           carry <<= 1
         }
@@ -43,17 +44,23 @@ export default class BinaryArray {
   }
 
   public jump(): void {
-    let i = this.arr.length - 1
-    while (this.arr[i] === 0 && i >= 0) i--
-    let mask = 1 << (BinaryArray.BITS - 1)
-    while ((mask & this.arr[i]) === 0) mask >>= 1
-    this.arr[i] = (mask << 1) - 1
-    for (i--; i >= 0; i--) this.arr[i] = BinaryArray.FULL
+    let c = this.count()
+    let i = this.bits
+    for (let i = this.arr.length - 1; i >= 0; i--) {
+      let mask = BinaryArray.LEFT
+      while (mask >= 1) {
+        if (c === 1) this.arr[i] |= mask
+        else
+          if ((this.arr[i] & mask) !== 0)
+            c--
+        mask >>= 1
+      }
+    }
   }
 
   public isExists(bit: number): boolean {
     return (bit <= this.bits) &&
-      (this.arr[Math.floor((bit-1) / BinaryArray.BITS)] & (1 << (bit - 1) % BinaryArray.BITS)) > 0
+      (this.arr[Math.floor((bit - 1) / BinaryArray.BITS)] & (1 << (bit - 1) % BinaryArray.BITS)) > 0
   }
 
   public count(): number {

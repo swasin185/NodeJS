@@ -204,37 +204,37 @@ export default class Prime {
     const lp = Prime.primeArray[n - 1].toNumber()
     const n2 = lp * lp
     let m = 0
-
+    let time: number = (new Date()).getTime()
     const barr = new BinaryArray(n)
-    // let line: string = ''
+    let line: string = ''
     let x = 1
     let k = 0
-    console.log('***', lp, 'upto', n2)
     while (barr.next()) {
-      k++
-      // line = ''
+      line = ''
       x = 1
       for (let i = 0; i < n && x <= n2; i++) {
         if (barr.isExists(i + 1)) {
           x *= Prime.primeArray[i].toNumber()
           if (x > n2) {
-            //line = '------------'
-            //barr.jump()
+            barr.jump()
           } else {
-            //line += ' ' + Prime.primeArray[i]
+            line += ' ' + Prime.primeArray[i]
           }
         } else {
-          //line += '  '
+          line += '  '
         }
       }
       if (x <= n2) {
+        k++
         x = Math.floor(n2 / x)
         if (barr.count() % 2 === 0) x = -x
         m += x
-      }
-      // console.log(k, '\t', barr.toString(), '\t', m, '\t', x, '\t', line)
+      } else
+        line = '-------------'
+      console.log(k, '\t', barr.toString(), '\t', m, '\t', x, '\t', line)
     }
-    console.log('n^2', n2, 'prime=', n2 - m + n - 1, ' run=', k)
+    time = ((new Date()).getTime() - time) / 1000
+    console.log(n, '\t', 'prime=', lp, 'p^2=', n2, 'prime count =', n2 - m + n - 1, ' run =', k, '\ttime =', time, ' seconds')
     return n2 - m + n - 1
   }
 }

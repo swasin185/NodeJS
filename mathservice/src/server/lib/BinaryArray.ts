@@ -1,5 +1,5 @@
 export default class BinaryArray {
-  private static BITS = 8
+  private static BITS = 30
   private static FULL = (1 << BinaryArray.BITS) - 1
   private static LEFT = 1 << (BinaryArray.BITS - 1)
   private bits: number
@@ -47,27 +47,42 @@ export default class BinaryArray {
     let c = this.count()
     let i = this.bits
     for (let i = this.arr.length - 1; i >= 0; i--) {
-      let mask = BinaryArray.LEFT
-      while (mask >= 1) {
-        if (c === 1) this.arr[i] |= mask
-        else
-          if ((this.arr[i] & mask) !== 0)
-            c--
-        mask >>= 1
+      if (c === 1 && i < this.arr.length - 1) {
+        this.arr[i] = BinaryArray.FULL
+      } else {
+        let mask = BinaryArray.LEFT
+        while (mask >= 1) {
+          if (c === 1) this.arr[i] |= mask
+          else
+            if ((this.arr[i] & mask) !== 0)
+              c--
+          mask >>= 1
+        }
       }
     }
   }
 
-  public isExists(bit: number): boolean {
-    return (bit <= this.bits) &&
-      (this.arr[Math.floor((bit - 1) / BinaryArray.BITS)] & (1 << (bit - 1) % BinaryArray.BITS)) > 0
+  public isExists(bit: number): boolean { // n - 1 bit
+    return (this.arr[Math.floor(bit / BinaryArray.BITS)] & (1 << bit % BinaryArray.BITS)) > 0
+  }
+
+  public age(): number { // n - 1 bit
+    let c = 0
+    for (let i = this.arr.length - 1; i >= 0 && c===0; i--) {
+      let mask = BinaryArray.LEFT
+      for (let j = BinaryArray.BITS; j > 0 && c===0; j--) {
+        if ((this.arr[i] & mask) > 0) c = (i * BinaryArray.BITS) + j + 1
+        mask >>= 1
+      }
+    }
+    return c
   }
 
   public count(): number {
     let c = 0
     for (let i = 0; i < this.arr.length; i++) {
       let mask = 1
-      for (let j = 0; j < this.bits; j++) {
+      for (let j = 0; j < BinaryArray.BITS; j++) {
         if ((this.arr[i] & mask) > 0) { c++ }
         mask <<= 1
       }

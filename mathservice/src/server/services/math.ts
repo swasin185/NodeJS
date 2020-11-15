@@ -104,9 +104,11 @@ export default (server: any, apiURL: string) => {
     if (h % 2 !== 0) h++
     let y = 0
     for (let i = 0; i < n; i++) {
-    //      gb = Prime.conjGoldbach(String(i))
-      y = Prime.primePop(i + 1)
+      y = Prime.sumReciprocal(i + 1)
+      // line += Prime.getPrime(i) + ' ' + y + '\n'
+      // y = Prime.primeFunction(i + 1)
       line += Prime.getPrime(i) + ' ' + y + '\n'
+      // line += (i + 1) + ' ' + y + '\n'
     }
     res.setHeader('Content-type', 'text/plain')
     res.setHeader('Content-disposition', 'attachment; filename=gdata.txt')

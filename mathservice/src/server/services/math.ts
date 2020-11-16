@@ -34,8 +34,9 @@ export default (server: any, apiURL: string) => {
     let x = '2'
     if (urlParams && urlParams.get('x')) { x = urlParams.get('x') }
     const n = Number(x)
-    let i = Math.round(n / 2)
-    if (i % 2 !== 0) { i++ }
+    // let i = Math.round(n / 2)
+    // if (i % 2 !== 0) { i++ }
+    let i = n
     let gb : string[]
     let min :number = i
     let max : number = 0

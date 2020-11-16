@@ -11,7 +11,7 @@ export default class Prime {
   private static n: number = Prime.primeArray.length;
 
   private static nOld = 0;
-  public static readFile(): void {
+  public static readFile (): void {
     try {
       const readData = fx.readFileSync(Prime.fileName, 'utf-8')
       const p = readData.split('\n')
@@ -29,7 +29,7 @@ export default class Prime {
     }
   }
 
-  public static saveFile(): void {
+  public static saveFile (): void {
     if (Prime.n !== Prime.nOld) {
       let data: string = ''
       for (let i = 0; i < Prime.n; i++) { data += Prime.primeArray[i].toFixed() + '\n' }
@@ -40,7 +40,7 @@ export default class Prime {
     }
   }
 
-  public static searchMaxPrime(x: Big): number {
+  public static searchMaxPrime (x: Big): number {
     let found = -1
     if (x.gt(1) && x.lte(Prime.getLastPrime())) {
       let hi = Prime.n - 1
@@ -50,7 +50,7 @@ export default class Prime {
         while (lo <= hi && found === -1) { // Binary Search
           mid = Math.floor((hi + lo) / 2)
           if (x.eq(Prime.primeArray[mid])) { found = mid } else
-            if (x.lt(Prime.primeArray[mid])) { hi = mid - 1 } else { lo = mid + 1 }
+          if (x.lt(Prime.primeArray[mid])) { hi = mid - 1 } else { lo = mid + 1 }
         }
         if (found === -1) {
           if (hi < mid) found = hi
@@ -63,11 +63,11 @@ export default class Prime {
     return found
   }
 
-  public static searchPrime(x: Big): boolean {
+  public static searchPrime (x: Big): boolean {
     return Prime.primeArray[Prime.searchMaxPrime(x)].eq(x)
   }
 
-  public static findDivisor(x: Big): Big {
+  public static findDivisor (x: Big): Big {
     let divisor = Prime.ONE
     if (!Prime.searchPrime(x)) { // if not prime find divisor
       const sqrt: Big = x.sqrt()
@@ -80,25 +80,25 @@ export default class Prime {
     return divisor
   }
 
-  public static isPrime(s: string): boolean {
+  public static isPrime (s: string): boolean {
     return this.findDivisor(new Big(s)).eq(1)
   }
 
-  public static getPrime(i: number): Big {
+  public static getPrime (i: number): Big {
     return Prime.primeArray[i]
   }
 
-  public static getLastPrime() {
+  public static getLastPrime () {
     return Prime.primeArray[Prime.n - 1]
   }
 
-  public static getLength(): number {
+  public static getLength (): number {
     return this.n
   }
 
   private static diffArray: number[];
   private static diffFile = 'primegap.txt';
-  public static gapHistogram() {
+  public static gapHistogram () {
     console.log('Prime Gap')
     Prime.diffArray = new Array(Prime.n)
     let diff = 0
@@ -115,7 +115,7 @@ export default class Prime {
     console.log('save to prime gap file')
   }
 
-  public static createPrimeArrayCount(n: number) {
+  public static createPrimeArrayCount (n: number) {
     // { // calculate new prime for count = n
     // let p = Number(Prime.getLastPrime());
     // let ratio = n / p * Math.log(p);
@@ -136,7 +136,7 @@ export default class Prime {
     this.saveFile()
   }
 
-  public static createPrimeArray(n: string) {
+  public static createPrimeArray (n: string) {
     const x: Big = new Big(n)
     let lastPrime: Big = Prime.getLastPrime()
     if (lastPrime.lt(x)) {
@@ -160,7 +160,7 @@ export default class Prime {
     }
   }
 
-  public static conjGoldbach(n: string): string[] {
+  public static conjGoldbach (n: string): string[] {
     const n2 = new Big(n)
     if (n2.mod(2).gt(0) || n2.lte(4)) {
       return undefined
@@ -182,7 +182,7 @@ export default class Prime {
     return goldbach
   }
 
-  public static sumReciprocal(n: number): number {
+  public static sumReciprocal (n: number): number {
     const lp = Prime.primeArray[n - 1]
     const n2 = lp.mul(lp)
     let sum = Prime.ZERO
@@ -209,7 +209,7 @@ export default class Prime {
     // return k / n2.toNumber()
   }
 
-  public static primeFunction(n: number): number {
+  public static primeFunction (n: number): number {
     const lp = Prime.primeArray[n - 1].toNumber()
     const n2 = lp * lp
     let m = 0
@@ -217,28 +217,26 @@ export default class Prime {
     const barr = new BinaryArray(n)
     let x = 1
     let k = 0
-    console.log('bits =',n, '\t', 'max prime =', lp, 'p^2 =', n2)
+    console.log('bits =', n, '\t', 'max prime =', lp, 'p^2 =', n2)
     while (barr.next()) {
       x = 1
-      for (let i = 0; i < n && x <= n2; i++)
+      for (let i = 0; i < n && x <= n2; i++) {
         if (barr.isExists(i)) {
           x *= Prime.primeArray[i].toNumber()
-          if (x > n2) 
-            barr.jump()
+          if (x > n2) { barr.jump() }
         }
+      }
       if (x <= n2) {
         k++
         x = Math.floor(n2 / x)
         if (barr.count() % 2 === 0) x = -x
         m += x
-        //   console.log(k, '\t', barr.age(), '\t', m, '\t', x)
       }
-
     }
     time = ((new Date()).getTime() - time) / 1000
-    let primeCount = n2 - m + n - 1
+    const primeCount = n2 - m + n - 1
     console.log('prime count =', primeCount, ' run =', k, '\ttime =', time, ' seconds')
     return primeCount
-    //return k / primeCount
+    // return k / primeCount
   }
 }

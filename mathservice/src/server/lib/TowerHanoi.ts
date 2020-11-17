@@ -5,15 +5,15 @@ export default class TowerHanoi {
   public static barr: BinaryArray
   public static poleOfDishs: number[]
   public static poles: string[]
-  public static recurMove(dish: number, from: string, to: string, temp: string): void {
+  public static recurMove (dish: number, from: string, to: string, temp: string): void {
     if (dish > 0) {
       TowerHanoi.recurMove(dish - 1, from, temp, to)
-      console.log(++this.count, '\tdish', dish, '\tfrom', from, '\tto', to, '\t =', Number(from) + Number(to) - 1)
+      console.log(++this.count, '\tdish', dish, '\tfrom', from, '\tto', to, '\t =', Number(to) + Number(from) - 1)
       TowerHanoi.recurMove(dish - 1, temp, to, from)
     }
   }
 
-  public static binaryMove(dish: number, from: string, to: string, temp: string): void {
+  public static binaryMove (dish: number, from: string, to: string, temp: string): void {
     TowerHanoi.count = 0
     TowerHanoi.recurMove(dish, from, to, temp)
     console.log('===========================================')
@@ -21,21 +21,19 @@ export default class TowerHanoi {
     TowerHanoi.count = 0
     this.barr = new BinaryArray(dish)
     this.poleOfDishs = new Array(dish)
-    this.poles = new Array(3)
-    this.poles[0] = from
-    this.poles[1] = to
-    this.poles[2] = temp
     this.poleOfDishs.fill(0)
+    this.poles = [from, to, temp]
     let moveDish: number = -1
     let pole: number = 0
-    let flag = dish % 2
-    let x = 0                  // x = to + from 
+    const dishIsEvent = dish % 2 === 0
+    let x = 0 // x = to + from
     while (this.barr.next()) {
       moveDish = this.barr.mostRight()
-      pole = x
-      if (flag === 0 && x < 2)
-        if (pole === 0) pole = 1
-        else pole = 0
+      if (dishIsEvent && x < 2) {
+        if (x === 0) { pole = 1 } else { pole = 0 }
+      } else {
+        pole = x
+      }
       pole = pole - this.poleOfDishs[moveDish - 1] + 1
       console.log(++this.count, '\tdish', moveDish, '\tfrom', this.poleOfDishs[moveDish - 1], '\tto', pole, '\t', this.barr.toString())
       this.poleOfDishs[moveDish - 1] = pole
@@ -45,4 +43,4 @@ export default class TowerHanoi {
 }
 
 console.log('Tower of Hanoi')
-TowerHanoi.binaryMove(4, '0', '1', '2')
+TowerHanoi.binaryMove(5, '0', '1', '2')

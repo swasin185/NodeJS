@@ -1,11 +1,26 @@
 import BinaryArray from './BinaryArray.js'
 
+/** Tower Of Hanoi
+ *    move all dishs from "A" to "C"
+ *    one by one and smaller on top
+ * 
+ *        From      Temp       To
+ *        pole      pole      pole
+ *          A         B         C
+ *          |         |         |
+ *     1    #         |         |
+ *     2   ###        |         |
+ *     3  #####       |         |  
+ *     4 #######      |         |  
+ * --------------------------------------
+ */
+
 export default class TowerHanoi {
   public static count: number = 0
   public static barr: BinaryArray
   public static poleOfDishs: number[]
   public static poles: string[]
-  public static recurMove (dish: number, from: string, to: string, temp: string): void {
+  public static recurMove(dish: number, from: string, to: string, temp: string): void {
     if (dish > 0) {
       TowerHanoi.recurMove(dish - 1, from, temp, to)
       console.log(++this.count, '\tdish', dish, '\tfrom', from, '\tto', to, '\t =', Number(to) + Number(from) - 1)
@@ -13,7 +28,7 @@ export default class TowerHanoi {
     }
   }
 
-  public static binaryMove (dish: number, from: string, to: string, temp: string): void {
+  public static binaryMove(dish: number, from: string, to: string, temp: string): void {
     TowerHanoi.count = 0
     TowerHanoi.recurMove(dish, from, to, temp)
     console.log('===========================================')

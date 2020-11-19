@@ -49,7 +49,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
-exports.QuickSort = exports.InsertSort = exports.SelectSort = exports.BubbleSort = exports.Sort = void 0;
+exports.QuickSort = exports.InsertSort = exports.SelectSort = exports.BubbleSort = void 0;
 var Sort = /** @class */ (function () {
     function Sort(n, canvasId) {
         this.swap = 0;
@@ -73,7 +73,7 @@ var Sort = /** @class */ (function () {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         for (var i = 0; i < this.arr.length; i++) {
             //this.ctx.fillRect(x, y, width, height)
-            this.ctx.fillRect(10 + (i * 3), 150, 2, -this.arr[i]);
+            this.ctx.fillRect(10 + i * 3, 150, 2, -this.arr[i]);
         }
         this.ctx.fillText("compare=" + this.compare + " swap=" + this.swap, 30, 190);
     };
@@ -115,7 +115,7 @@ var Sort = /** @class */ (function () {
     };
     return Sort;
 }());
-exports.Sort = Sort;
+exports["default"] = Sort;
 var BubbleSort = /** @class */ (function (_super) {
     __extends(BubbleSort, _super);
     function BubbleSort(n, canvasId) {
@@ -352,63 +352,80 @@ var QuickSort = /** @class */ (function (_super) {
     };
     QuickSort.prototype.quickSort = function (lo, hi) {
         return __awaiter(this, void 0, void 0, function () {
-            var pivot, l_1, h_1, x_1;
+            var pivot, l, h, x;
+            var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        if (!(lo < hi)) return [3 /*break*/, 14];
                         pivot = Math.floor((lo + hi) / 2);
-                        l_1 = lo;
-                        h_1 = hi;
-                        x_1 = -1;
+                        l = lo;
+                        h = hi;
+                        x = -1;
                         _a.label = 1;
                     case 1:
-                        if (!(l_1 < h_1)) return [3 /*break*/, 9];
+                        if (!(l < h)) return [3 /*break*/, 9];
                         _a.label = 2;
                     case 2:
-                        if (!(x_1 < 0)) return [3 /*break*/, 4];
-                        return [4 /*yield*/, this.compareData(pivot, h_1).then(function (result) {
+                        if (!(x < 0)) return [3 /*break*/, 4];
+                        return [4 /*yield*/, this.compareData(pivot, h).then(function (result) {
                                 if (result < 0)
-                                    h_1--;
-                                x_1 = result;
+                                    h--;
+                                x = result;
                             })];
                     case 3:
                         _a.sent();
                         return [3 /*break*/, 2];
                     case 4:
-                        if (!(x_1 >= 0)) return [3 /*break*/, 6];
-                        return [4 /*yield*/, this.compareData(pivot, l_1).then(function (result) {
+                        if (!(x >= 0)) return [3 /*break*/, 6];
+                        return [4 /*yield*/, this.compareData(pivot, l).then(function (result) {
                                 if (result >= 0)
-                                    l_1++;
-                                x_1 = result;
+                                    l++;
+                                x = result;
                             })];
                     case 5:
                         _a.sent();
                         return [3 /*break*/, 4];
                     case 6:
-                        if (!(l_1 < h_1)) return [3 /*break*/, 8];
-                        if (h_1 == pivot)
-                            pivot = l_1;
-                        return [4 /*yield*/, this.swapData(l_1, h_1)];
+                        if (!(l < h)) return [3 /*break*/, 8];
+                        if (h == pivot)
+                            pivot = l;
+                        return [4 /*yield*/, this.swapData(l, h)];
                     case 7:
                         _a.sent();
                         _a.label = 8;
                     case 8: return [3 /*break*/, 1];
                     case 9:
-                        if (!(pivot < h_1)) return [3 /*break*/, 11];
-                        return [4 /*yield*/, _super.prototype.swapData.call(this, h_1, pivot)];
+                        if (!(pivot < h)) return [3 /*break*/, 11];
+                        return [4 /*yield*/, this.compareData(pivot, h).then(function (result) { return __awaiter(_this, void 0, void 0, function () {
+                                return __generator(this, function (_a) {
+                                    switch (_a.label) {
+                                        case 0:
+                                            if (!(result !== 0)) return [3 /*break*/, 2];
+                                            return [4 /*yield*/, _super.prototype.swapData.call(this, h, pivot)];
+                                        case 1:
+                                            _a.sent();
+                                            _a.label = 2;
+                                        case 2: return [2 /*return*/];
+                                    }
+                                });
+                            }); })];
                     case 10:
                         _a.sent();
-                        pivot = h_1;
+                        pivot = h;
                         _a.label = 11;
-                    case 11: return [4 /*yield*/, this.quickSort(lo, pivot - 1)];
+                    case 11:
+                        if (!(lo < pivot - 1)) return [3 /*break*/, 13];
+                        return [4 /*yield*/, this.quickSort(lo, pivot - 1)];
                     case 12:
                         _a.sent();
-                        return [4 /*yield*/, this.quickSort(pivot + 1, hi)];
+                        _a.label = 13;
                     case 13:
+                        if (!(hi > pivot + 1)) return [3 /*break*/, 15];
+                        return [4 /*yield*/, this.quickSort(pivot + 1, hi)];
+                    case 14:
                         _a.sent();
-                        _a.label = 14;
-                    case 14: return [2 /*return*/];
+                        _a.label = 15;
+                    case 15: return [2 /*return*/];
                 }
             });
         });

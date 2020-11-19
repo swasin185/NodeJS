@@ -7,7 +7,8 @@
     "serve": "tsc & nodemon dist/server/Server.js",
     "build": "tsc",
     "fix": "npx eslint --fix src/**/*.ts",
-    "hanoi" : "tsc & node dist/server/lib/TowerHanoi.js"
+    "hanoi" : "tsc & node dist/server/lib/TowerHanoi.js",
+    "sort" : "tsc & node dist/server/lib/QuickSort.js"
   },
   "devDependencies": {
     "@types/body-parser": "^1.19.0",

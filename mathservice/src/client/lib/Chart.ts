@@ -18,133 +18,133 @@ class Chart {
     private imgData;
     private color: string;
 
-    constructor (canvasName: string, dataX: number[], dataY: number[]) {
-      this.cv = document.getElementById(canvasName) as HTMLCanvasElement
-      this.cx = this.cv.getContext('2d') as CanvasRenderingContext2D
-      this.imgData = this.cx.createImageData(this.cv.width, this.cv.height)
-      this.color = Chart.COLORS[Math.floor(Math.random() * 8)]
-      console.log(this.color)
-      this.createChart(dataX, dataY)
+    constructor(canvasName: string, dataX: number[], dataY: number[]) {
+        this.cv = document.getElementById(canvasName) as HTMLCanvasElement
+        this.cx = this.cv.getContext('2d') as CanvasRenderingContext2D
+        this.imgData = this.cx.createImageData(this.cv.width, this.cv.height)
+        this.color = Chart.COLORS[Math.floor(Math.random() * 8)]
+        console.log(this.color)
+        this.createChart(dataX, dataY)
     }
 
-    public createChart (dataX: number[], dataY: number[]) {
-      this.dataX = dataX
-      this.dataY = dataY
-      this.findMinMax()
-      this.dx = this.cv.width / (this.maxX - this.minX) * 0.9
-      this.dy = this.cv.height / (this.maxY - this.minY) * 0.9
-      console.log('dx =', this.dx, 'dy =', this.dy)
-      this.xAxis = Math.floor(this.cv.height / 2) + Math.floor((this.maxY + this.minY) / 2 * this.dy)
-      this.yAxis = Math.floor(this.cv.width / 2) - Math.floor((this.maxX + this.minX) / 2 * this.dx)
-      this.plot()
+    public createChart(dataX: number[], dataY: number[]) {
+        this.dataX = dataX
+        this.dataY = dataY
+        this.findMinMax()
+        this.dx = this.cv.width / (this.maxX - this.minX) * 0.9
+        this.dy = this.cv.height / (this.maxY - this.minY) * 0.9
+        console.log('dx =', this.dx, 'dy =', this.dy)
+        this.xAxis = Math.floor(this.cv.height / 2) + Math.floor((this.maxY + this.minY) / 2 * this.dy)
+        this.yAxis = Math.floor(this.cv.width / 2) - Math.floor((this.maxX + this.minX) / 2 * this.dx)
+        this.plot()
     }
 
-    private findMinMax (): void {
-      this.minX = this.dataX[0]
-      this.maxX = this.dataX[0]
-      this.minY = this.dataY[0]
-      this.maxY = this.dataY[0]
-      for (let i = 1; i < this.dataX.length; i++) {
-        if (this.dataX[i] < this.minX) { this.minX = this.dataX[i] }
-        if (this.dataY[i] < this.minY) { this.minY = this.dataY[i] }
-        if (this.dataX[i] > this.maxX) { this.maxX = this.dataX[i] }
-        if (this.dataY[i] > this.maxY) { this.maxY = this.dataY[i] }
-      }
-      console.log('min X =', this.minX, 'max X =', this.maxX)
-      console.log('min Y =', this.minY, 'max Y =', this.maxY)
+    private findMinMax(): void {
+        this.minX = this.dataX[0]
+        this.maxX = this.dataX[0]
+        this.minY = this.dataY[0]
+        this.maxY = this.dataY[0]
+        for (let i = 1; i < this.dataX.length; i++) {
+            if (this.dataX[i] < this.minX) { this.minX = this.dataX[i] }
+            if (this.dataY[i] < this.minY) { this.minY = this.dataY[i] }
+            if (this.dataX[i] > this.maxX) { this.maxX = this.dataX[i] }
+            if (this.dataY[i] > this.maxY) { this.maxY = this.dataY[i] }
+        }
+        console.log('min X =', this.minX, 'max X =', this.maxX)
+        console.log('min Y =', this.minY, 'max Y =', this.maxY)
     }
 
-    public plot (): void {
-      this.cx.clearRect(0, 0, this.cv.width, this.cv.height)
+    public plot(): void {
+        this.cx.clearRect(0, 0, this.cv.width, this.cv.height)
 
-      this.cx.strokeStyle = 'grey'
-      this.cx.beginPath()
-      let y = this.xAxis - this.minY * this.dy
-      let x = this.yAxis + this.minX * this.dx
-      const y2 = this.xAxis - this.maxY * this.dy
-      const x2 = this.yAxis + this.maxX * this.dx
-      this.cx.strokeRect(x, y, x2 - x, y2 - y)
-      this.cx.closePath()
-      this.cx.stroke()
+        this.cx.strokeStyle = 'grey'
+        this.cx.beginPath()
+        let y = this.xAxis - this.minY * this.dy
+        let x = this.yAxis + this.minX * this.dx
+        const y2 = this.xAxis - this.maxY * this.dy
+        const x2 = this.yAxis + this.maxX * this.dx
+        this.cx.strokeRect(x, y, x2 - x, y2 - y)
+        this.cx.closePath()
+        this.cx.stroke()
 
-      this.cx.strokeStyle = 'black'
-      this.cx.beginPath()
-      this.cx.moveTo(0, this.xAxis)
-      this.cx.lineTo(this.cv.width, this.xAxis)
-      this.cx.moveTo(this.yAxis, 0)
-      this.cx.lineTo(this.yAxis, this.cv.height)
-      this.cx.closePath()
-      this.cx.stroke()
+        this.cx.strokeStyle = 'black'
+        this.cx.beginPath()
+        this.cx.moveTo(0, this.xAxis)
+        this.cx.lineTo(this.cv.width, this.xAxis)
+        this.cx.moveTo(this.yAxis, 0)
+        this.cx.lineTo(this.yAxis, this.cv.height)
+        this.cx.closePath()
+        this.cx.stroke()
 
-      this.cx.fillStyle = this.color
-      this.cx.strokeStyle = this.color
-      this.cx.beginPath()
-      this.cx.closePath()
-      // let img = this.imgData.data;
-      // let coor = 0;
-      for (let i = 0; i < this.dataX.length; i++) {
-        x = this.yAxis + this.dataX[i] * this.dx
-        y = this.xAxis - this.dataY[i] * this.dy
+        this.cx.fillStyle = this.color
+        this.cx.strokeStyle = this.color
+        this.cx.beginPath()
+        this.cx.closePath()
+        // let img = this.imgData.data;
+        // let coor = 0;
+        for (let i = 0; i < this.dataX.length; i++) {
+            x = this.yAxis + this.dataX[i] * this.dx
+            y = this.xAxis - this.dataY[i] * this.dy
 
-        // this.cx.fillRect(x - 1, y - 1, 1, 1);
+            // this.cx.fillRect(x - 1, y - 1, 1, 1);
 
-        this.cx.moveTo(x - 1, y)
-        this.cx.lineTo(x, y)
-        this.cx.moveTo(x, y - 1)
-        this.cx.lineTo(x, y)
+            this.cx.moveTo(x - 1, y)
+            this.cx.lineTo(x, y)
+            this.cx.moveTo(x, y - 1)
+            this.cx.lineTo(x, y)
 
-        // coor = Math.round(y * this.cv.width * 0.9) + x * 4;
-        // img[coor] = 255; // RED
-        // img[++coor] = 255; // GREEN
-        // img[++coor] = 128; // BLUE
-        // img[++coor] = 255; // ALPHA
-      }
-      this.cx.stroke()
+            // coor = Math.round(y * this.cv.width * 0.9) + x * 4;
+            // img[coor] = 255; // RED
+            // img[++coor] = 255; // GREEN
+            // img[++coor] = 128; // BLUE
+            // img[++coor] = 255; // ALPHA
+        }
+        this.cx.stroke()
 
-      // this.cx.putImageData(this.imgData, 0, 0);
+        // this.cx.putImageData(this.imgData, 0, 0);
     }
 
-    public clickXY (event: MouseEvent) {
-      let x = event.offsetX - this.yAxis
-      let y = this.xAxis - event.offsetY
-      x = Math.round(x / this.dx * 100) / 100
-      y = Math.round(y / this.dy * 100) / 100
-      alert('X = [ ' + x + ' ]          Y = [ ' + y + ' ]')
+    public clickXY(event: MouseEvent) {
+        let x = event.offsetX - this.yAxis
+        let y = this.xAxis - event.offsetY
+        x = Math.round(x / this.dx * 100) / 100
+        y = Math.round(y / this.dy * 100) / 100
+        alert('X = [ ' + x + ' ]          Y = [ ' + y + ' ]')
     }
 
-    public createTestData1 (): void {
-      const n = 800
-      const pc = n / 4
-      let x = -n / 2
-      let y = 0
+    public createTestData1(): void {
+        const n = 800
+        const pc = n / 4
+        let x = -n / 2
+        let y = 0
 
-      this.dataX = new Array(n)
-      this.dataY = new Array(n)
-      let i = 0
-      while (x < n / 2) {
-        y = Math.sin(Math.PI / pc * x)
-        this.dataX[i] = x
-        this.dataY[i] = y
-        i++
-        x++
-      }
-      this.createChart(this.dataX, this.dataY)
+        this.dataX = new Array(n)
+        this.dataY = new Array(n)
+        let i = 0
+        while (x < n / 2) {
+            y = Math.sin(Math.PI / pc * x)
+            this.dataX[i] = x
+            this.dataY[i] = y
+            i++
+            x++
+        }
+        this.createChart(this.dataX, this.dataY)
     }
 
-    public createTestData2 (): void {
-      const n = 1000
-      this.dataX = new Array(n)
-      this.dataY = new Array(n)
-      for (let i = 0; i < n; i++) {
-        this.dataX[i] = Math.cos(2 * Math.PI * (i + 1) / n)
-        this.dataY[i] = Math.sin(2 * Math.PI * (i + 1) / n)
-      }
-      this.createChart(this.dataX, this.dataY)
+    public createTestData2(): void {
+        const n = 1000
+        this.dataX = new Array(n)
+        this.dataY = new Array(n)
+        for (let i = 0; i < n; i++) {
+            this.dataX[i] = Math.cos(2 * Math.PI * (i + 1) / n)
+            this.dataY[i] = Math.sin(2 * Math.PI * (i + 1) / n)
+        }
+        this.createChart(this.dataX, this.dataY)
     }
 
-    public clickClick (event: MouseEvent) {
-      const x = event.offsetX
-      const y = event.offsetY
-      console.log('X=', x, ' Y=', y)
+    public clickClick(event: MouseEvent) {
+        const x = event.offsetX
+        const y = event.offsetY
+        console.log('X=', x, ' Y=', y)
     }
 }

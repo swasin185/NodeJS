@@ -376,7 +376,7 @@ var QuickSort = /** @class */ (function (_super) {
                         _a.sent();
                         return [3 /*break*/, 2];
                     case 4:
-                        if (!(x >= 0)) return [3 /*break*/, 6];
+                        if (!(l < h && x >= 0)) return [3 /*break*/, 6];
                         return [4 /*yield*/, this.compareData(pivot, l).then(function (result) {
                                 if (result >= 0)
                                     l++;

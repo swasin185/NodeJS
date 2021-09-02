@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Maze</title>
+</head>
+<body bgcolor="#111111">
+	<center>
+		<input label="Width:" id="width" type="text" value="81"></input>x
+		<input label="Height" id="height" type="text" value="61"></input>
+		<input type="button" value="Calculate" onclick="depthFirstSearch()"></input>
+		<hr>
+		<canvas id="cpxCanvas"; width="800"; height="600"; style="border:1px solid #FFFFFF;"
+			onclick="mazeGenerate()"></canvas>
+	</center>
+</body>
+<script src="script.js"></script>
+
+</html>

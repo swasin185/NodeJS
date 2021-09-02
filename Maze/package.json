@@ -1,0 +1,7 @@
+{
+  "name": "maze",
+  "version": "1.0.1",
+  "scripts": {
+    "build": "tsc && uglifyjs Maze.js -c -m -o ./public/script.js && rm Maze.js"
+  }
+}

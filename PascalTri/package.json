@@ -2,6 +2,6 @@
   "name": "pascaltri",
   "version": "1.0.1",
   "scripts": {
-    "build": "tsc PascalTri.ts & uglifyjs PascalTri.js -c -m -o ./public/script.js & del PascalTri.js"
+    "build": "tsc && uglifyjs PascalTri.js -c -m -o ./public/script.js && rm PascalTri.js"
   }
 }

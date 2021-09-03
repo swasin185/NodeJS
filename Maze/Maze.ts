@@ -5,6 +5,7 @@ const HEIGHT = cv.height;
 const textWidth = document.getElementById("width") as HTMLInputElement;
 const textHeight = document.getElementById("height") as HTMLInputElement;
 const checkImprove = document.getElementById("improve") as HTMLInputElement;
+// github token : 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
 
 // ประกาศตัวแปร Global 
 // ----------------------------------------------------------------------------

@@ -4,13 +4,23 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Maze</title>
+	<style>
+	.block {
+  	width: 160px;
+  	border: solid;
+  	color: navy;
+  	padding: 14px 28px;
+  	font-size: 20px;
+  	text-align: center;
+	}
+	</style>
 </head>
-<body bgcolor="#111111">
+<body bgcolor="#112233">
 	<center>
 		<input label="Width:" id="width" type="text" value="81"></input>x
-		<input label="Height" id="height" type="text" value="61"></input>
-		<input type="button" value="Calculate" onclick="depthFirstSearch()"></input>
-		<input type="checkbox" id="improve" checked="false"></input>
+		<input label="Height" id="height" type="text" value="61"></input><br>
+		<input type="button" class="block" value="Calculate" onclick="depthFirstSearch()"></input>
+		<input type="checkbox" id="improve"></input>
 		<hr>
 		<canvas id="cpxCanvas"; width="800"; height="600"; style="border:1px solid #FFFFFF;"
 			onclick="mazeGenerate()"></canvas>

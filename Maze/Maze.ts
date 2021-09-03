@@ -4,6 +4,8 @@ const WIDTH = cv.width;
 const HEIGHT = cv.height;
 const textWidth = document.getElementById("width") as HTMLInputElement;
 const textHeight = document.getElementById("height") as HTMLInputElement;
+const checkImprove = document.getElementById("improve") as HTMLInputElement;
+
 // ประกาศตัวแปร Global 
 // ----------------------------------------------------------------------------
 var n: number = Number(textWidth.value);
@@ -22,9 +24,10 @@ var di = start_i;
 var dj = start_j;
 var pathCount = 0;
 var maxStep = 0;
+var improve = false;
 var colors: string[] = new Array(100);
 for (let i=0; i<colors.length; i++)
-	colors[i] = rgb(50+i*2, 255-(i*2), 150+i);
+	colors[i] = rgb(150+i, 255-(i*2), 50+(i*2));
 
 mazeGenerate();
 
@@ -81,14 +84,15 @@ async function mazeGenerate() {
 	resetMaze();
 }
 
-function howFarFromFinish() : number {
-	if (finish_i && finish_j)
-		return Math.abs(finish_i - di) + Math.abs(finish_j - dj);
-	else
+function howFarFromFinish(i:number, j:number) : number {
+	if (found_i == undefined || found_j == undefined)
 		return -1;
+	else
+		return Math.abs(found_i - i) + Math.abs(found_j - j);
 } 
 
 function resetMaze() : void {
+	improve = checkImprove.checked;
 	found_i = undefined;
 	found_j = undefined;
 	di = start_i;
@@ -149,7 +153,7 @@ async function depthFirstSearch() {
 			walk = blocks[di][dj] + 1;
 
 		choice = 0;
-		if (walk + howFarFromFinish() < distance) {
+		if (walk + howFarFromFinish(di, dj) < distance) {
 			d = 0;
 			if (di > 1 && isNextBlock(blocks[di][dj], blocks[di - 1][dj]))
 				{ choice++; d += 1; }
@@ -188,7 +192,7 @@ function createPath() : void {
 	}
 	di = odi;
 	dj = odj;
-	console.log("path["+pathCount+"] = " + x);
+	//console.log("path["+pathCount+"] = " + x);
 }
 
 function move(direction : number) : void {
@@ -236,6 +240,16 @@ function randomDirection(directions : number, total : number) : number {
 }
 
 function selectDirection(directions : number, total : number) : number {
+	let select = 0;
+	if (total > 0) {
+		select = 1;
+		while ((select & directions) == 0 && select <= 8)
+			select <<= 1;
+	}
+	return select;	
+}
+
+function routeDirection(directions : number, total : number) : number {
 	let select = 0;
 	if (total > 0) {
 		select = 1;

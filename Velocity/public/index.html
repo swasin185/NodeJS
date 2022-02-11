@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Velocity</title>
+	<style>
+	.block {
+  		width: 160px;
+	  	color: navy;
+	  	padding: 14px 28px;
+	  	font-size: 20px;
+	  	text-align: center;
+	}
+	.textbox {
+		width: 100px;
+		display: inline-block;
+		margin-right: 5px;
+		text-align: right;
+	}
+	</style>
+</head>
+<body bgcolor="#0" >
+	<table style="text-align: right; border:1px; padding:5px; color:white;">
+		<tr>
+			<td width="250">
+				Length : <input class="textbox" id="length" type="text" value="100"></input>
+			</td>
+			<td width="250">
+				
+			</td>
+			<td width="250">
+				<input type="button" class="block" value="Generate" onclick="hello()"></input>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Distance A : <input class="textbox" id="distanceA" type="text" value="0"></input>
+				<hr>
+				Time A : <input class="textbox" id="timeA" type="text" value="0"></input>
+				<hr>
+				Speed A : <input class="textbox" id="speedA" type="text" value="0" disabled></input> 
+			</td>
+			<td>
+				Distance B : <input class="textbox" id="distanceB" type="text" value="0"></input>
+				<hr>
+				Time B : <input class="textbox" id="timeB" type="text" value="0"></input>
+				<hr>
+				Speed B : <input class="textbox" id="speedB" type="text" value="0" disabled></input> 
+			</td>
+			<td>
+				Speed AX : <input class="textbox" id="speedAX" type="text" value="0" disabled></input>
+				<hr>
+				Speed BX : <input class="textbox" id="speedBX" type="text" value="0" disabled></input>
+				<hr>
+				Time X : <input class="textbox" id="timeX" type="text" value="0" disabled></input>
+			</td>
+		</tr>
+	</table>
+</body>
+<script>
+	var length = 0;
+	
+	var distanceA = 0;
+	var timeA = 0;
+	var speedA = 0;
+	
+	var distanceB = 0;
+	var timeB = 0;
+	var speedB = 0;
+	
+	var speedAX = 0;
+	var speedBX = 0;
+	var timeX = 0;
+	
+	function hello() {
+		length = document.getElementById("length").value;
+		distanceA = document.getElementById("distanceA").value;
+		timeA = document.getElementById("timeA").value;
+		if (timeA != 0)
+			speedA = Math.round(distanceA / timeA * 100) / 100;
+		speedAX = speedA;
+
+		distanceB = document.getElementById("distanceB").value;
+		timeB = document.getElementById("timeB").value;
+		if (timeB != 0)
+			speedB = Math.round(distanceB / timeB * 100) / 100;
+		speedBX = speedB;
+		
+		if (speedAX > speedBX) {
+			timeX = (length - distanceA) / speedAX;
+			speedBX = (length - distanceB) / timeX;
+		} else {
+			timeX = Math.round((length - distanceB) / speedBX * 100) / 100;
+			speedAX = (length - distanceA) / timeX;
+		}
+		timeX = Math.round(timeX * 100) / 100;
+		
+		document.getElementById("speedA").value = speedA;
+		document.getElementById("speedB").value = speedB;
+
+		document.getElementById("speedAX").value = speedAX;
+		document.getElementById("speedBX").value = speedBX;
+		document.getElementById("timeX").value = timeX;
+	}
+</script>
+
+</html>

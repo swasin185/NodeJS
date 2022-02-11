@@ -15,16 +15,25 @@
 	}
 	</style>
 </head>
-<body bgcolor="#112233">
-	<center>
-		<input label="Width:" id="width" type="text" value="81"></input>x
-		<input label="Height" id="height" type="text" value="61"></input><br>
-		<input type="button" class="block" value="Calculate" onclick="depthFirstSearch()"></input>
-		<input type="checkbox" id="improve"></input>
-		<hr>
-		<canvas id="cpxCanvas"; width="800"; height="600"; style="border:1px solid #FFFFFF;"
-			onclick="mazeGenerate()"></canvas>
-	</center>
+<body bgcolor="#000000" >
+	<table style="border:0; padding:5px; color:white;">
+		<tr>
+			<td width="500" style="vertical-align: top; padding:50px;">
+			Width: <input id="width" type="text" value="81"></input>
+			Height: <input id="height" type="text" value="81"></input>
+			<br>
+			<br>
+			<input type="button" class="block" value="Generate" onclick="generateMaze()"></input>
+			<input type="checkbox" id="improve"></input>
+			<input type="button" class="block" value="Solve" onclick="solveMaze()"></input>
+			<input type="button" class="block" value="Team Solve" onclick="teamSolveMaze()"></input>
+			</td>
+			<td>
+				<canvas id="cpxCanvas"; width="800"; height="800"; style="border:1px solid #FFFFFF;"
+				onclick=""></canvas>
+			</td>
+		</tr>
+	</table>
 </body>
 <script src="script.js"></script>
 

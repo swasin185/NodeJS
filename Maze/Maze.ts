@@ -9,292 +9,514 @@ const checkImprove = document.getElementById("improve") as HTMLInputElement;
 
 // ประกาศตัวแปร Global 
 // ----------------------------------------------------------------------------
+class Address {
+    public i: number;         
+    public j: number;         
+    constructor(i: number, j: number) {
+        this.set(i, j);
+    }
+    public set(i: number, j: number): void {
+        this.i = i;
+        this.j = j;
+    }
+    public setAddress(a : Address): void {
+        this.i = a.i;
+        this.j = a.j;
+    }
+    public equals(b: Address): boolean {
+		return b!=undefined && this.i==b.i && this.j==b.j;
+    }
+}
+class Pioneer {
+    public locate : Address;
+ 	public walk : number = 0;
+	public direction : number = NONE;
+	public active : boolean = true;
+	public start : Address = undefined;
+	public found : Address = undefined;
+	public route : Address[];
+	public boundary = 10;
+	public backward = false;
+	        
+    constructor(i: number, j: number) {
+    	this.locate = new Address(i, j);
+		this.start = new Address(i, j);
+		if (map[i][j] != null) {
+			this.walk = map[i][j];
+		} else {
+			this.walk = 0;
+		}
+		if (map[i][j]>0) 
+			this.boundary = this.walk * GOLDEN;
+		else
+			this.boundary = 10;
+		this.route = [];
+		this.active = true;
+    }
+
+	public move() : void {
+		if (this.direction > NONE) {
+			let i = this.locate.i;
+			let j = this.locate.j; 
+			if (this.direction == NORTH) this.locate.i--;
+			else if (this.direction == WEST) this.locate.j--;
+			else if (this.direction == SOUTH) this.locate.i++;
+			else if (this.direction == EAST) this.locate.j++;	
+			this.backward = (this.route.length > 0 && this.locate.equals(this.route[this.route.length-1]));
+			if (this.backward)
+				this.route.pop();
+			else
+				this.route.push(new Address(i,j));
+		}
+	}
+	public goBack() : void {
+		if (this.route.length > 0) {
+			let prior = this.route[this.route.length-1]
+			if (prior.i < this.locate.i)
+				this.direction = NORTH;
+			else if (prior.j < this.locate.j)
+				this.direction = WEST;
+			else if (prior.i > this.locate.i)
+				this.direction = SOUTH;
+			else if (prior.j > this.locate.j)
+				this.direction = EAST;
+			else
+				this.direction = NONE;
+		} else
+			this.direction = NONE;
+	}
+}
+
+const GOLDEN = 1.61807;
+const DEADEND = -2;
+const WALL = -1;
+const WAY = 0;
+const NONE = 0;
+const NORTH = 1;
+const WEST = 2;
+const SOUTH = 4;
+const EAST = 8;
+
+var shortest : number = 0;
 var n: number = Number(textWidth.value);
 var m: number = Number(textHeight.value);
+var improve = false;
 var w = WIDTH / n;
 var h = HEIGHT / m;
-var blocks: number[][] = new Array(m);
-var path: number[][] = new Array(m);
-var found_i = 0;
-var found_j = 0;
-var start_i = 1;
-var start_j = 1;
-var finish_i = m - 2;
-var finish_j = n - 2;
-var di = start_i;
-var dj = start_j;
-var pathCount = 0;
-var maxStep = 0;
-var improve = false;
-var colors: string[] = new Array(100);
+var maze: number[][] = new Array(m);
+var map: number[][] = new Array(m);
+var found = undefined;
+var start: Address = new Address(0, 0);
+var finish: Address = new Address(0, 0);
+var worker: Address = new Address(0, 0);
+var colors : string[] = new Array(100);
 for (let i=0; i<colors.length; i++)
-	colors[i] = rgb(150+i, 255-(i*2), 50+(i*2));
+	colors[i] = rgb(i*2.5, 255-(i*2), 150+i);
 
-mazeGenerate();
+var points = 0;	
+var portal : Address[] = new Array(1);
+var max_point = 0;
+var path : Address[] = new Array(1);
+var teams : Pioneer[] = [];
+
+var time = 0;
+generateMaze();
 
 // ฟังก์ชั่น
 // ----------------------------------------------------------------------------
-async function mazeGenerate() {
+function resetMaze() : void {
+	improve = checkImprove.checked;
+	found = undefined;
+	worker.set(start.i, start.j);
+	path = new Array(0);
+	for (let i = 0; i < m; i++) 
+		for (let j = 0; j < n; j++) {
+			if (maze[i][j] != WALL)
+				maze[i][j] = null;
+			map[i][j] = null;
+		}
+	portal[0] = start; 
+	points = 1;
+	max_point = points;
+	teams = [new Pioneer(start.i, start.j)];
+	// shortest = Math.sqrt(m*n) / 4;
+	shortest = 10;	
+}
+
+async function generateMaze() {
 	n = Number(textWidth.value);
 	m = Number(textHeight.value);
 	w = WIDTH / n;
 	h = HEIGHT / m;
-	blocks = new Array(m);
-	path = new Array(m);
+	maze = new Array(m);
+	map = new Array(m);
 	for (let i = 0; i < m; i++) {
-		blocks[i] = new Array(n);
-		blocks[i].fill(-1);
-		path[i] = new Array(n);
-		path[i].fill(-1);
+		maze[i] = new Array(n);
+		maze[i].fill(WALL);
+		map[i] = new Array(n);
+		map[i].fill(WALL);
 	}
-
-	di = start_i;
-	dj = start_j;
-	finish_i = Math.floor(Math.random() * (m-2) / 2) * 2 + 1;
-	finish_j = Math.floor(Math.random() * (n-2) / 2) * 2 + 1;
-	if(finish_i < m /2) finish_i = finish_i * 2 - 1;
-	if(finish_j < n /2) finish_j = finish_j * 2 - 1;
-	console.log("finish=", finish_i, finish_j);
-	let choice = 1;
-	let d = -1;
-	let walk = 1;
+	worker.i = 1;
+	worker.j = 1;	
+	let choice = NORTH;
+	let walk = 0;
 	let backward = false;
-	while (choice > 0) {
-		if (blocks[di][dj] < 0) {
-			blocks[di][dj] = walk++;
-			backward = false;
-		} else
-			walk = blocks[di][dj] + 1;
-			 
-		if (di % 2 == 1 && dj % 2 == 1) {
-			choice = 0;
-			d = 0;
-			if (di > 1 && blocks[di - 2][dj] == -1) { choice++; d += 1; }
-			if (dj > 1 && blocks[di][dj - 2] == -1) { choice++; d += 2; }
-			if (di < m - 2 && blocks[di + 2][dj] == -1) { choice++; d += 4; }
-			if (dj < n - 2 && blocks[di][dj + 2] == -1) { choice++; d += 8; }
-			choice = randomDirection(d, choice);
+	start = new Address(Math.floor(m / 4) * 2 + 1, Math.floor(n / 4) * 2 + 1);
+	finish = new Address(Math.floor(Math.random() * (m-2) / 2) * 2 + 1,
+					   Math.floor(Math.random() * (n-2) / 2) * 2 + 1);
+	paintMaze();
+	while (choice > NONE) {
+		if (map[worker.i][worker.j] == WALL) {
+			maze[worker.i][worker.j] = null;
+			map[worker.i][worker.j] = walk;
+		} else 
+			walk = map[worker.i][worker.j];
+		walk++;
+		if (worker.i%2 == 1 && worker.j%2 == 1) {
+			choice = randomDirection(worker);
+			if (choice == NONE) {
+				choice = goBack(worker);
+				if (!backward) { 
+					connnectDEADEND(worker, choice);
+					backward = true;
+				}
+			} else 
+				backward = false;
 		}
-		if (choice == 0 && !(di == start_i && dj == start_j)) {
-			choice = goBack();
-			if (choice > 0 && !backward) connnectDeadEnd(choice);
-			backward = true;			
-		}
-		move(choice);
+		move(worker, choice);
 	}
 	resetMaze();
+	paintMaze();
 }
 
-function howFarFromFinish(i:number, j:number) : number {
-	if (found_i == undefined || found_j == undefined)
-		return -1;
+function howFarFromFinish(point : Address) : number {
+	if (found == undefined)	
+		return 0;
 	else
-		return Math.abs(found_i - i) + Math.abs(found_j - j);
+		return Math.abs(found.i-point.i) + Math.abs(found.j-point.j);
 } 
 
-function resetMaze() : void {
-	improve = checkImprove.checked;
-	found_i = undefined;
-	found_j = undefined;
-	di = start_i;
-	dj = start_j;
-	maxStep = 0;
-	for (let i = 0; i < m; i++)
-		for (let j = 0; j < n; j++)
-			path[i][j] = -1; 
-	pathCount = 0;
-	for (let i = 0; i < m; i++) 
-		for (let j = 0; j < n; j++) 
-			if (blocks[i][j] > -1)
-				blocks[i][j] = null;	
-	paint();
+function connnectDEADEND(point : Address, direction : number) : void {
+	if (point.i > 1 && direction == SOUTH && map[point.i-1][point.j] == WALL && 
+	    map[point.i][point.j] - map[point.i-2][point.j] > m)
+		maze[point.i-1][point.j] = WAY;
+	else if (point.j > 1 && direction == EAST && map[point.i][point.j-1] == WALL && 
+         	map[point.i][point.j] - map[point.i][point.j-2] > m) 
+		maze[point.i][point.j-1] = WAY;
+	else if (point.i < m-2 && direction == NORTH && map[point.i+1][point.j] == WALL && 
+	        map[point.i][point.j] - map[point.i+2][point.j] > n)
+		maze[point.i + 1][point.j] = WAY;
+	else if (point.j < n-2 && direction == WEST && map[point.i][point.j+1] == WALL && 
+	        map[point.i][point.j] - map[point.i][point.j+2] > n)
+		maze[point.i][point.j+1] = WAY;
 }
 
-function connnectDeadEnd(direction : number) : void {
-	if (di > 1 && direction == 4 && blocks[di - 1][dj] == -1 && 
-	    blocks[di][dj] - blocks[di - 2][dj] > m)
-		blocks[di - 1][dj] = 0;
-	else if (dj > 1 && direction == 8 && blocks[di][dj - 1] == -1 && 
-         	blocks[di][dj] - blocks[di][dj-2] > m) 
-		blocks[di][dj - 1] = 0;
-	else if (di < m - 2 && direction == 1 && blocks[di + 1][dj] == -1 && 
-	        blocks[di][dj] - blocks[di + 2][dj] > n)
-		blocks[di + 1][dj] = 0;
-	else if (dj < n - 2 && direction == 2 && blocks[di][dj + 1] == -1 && 
-	        blocks[di][dj] - blocks[di][dj + 2] > n)
-		blocks[di][dj + 1] = 0;
-}
-
-async function depthFirstSearch() {
+async function solveMaze() {
 	resetMaze();
-	let choice = 1;
-	let walk = 1;
-	let d = 0;
-	let distance = m * n;
-	let time = 0;
-	while (choice > 0) {
-		time++;
-		if (blocks[di][dj] == null || blocks[di][dj] > walk) {
-			if (blocks[di][dj] == null) {
-				paint();
-				await new Promise(r => setTimeout(r, 5));
-			}
-			if (walk > maxStep) maxStep = walk;
- 			blocks[di][dj] = walk++;
-			if (di == finish_i && dj == finish_j) {
-				found_i = finish_i;
-				found_j = finish_j;
-				distance = walk - 1;
-				maxStep = distance;
-				createPath();
-				paint();
-				await new Promise(r => setTimeout(r, 50));
-			}
-		} else
-			walk = blocks[di][dj] + 1;
-
-		choice = 0;
-		if (walk + howFarFromFinish(di, dj) < distance) {
-			d = 0;
-			if (di > 1 && isNextBlock(blocks[di][dj], blocks[di - 1][dj]))
-				{ choice++; d += 1; }
-			if (dj > 1 && isNextBlock(blocks[di][dj], blocks[di][dj - 1]))
-				{ choice++; d += 2; }
-			if (di < m - 2 && isNextBlock(blocks[di][dj], blocks[di + 1][dj]))
-				{ choice++; d += 4; }
-			if (dj < n - 2 && isNextBlock(blocks[di][dj], blocks[di][dj + 1]))
-				{ choice++; d += 8; }
-			choice = selectDirection(d, choice);
-		} 
-		if (choice == 0) choice = goBack();
-		move(choice);
-	}
-	paint();
-	console.log("maxStep=" + maxStep, "time="+time);
-}
-
-function createPath() : void {
-	pathCount++;
-	for (let i = 0; i < m; i++) {
-		path[i] = new Array(n);
-		path[i].fill(-1);
-	}
-	let odi = di;
-	let odj = dj;
-	di = finish_i;
-	dj = finish_j;
-	let c = 0;
-	let x = 1;
-	while (di != 1 || dj != 1) {
-		x++;
-		c = goBack();
-		path[di][dj] = blocks[di][dj];
-		move(c);
-	}
-	di = odi;
-	dj = odj;
-	//console.log("path["+pathCount+"] = " + x);
-}
-
-function move(direction : number) : void {
-	if (direction == 1) di--;
-	else if (direction == 2) dj--;
-	else if (direction == 4) di++;
-	else if (direction == 8) dj++;
-}
-
-function goBack() : number {
-	let choice = 0;
-	if (di > 1 && isPriorBlock(blocks[di][dj], blocks[di - 1][dj])) 
-		choice = 1; 
-	else if (dj > 1 && isPriorBlock(blocks[di][dj], blocks[di][dj - 1])) 
-		choice = 2; 
-	else if (di<(m-1) && isPriorBlock(blocks[di][dj], blocks[di + 1][dj])) 
-		choice = 4; 
-	else if (dj<(n-1) && isPriorBlock(blocks[di][dj], blocks[di][dj + 1])) 
-		choice = 8;
-	return choice;
-}
-
-function isPriorBlock(b1 : number,  b2 : number) : boolean {
-	return b1 == b2 + 1;
-}
-
-function isNextBlock(b1 : number,  b2 : number) : boolean {
-	return b2 == null || b2-b1 > 1;
-}
-
-function randomDirection(directions : number, total : number) : number {
-	let select = 0;
-	if (total > 0) {
-		let ran = Math.floor(Math.random() * total);
-		select = 1;
-		for (let ro = 0; ro < ran; ro++) {
-			while ((select & directions) == 0 && select <= 8)
-				select <<= 1;
-			select <<= 1;
-		}
-		while ((select & directions) == 0 && select <= 8)
-			select <<= 1;
-	}
-	return select;	
-}
-
-function selectDirection(directions : number, total : number) : number {
-	let select = 0;
-	if (total > 0) {
-		select = 1;
-		while ((select & directions) == 0 && select <= 8)
-			select <<= 1;
-	}
-	return select;	
-}
-
-function routeDirection(directions : number, total : number) : number {
-	let select = 0;
-	if (total > 0) {
-		select = 1;
-		while ((select & directions) == 0 && select <= 8)
-			select <<= 1;
-	}
-	return select;	
-}
-
-function paint() {
 	cx.clearRect(0, 0, WIDTH, HEIGHT);
-	let x = 0;
-	let y = 0;
-	cx.fillStyle = "white";
-	cx.strokeStyle = 'black';
-	for (let i = 0; i < m; i++)
-		for (let j = 0; j < n; j++)
-			if (blocks[i][j] != -1) {
-				x = j * w;
-				y = i * h;
-				if (path[i][j] != -1) {
-					cx.fillStyle = "yellow";
-					cx.fillRect(x, y, w-1, h-1);
-				} else {
-					if (blocks[i][j]<=maxStep) {
-						if (blocks[i][j] != null)
-							cx.fillStyle = colors[Math.round(blocks[i][j] / maxStep * (colors.length-1))];
-						else
-							cx.fillStyle = "white";
-					} else {
-						cx.fillStyle = "grey";
+	time = 0;
+	let pioneer : Pioneer = new Pioneer(start.i, start.j);
+	console.time("Solve Maze");
+	while (points > 0) {
+		time++;
+		await explorer(pioneer);
+	}
+	console.timeEnd("Solve Maze");
+	paintMaze();
+	paintPath(pioneer.locate);
+	console.log("points="+max_point, "path="+path.length);
+	console.log("time="+time);
+}
+
+async function teamSolveMaze() {
+	resetMaze();
+	cx.clearRect(0, 0, WIDTH, HEIGHT);
+	console.time("Team Solve Maze");
+	time = 0;
+	let count = 1;
+	while (points > 0 && count > 0) {
+		time++;
+		count = 0;
+		for (let pioneer of teams) { 
+			if (pioneer.active) {
+				count++;
+				await explorer(pioneer);
+			}
+		}
+	}
+	paintMaze();
+	paintPath(undefined);
+	console.timeEnd("Team Solve Maze");
+	console.log("points="+max_point, "path="+path.length);
+	console.log("time="+time);
+}
+
+async function explorer(worker : Pioneer) {
+	if (found!=undefined && shortest < worker.boundary)
+		worker.boundary = shortest;
+		
+	let di = worker.locate.i;
+	let dj = worker.locate.j; 
+	if (!worker.backward && (map[di][dj] == null || worker.walk < map[di][dj])) {
+ 		map[di][dj] = worker.walk;
+	} else {
+		worker.walk = map[di][dj];
+	}
+	if (map[di][dj] == DEADEND)
+		worker.goBack();
+	else {
+		worker.walk++;
+		worker.direction = NONE;
+		if (worker.locate.equals(finish)) {
+			found = finish;
+			path = createPath(worker.locate);
+			shortest = worker.walk-1;
+		} else 
+			worker.direction = selectDirection(worker.locate);
+	}
+			
+	if (worker.direction == NONE || 
+	   (worker.walk + howFarFromFinish(worker.locate)) > worker.boundary) {
+		if (worker.direction == NONE || found != undefined) {
+			let i = 0;
+			while (i < points && !worker.locate.equals(portal[i])) i++; 
+			if (i < points) {
+				while (i < points-1) {
+					portal[i] = portal[i+1];
+					i++
+				}
+				points--;
+			}
+			
+			if (worker.locate.equals(worker.start)) {
+				worker.active = false;
+				for (let i=0; i < points && worker.walk < map[portal[i].i][portal[i].j]; i++) 
+						teams[teams.length] = new Pioneer(portal[i].i, portal[i].j);
+				if (improve && found==undefined) {
+					paintPath(undefined);
+					await new Promise(r => setTimeout(r, 50));
+				}
+				if (points > 0 && worker.walk < map[portal[0].i][portal[0].j]) {
+					if (max_point < points)
+						max_point = points;
+					if (improve) 
+						console.log(di, dj, "START", points);
+				}
+//				else {
+//					let c = 0;
+//					for (let i=0; i<teams.length; i++) if (teams[i].active) c++;
+//					console.log(c, "actived");
+//				}
+				
+				if (points > 0) {
+					worker.start = portal[0];
+					worker.locate.setAddress(worker.start);
+					worker.route = [];
+					worker.walk = map[worker.locate.i][worker.locate.j];
+					worker.direction = NONE;
+					if (found == undefined) { 
+						worker.boundary = worker.walk * GOLDEN;
+						shortest = worker.boundary;
 					}
-					cx.fillRect(x, y, w-1, h-1);
-//					if (blocks[i][j] != null && blocks[i][j] > 0)
-//						cx.strokeText(String(blocks[i][j]), x + 2, y + 10);
 				}
 			}
-	cx.fillStyle = "orange";
-	cx.fillRect(dj * w, di * h, w-1, h-1);
-	cx.fillStyle = "blue";
-	cx.fillRect(start_j * w, start_i * h, w-1, h-1);
-	if (found_i && found_j) {
+		} else if (found == undefined) {
+			let i = 0;
+			while (i < points && !worker.locate.equals(portal[i])) i++;
+			if (i == points) {
+				portal[points] = new Address(di, dj);
+				points++;
+			} 
+		} else {
+			worker.active = false;
+		}
+			 
+		if (points > 0 && !worker.locate.equals(worker.start)) { 
+			worker.goBack();
+			/*
+ 			if ((found==undefined || !worker.locate.equals(found)) && isDEADEND(worker.locate)) { 
+				map[di][dj] = DEADEND;
+				let i = 0;
+				while (i < points && !worker.locate.equals(portal[i])) i++; 
+				if (i < points) {
+					console.log("remove deadend portal", di, dj)
+					while (i < points-1) {
+						portal[i] = portal[i+1];
+						i++
+					}
+					points--;
+				}
+			}
+			*/	
+		}
+	}
+	//move(worker.locate, worker.direction);
+	worker.move();
+}
+
+function createPath(point : Address) : Address[] {
+	let path : Address[] = new Array(map[point.i][point.j]-1);
+	let x = 0;
+	path[x++] = new Address(point.i, point.j);
+	let c = goBack(point);
+	while (c > 0 && !point.equals(start)) {
+		point = new Address(point.i, point.j);
+		move(point, c);
+		path[x++] = point;
+		c = goBack(point);
+	}
+	return path;
+}
+
+function move(point : Address, direction : number) : void {
+	if (direction == NORTH) point.i--;
+	else if (direction == WEST) point.j--;
+	else if (direction == SOUTH) point.i++;
+	else if (direction == EAST) point.j++;
+}
+
+function goBack(point : Address) : number {
+	let direction = NONE;
+	if (point.i>1 && isPriorAddress(map[point.i][point.j], map[point.i-1][point.j])) 
+		direction = NORTH; 
+	else if (point.j>1 && isPriorAddress(map[point.i][point.j], map[point.i][point.j-1])) 
+		direction = WEST; 
+	else if (point.i<(m-2) && isPriorAddress(map[point.i][point.j], map[point.i+1][point.j])) 
+		direction = SOUTH; 
+	else if (point.j<(n-2) && isPriorAddress(map[point.i][point.j], map[point.i][point.j+1])) 
+		direction = EAST;
+	return direction;
+}
+
+function isPriorAddress(b1 : number,  b2 : number) : boolean {
+	return b2 != null && b2 != WALL && b1 == b2 + 1;
+}
+
+function isNextAddress(b1 : number,  b2 : number, maze : number) : boolean {
+	return b1 != DEADEND && maze != WALL && b2 != DEADEND && (b2 == null || b2-b1 > 1);
+}
+
+function isDEADEND(point : Address) : boolean {
+	let x = 0;
+	if (point.i<=1 || maze[point.i-1][point.j]==WALL || map[point.i-1][point.j]==DEADEND)
+		x++;
+	if 	(point.i>=(m-2) || maze[point.i+1][point.j]==WALL || map[point.i+1][point.j]==DEADEND)
+		x++;	
+	if (point.j<=1 || maze[point.i][point.j-1]==WALL || map[point.i][point.j-1]==DEADEND)
+		x++;
+	if (point.j>=(n-2) || maze[point.i][point.j+1]==WALL || map[point.i][point.j+1]==DEADEND)
+		x++;
+	return x>=3;
+}
+
+function randomDirection(point : Address) : number {
+	let select = 0;
+	let directions = 0;
+	if (point.i > 1 && map[point.i-2][point.j] == WALL) { select++; directions += NORTH; }
+	if (point.j > 1 && map[point.i][point.j-2] == WALL) { select++; directions += WEST; }
+	if (point.i < m-2 && map[point.i+2][point.j] == WALL) { select++; directions += SOUTH; }
+	if (point.j < n-2 && map[point.i][point.j+2] == WALL) { select++; directions += EAST; }
+	if (select > NONE) {
+		let ran = Math.floor(Math.random() * select);
+		select = EAST;
+		for (let ro = 0; ro < ran; ro++) {
+			while ((select & directions) == 0 && select > NONE)
+				select >>= 1;
+			select >>= 1;
+		}
+		while ((select & directions) == 0 && select > NONE)
+			select >>= 1;
+	}
+	return select;	
+}
+
+function selectDirection(point : Address) : number {
+	let select = 0;
+	let directions = 0;
+	if (point.i > 1 && isNextAddress(map[point.i][point.j], map[point.i-1][point.j], maze[point.i-1][point.j]))
+		directions += NORTH;
+	if (point.j > 1 && isNextAddress(map[point.i][point.j], map[point.i][point.j-1], maze[point.i][point.j-1]))
+		directions += WEST;
+	if (point.i < m-2 && isNextAddress(map[point.i][point.j], map[point.i+1][point.j], maze[point.i+1][point.j]))
+		directions += SOUTH;
+	if (point.j < n-2 && isNextAddress(map[point.i][point.j], map[point.i][point.j+1], maze[point.i][point.j+1]))
+		directions += EAST;	
+	if (directions > NONE) {
+		select = EAST;
+		while ((select & directions) == 0 && select > NONE)
+			select >>= 1;
+	}
+	return select;	
+}
+
+function paintPath(worker : Address) {
+	let x = 0;
+	let y = 0;
+	for (let i = 1; i < m-1; i++) {
+		y = i * h;
+		for (let j = 1; j < n-1; j++) {
+			if (map[i][j] != null && map[i][j] != WALL) {
+				x = j * w;
+				
+				if (map[i][j] == DEADEND) 
+					cx.fillStyle = "navy";
+				else if (map[i][j] <= shortest) 
+					cx.fillStyle = colors[Math.round(map[i][j] / shortest * (colors.length-1))];
+				else 
+				   cx.fillStyle = "#333333";
+				cx.fillRect(x, y, w-1, h-1);
+			}
+		}
+	}
+	cx.fillStyle = "yellow";
+	for (let i=0; i<path.length; i++) 
+		if (path[i]!=undefined) 
+			cx.fillRect(path[i].j * w, path[i].i * h, w-1, h-1);
+		
+	cx.fillStyle = "cyan";
+	for (let i=0; i<points; i++) 
+			cx.fillRect(portal[i].j * w, portal[i].i * h, w-1, h-1);
+
+	if (time % 2 == 0) 
 		cx.fillStyle = "red";
-		cx.fillRect(found_j * w, found_i * h, w-1, h-1);
+	else
+		cx.fillStyle = "lime";
+	cx.fillRect((start.j-0.5) * w, (start.i-0.5) * h, 2*w-1, 2*h-1);
+	if (found != undefined) {
+		cx.fillStyle = "red";
+		cx.fillRect((found.j-0.5) * w, (found.i-0.5) * h, 2*w-1, 2*h-1);
+	}
+	for (let i=0; i<teams.length; i++) {
+		if (teams[i].active)
+			cx.fillStyle = "lime";
+		else
+			cx.fillStyle = "brown";
+		cx.fillRect((teams[i].locate.j) * w, (teams[i].locate.i) * h, w-1, h-1);
+	}		
+	if (worker!=undefined) {
+		cx.fillStyle = "orange";
+		cx.fillRect(worker.j * w, worker.i * h, w-1, h-1);
+	}
+}
+
+function paintMaze() {
+	let x = 0;
+	let y = 0;
+	cx.clearRect(0, 0, WIDTH, HEIGHT);
+	cx.fillStyle = "white";
+	for (let i=1; i<m-1; i++)
+		for (let j=1; j<n-1; j++) 
+			if (maze[i][j] != WALL) {
+				x = j * w;
+				y = i * h;
+				cx.fillRect(x, y, w-1, h-1);
+			}
+			
+	cx.fillStyle = "lime";
+	cx.fillRect((start.j-0.5) * w, (start.i-0.5) * h, 2*w-1, 2*h-1);
+	if (finish.i && finish.j) {
+		cx.fillStyle = "red";
+		cx.fillRect((finish.j-0.5) * w, (finish.i-0.5) * h, 2*w-1, 2*h-1);
 	}
 }
 

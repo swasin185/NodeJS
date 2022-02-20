@@ -19,12 +19,13 @@
 	<table style="border:0; padding:5px; color:white;">
 		<tr>
 			<td width="500" style="vertical-align: top; padding:50px;">
-			Width: <input id="width" type="text" value="81"></input>
-			Height: <input id="height" type="text" value="81"></input>
-			<br>
+              <input type="range" id="size" name="size"
+                 min="20" max="600" step="20" value="40">
+              <label id="sizeLabel" for="volume">Size:</label>
 			<br>
 			<input type="button" class="block" value="Generate" onclick="generateMaze()"></input>
-			<input type="checkbox" id="improve"></input>
+			<input type="checkbox" id="improve"></input><label for="improve">Slow Mode</label>
+            <br>
 			<input type="button" class="block" value="Solve" onclick="solveMaze()"></input>
 			<input type="button" class="block" value="Team Solve" onclick="teamSolveMaze()"></input>
 			</td>
@@ -36,5 +37,14 @@
 	</table>
 </body>
 <script src="script.js"></script>
+<script>
+	var rangeslider = document.getElementById("size");
+	var output = document.getElementById("sizeLabel");
+	output.innerHTML = rangeslider.value;
+  
+	rangeslider.oninput = function() {
+  		output.innerHTML = this.value;
+	}
+</script>
 
 </html>

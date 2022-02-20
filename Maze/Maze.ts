@@ -2,8 +2,7 @@ const cv = document.getElementById("cpxCanvas") as HTMLCanvasElement;
 const cx = cv.getContext("2d") as CanvasRenderingContext2D;
 const WIDTH = cv.width;
 const HEIGHT = cv.height;
-const textWidth = document.getElementById("width") as HTMLInputElement;
-const textHeight = document.getElementById("height") as HTMLInputElement;
+const size = document.getElementById("size") as HTMLInputElement;
 const checkImprove = document.getElementById("improve") as HTMLInputElement;
 // github token : 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
 
@@ -98,8 +97,8 @@ const SOUTH = 4;
 const EAST = 8;
 
 var shortest : number = 0;
-var n: number = Number(textWidth.value);
-var m: number = Number(textHeight.value);
+var n: number = Number(size.value)+1;
+var m: number = Number(size.value)+1;
 var improve = false;
 var w = WIDTH / n;
 var h = HEIGHT / m;
@@ -144,8 +143,8 @@ function resetMaze() : void {
 }
 
 async function generateMaze() {
-	n = Number(textWidth.value);
-	m = Number(textHeight.value);
+	n = Number(size.value)+1;
+	m = Number(size.value)+1;
 	w = WIDTH / n;
 	h = HEIGHT / m;
 	maze = new Array(m);
@@ -185,8 +184,21 @@ async function generateMaze() {
 		}
 		move(worker, choice);
 	}
+	connectMore();
 	resetMaze();
 	paintMaze();
+}
+
+function connectMore() {
+	for (let i=2; i<maze.length-2; i+=2) {
+		for (let j=2; j<maze.length-2; j+=2) {
+			if (maze[i][j] == WALL && Math.random() > 0.9 &&
+			((maze[i-1][j]!=WALL && maze[i+1][j]!=WALL && maze[i][j-1]==WALL && maze[i][j+1]==WALL) ||
+			 (maze[i][j-1]!=WALL && maze[i][j+1]!=WALL && maze[i-1][j]==WALL && maze[i+1][j]==WALL))) {
+				maze[i][j] = WAY;
+			}
+		}
+	}
 }
 
 function howFarFromFinish(point : Address) : number {

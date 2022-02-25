@@ -8,7 +8,8 @@ class ComplexNumber {
         this.im = im;
     }
     public absolute(): number {
-        return Math.hypot(this.re, this.im); 
+        // return Math.hypot(this.re, this.im);
+        return Math.sqrt(this.re * this.re + this.im * this.im); 
     }
 
     public add(x: ComplexNumber): void {
@@ -88,7 +89,7 @@ function calculate() {
     center_image = Number(boxImage.value);
     center = new ComplexNumber(center_real, center_image);
 
-    let frontier = Math.PI;
+    let frontier = 2;
     let C: ComplexNumber = new ComplexNumber(-0.5, -0.5);
     let Zn: ComplexNumber;
     let im: number;

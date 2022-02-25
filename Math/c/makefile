@@ -1,2 +1,2 @@
 compile:
-	cc Fibonacci.c -lm
+	cc Fibonacci.c -lm -o fibo && ./fibo

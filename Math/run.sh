@@ -1,9 +1,16 @@
+data=9999
 cd c
-cc divisor.c -lm
-time ./a.out > output.txt
+#cc divisor.c -lm -O3
+time ./a.out $data > output.txt
+echo C
 cd ..
-tsc Divisor.ts
-time node Divisor.js > output.txt
+#tsc Divisor.ts
+time node Divisor.js $data > output.txt
+echo NodeJS
 cd java
-javac Divisor.java
-time java Divisor > output.txt
+#javac Divisor.java
+time java Divisor $data > output.txt
+echo JAVA
+cd ../lua
+time lua divisor.lua $data > output.txt
+echo LUA

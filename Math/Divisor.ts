@@ -1,9 +1,8 @@
-let N: number = 49999;
+let N: number = Number(process.argv[2]);
 let MAX_PRECISION: number = N * 2;
 let MAX_DISPLAY: number = 45;
 let array_x: number[] = new Array(N);
 let array_y: number[] = new Array(N);
-let chars = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 for (let i: number = 0; i < N; i++) {
     array_x[i] = 1;
     array_y[i] = i + 1;
@@ -51,13 +50,13 @@ for (let i: number = 1; i <= N; i++) {
     process.stdout.write("[" + repeat  + "]\t" + z + ".");
     if (repeat <= 1) {
         for (let j=0; j<tail && j<MAX_DISPLAY; j++)
-            process.stdout.write(chars[digits[j]]);
+            process.stdout.write(String(digits[j]));
     } else {
         for (let j=0; j<head-repeat && j<MAX_DISPLAY; j++)
-            process.stdout.write(chars[digits[j]]);
+            process.stdout.write(String(digits[j]));
         process.stdout.write("|");
         for (let j=head-repeat; j<tail-repeat && j<MAX_DISPLAY; j++)
-            process.stdout.write(chars[digits[j]]);
+            process.stdout.write(String(digits[j]));
         if (tail-repeat < MAX_DISPLAY) 
             process.stdout.write("|");
         else

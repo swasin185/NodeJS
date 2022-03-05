@@ -1,12 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#define N 49999
-#define MAX_PRECISION N * 2
+//#define N 49999
+//#define MAX_PRECISION N * 2
 #define MAX_DISPLAY 45
-void main()
+int main(int argc, char *argv[])
 {
     //    clock_t etime = clock();
+    int N = atoi(argv[1]);
+    int MAX_PRECISION = N * 2;
     int array_x[N];
     int array_y[N];
     //    srand(time(0));
@@ -88,4 +90,5 @@ void main()
     }
     //    etime = clock() - etime;
     //    printf("elapse time = %f sec\n", (double)etime / CLOCKS_PER_SEC);
+    return(0);
 }

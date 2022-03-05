@@ -4,6 +4,8 @@ public class Divisor {
     private static int MAX_DISPLAY = 45;
 
     public static void main(String[] args) {
+    	Divisor.N = Integer.parseInt(args[0]);
+    	Divisor.MAX_PRECISION = N * 2;
         int[] array_x = new int[N];
         int[] array_y = new int[N];
         for (int i = 0; i < N; i++) {

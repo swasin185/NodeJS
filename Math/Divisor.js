@@ -1,9 +1,8 @@
-var N = 49999;
+var N = Number(process.argv[2]);
 var MAX_PRECISION = N * 2;
 var MAX_DISPLAY = 45;
 var array_x = new Array(N);
 var array_y = new Array(N);
-var chars = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
 for (var i = 0; i < N; i++) {
     array_x[i] = 1;
     array_y[i] = i + 1;
@@ -51,14 +50,14 @@ for (var i = 1; i <= N; i++) {
     process.stdout.write("[" + repeat + "]\t" + z + ".");
     if (repeat <= 1) {
         for (var j = 0; j < tail && j < MAX_DISPLAY; j++)
-            process.stdout.write(chars[digits[j]]);
+            process.stdout.write(String(digits[j]));
     }
     else {
         for (var j = 0; j < head - repeat && j < MAX_DISPLAY; j++)
-            process.stdout.write(chars[digits[j]]);
+            process.stdout.write(String(digits[j]));
         process.stdout.write("|");
         for (var j = head - repeat; j < tail - repeat && j < MAX_DISPLAY; j++)
-            process.stdout.write(chars[digits[j]]);
+            process.stdout.write(String(digits[j]));
         if (tail - repeat < MAX_DISPLAY)
             process.stdout.write("|");
         else

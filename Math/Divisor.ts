@@ -49,20 +49,14 @@ for (let i = 1; i <= N; i++) {
     }
     
     process.stdout.write("[" + repeat  + "]\t" + z + ".")
-    if (repeat <= 1) {
-        for (let j=0; j<tail && j<MAX_DISPLAY; j++)
-            process.stdout.write(String(digits[j]))
-
-    } else {
-        for (let j=0; j<head-repeat && j<MAX_DISPLAY; j++)
-            process.stdout.write(String(digits[j]))
+    for (let j=0; j<head-repeat && j<MAX_DISPLAY; j++)
+        process.stdout.write(String(digits[j]))
+    process.stdout.write("|")
+    for (let j=head-repeat; j<tail-repeat && j<MAX_DISPLAY; j++)
+        process.stdout.write(String(digits[j]))
+    if (tail-repeat < MAX_DISPLAY) 
         process.stdout.write("|")
-        for (let j=head-repeat; j<tail-repeat && j<MAX_DISPLAY; j++)
-            process.stdout.write(String(digits[j]))
-        if (tail-repeat < MAX_DISPLAY) 
-            process.stdout.write("|")
-        else
-            process.stdout.write("..")
-    }
+    else
+        process.stdout.write("..")
     process.stdout.write("\n")
 }

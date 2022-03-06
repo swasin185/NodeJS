@@ -68,25 +68,15 @@ int main(int argc, char *argv[])
         }
 
         printf("[%4d]%4d.", repeat, z);
-        if (repeat <= 1)
-        {
-            for (int j = 0; j < tail && j < MAX_DISPLAY; j++)
-                printf("%c", digits[j]);
-        }
-        else
-        {
-            for (int j = 0; j < head - repeat && j < MAX_DISPLAY; j++)
-                printf("%c", digits[j]);
+        for (int j = 0; j < head - repeat && j < MAX_DISPLAY; j++)
+            printf("%c", digits[j]);
+        printf("|");
+        for (int j = head - repeat; j < tail - repeat && j < MAX_DISPLAY; j++)
+            printf("%c", digits[j]);
+        if (tail - repeat < MAX_DISPLAY)
             printf("|");
-            for (int j = head - repeat; j < tail - repeat && j < MAX_DISPLAY; j++)
-                printf("%c", digits[j]);
-            if (tail - repeat < MAX_DISPLAY)
-                printf("|");
-            else
-                printf("..");
-            // for (int j=tail-repeat; j<tail && j<MAX_DISPLAY; j++)
-            //     printf("%c", digits[j]);
-        }
+        else
+            printf("..");
         printf("\n");
     }
     //    etime = clock() - etime;

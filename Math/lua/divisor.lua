@@ -53,29 +53,21 @@ for i=1, N do
     end;
 
     io.write(string.format("[%4d]%4d.", repeats, z))
-    if (repeats <= 1) then
-        local j = 0
-        while (j<tail and j<MAX_DISPLAY) do
-            io.write(digits[j])
-            j = j + 1
-        end
-    else 
-        local j = 0
-        while (j<head-repeats and j<MAX_DISPLAY) do
-            io.write(digits[j])
-            j = j + 1
-        end
+    local j = 0
+    while (j<head-repeats and j<MAX_DISPLAY) do
+        io.write(digits[j])
+        j = j + 1
+    end
+    io.write("|")
+    j = head-repeats
+    while (j<tail-repeats and j<MAX_DISPLAY) do
+        io.write(digits[j]);
+        j = j + 1
+    end
+    if (tail-repeats < MAX_DISPLAY) then
         io.write("|")
-        j = head-repeats
-        while (j<tail-repeats and j<MAX_DISPLAY) do
-            io.write(digits[j]);
-            j = j + 1
-        end
-        if (tail-repeats < MAX_DISPLAY) then
-            io.write("|")
-        else
-            io.write("..")
-        end
+    else
+        io.write("..")
     end
     io.write("\n");
 end

@@ -53,20 +53,15 @@ public class Divisor {
                 tail++;
             }
             System.out.print(String.format("[%4d]%4d.", repeat, z));
-            if (repeat <= 1) {
-                for (int j = 0; j < tail && j < MAX_DISPLAY; j++)
-                    System.out.print(String.format("%c", digits[j]));
-            } else {
-                for (int j = 0; j < head - repeat && j < MAX_DISPLAY; j++)
-                    System.out.print(String.format("%c", digits[j]));
+            for (int j = 0; j < head - repeat && j < MAX_DISPLAY; j++)
+                System.out.print(String.format("%c", digits[j]));
+            System.out.print("|");
+            for (int j = head - repeat; j < tail - repeat && j < MAX_DISPLAY; j++)
+                System.out.print(String.format("%c", digits[j]));
+            if (tail - repeat < MAX_DISPLAY)
                 System.out.print("|");
-                for (int j = head - repeat; j < tail - repeat && j < MAX_DISPLAY; j++)
-                    System.out.print(String.format("%c", digits[j]));
-                if (tail - repeat < MAX_DISPLAY)
-                    System.out.print("|");
-                else
-                    System.out.print("..");
-            }
+            else
+                System.out.print("..");
             System.out.println();
         }
     }

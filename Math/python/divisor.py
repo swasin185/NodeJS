@@ -44,25 +44,18 @@ for i in range(N) :
                 length = 0
                 head = 0
         tail += 1
-
     print(f"[{repeat:4}]\t{z:4}.", end = "")
-    if (repeat <= 1) :
-        j = 0
-        while (j < tail and j < MAX_DISPLAY) :
-            print(digits[j], end = "")
-            j += 1
-    else :
-        j = 0
-        while (j < head - repeat and j < MAX_DISPLAY) :
-            print(digits[j], end = "")
-            j += 1
+    j = 0
+    while (j < head - repeat and j < MAX_DISPLAY) :
+        print(digits[j], end = "")
+        j += 1
+    print("|", end = "")
+    j = head - repeat
+    while (j < tail - repeat and j < MAX_DISPLAY) :
+        print(digits[j], end = "")
+        j += 1
+    if (tail - repeat < MAX_DISPLAY) :
         print("|", end = "")
-        j = head - repeat
-        while (j < tail - repeat and j < MAX_DISPLAY) :
-            print(digits[j], end = "")
-            j += 1
-        if (tail - repeat < MAX_DISPLAY) :
-            print("|", end = "")
-        else :
-            print("..", end = "")
+    else :
+        print("..", end = "")
     print()

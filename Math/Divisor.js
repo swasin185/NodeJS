@@ -18,17 +18,18 @@ for (var i = 1; i <= N; i++) {
     var tail = 0;
     var repeat = 0;
     var length_1 = 0;
+    var search = 0;
     while (tail == 0 || (tail < MAX_PRECISION && x > 0 &&
         (repeat < 10 || repeat < length_1))) {
         digits[tail] = Math.floor(x / y);
         x = (x % y) * 10;
         if (tail > 0) {
-            var search = 0;
+            search = 0;
             while (search < tail && digits[head] != digits[tail]) {
                 search++;
                 head++;
                 head %= tail;
-                repeat = 0; // if miss just one point reset repeat to 0;
+                repeat = 0; // if miss just one point reset repeat to 0
             }
             if (head < tail && digits[head] == digits[tail]) {
                 length_1 = tail - head;

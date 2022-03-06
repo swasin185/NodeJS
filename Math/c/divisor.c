@@ -31,6 +31,7 @@ int main(int argc, char *argv[])
         int tail = 0;
         int repeat = 0;
         int length = 0;
+        int search = 0;
         while (tail == 0 || (tail < MAX_PRECISION && x > 0 &&
                (repeat < 10 || repeat < length)))
         {
@@ -38,7 +39,7 @@ int main(int argc, char *argv[])
             x = (x % y) * 10;
             if (tail > 0)
             {
-                int search = 0;
+                search = 0;
                 while (search < tail && digits[head] != digits[tail])
                 {
                     search++;

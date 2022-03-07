@@ -1,41 +1,5 @@
-/* Class ---------------------------------------------------------------------*/
-class ComplexNumber {
-    public static PRECISION: number = 1E15;
-    private re: number;
-    private im: number;
-    public constructor(re: number, im: number) {
-        this.re = re;
-        this.im = im;
-    }
-    public absolute(): number {
-        // return Math.hypot(this.re, this.im);
-        return Math.sqrt(this.re * this.re + this.im * this.im); 
-    }
-
-    public add(x: ComplexNumber): void {
-        this.re = Math.round((this.re + x.re) * ComplexNumber.PRECISION) / ComplexNumber.PRECISION;
-        this.im = Math.round((this.im + x.im) * ComplexNumber.PRECISION) / ComplexNumber.PRECISION;
-    }
-
-    public getImage(): number {
-        return this.im;
-    }
-    public getReal(): number {
-        return this.re;
-    }
-
-    public multiply(x: ComplexNumber): void {
-        let re = (this.re * x.re) - (this.im * x.im);
-        let im = (this.re * x.im) + (this.im * x.re);
-        this.re = Math.round(re * ComplexNumber.PRECISION) / ComplexNumber.PRECISION;
-        this.im = Math.round(im * ComplexNumber.PRECISION) / ComplexNumber.PRECISION;
-    }
-
-    public power2(): void {
-        this.multiply(this);
-    }
-}
-
+import Big from "big.js";
+import Complex from "./Complex.js";
 // ประกาศตัวแปร Global 
 // ----------------------------------------------------------------------------
 const canvas = document.getElementById("cpxCanvas") as HTMLCanvasElement;
@@ -65,57 +29,50 @@ for (let i = 0; i < MAX_N; i++) {
 var imgData = ctx.createImageData(WIDTH, HEIGHT); // width x height
 var data = imgData.data;
 
-var boundary: number;
-var center_real: number;
-var center_image: number;
-var center: ComplexNumber;
+var boundary;
+var center_real;
+var center_image;
+var center: Complex;
 // การทำงานเริ่มต้น
 // ----------------------------------------------------------------------------
 paint();
 calculate();
-
-// var bigA = new Big(1e-20);
-// var bigB= new Big(2e-21);
-// var bigC = bigA.add(bigB);
-// console.log(bigA.toString(), '+', bigB.toString(), '=', bigC.toString())
 
 // ฟังก์ชั่น
 // ----------------------------------------------------------------------------
 function calculate() {
     console.log('calculate');
     let time: number = (new Date()).getTime();
-    boundary = Number(boxBoundary.value);
-    center_real = Number(boxReal.value);
-    center_image = Number(boxImage.value);
-    center = new ComplexNumber(center_real, center_image);
+    boundary = new Big(boxBoundary.value);
+    center_real = new Big(boxReal.value);
+    center_image = new Big(boxImage.value);
+    center = new Complex(center_real, center_image);
 
     let frontier = 2;
-    let C: ComplexNumber = new ComplexNumber(-0.5, -0.5);
-    let Zn: ComplexNumber;
-    let im: number;
-    let re: number;
+    let C: Complex = new Complex(new Big(-0.5), new Big(-0.5));
+    let Zn: Complex;
+    let im;
+    let re;
     let n: number = 0;
     let coor: number = 0;
-    let re0: number = 0;
-    let im0: number = 0;
+    let Z0: Complex;
     let percent = Math.round(WIDTH * HEIGHT / 100);
     let i = 0;
     for (let y = 0; y < HEIGHT; y++) {
-        im = Math.round(((y - MID_HEIGHT) * boundary / HEIGHT + center_image) * ComplexNumber.PRECISION) / ComplexNumber.PRECISION;
+        im = boundary.times(y - MID_HEIGHT).div(HEIGHT).add(center_image);
         for (let x = 0; x < WIDTH; x++) {
             i++;
             if (i % percent == 0)
                 console.log(i / percent + ' %');
-            re = Math.round(((x - MID_WIDTH) * boundary / WIDTH + center_real) * ComplexNumber.PRECISION) / ComplexNumber.PRECISION;
-            C = new ComplexNumber(re, im);
-            Zn = new ComplexNumber(re, im);
+            re = boundary.times(x - MID_WIDTH).div(WIDTH).add(center_real);
+            C = new Complex(re, im);
+            Zn = new Complex(re, im);
             n = 1;
-            while (n < MAX_N && Zn.absolute() < frontier) {
-                re0 = Zn.getReal();
-                im0 = Zn.getImage();
+            while (n < MAX_N && Zn.absolute().lt(frontier)) {
+                Z0 = Zn;
                 Zn.power2();
                 Zn.add(C);
-                if (Zn.getReal() == re0 && Zn.getImage() == im0)
+                if (Zn.equals(Z0))
                     n = MAX_N;
                 else
                     n++;
@@ -138,14 +95,13 @@ function calculate() {
 function clickXY(event: MouseEvent) {
     let x = event.offsetX;
     let y = event.offsetY;
-    //console.log(center_real + " + " + center_image + "i");
-    boxReal.value = String(center_real + Math.round((x - MID_WIDTH) * boundary / WIDTH * ComplexNumber.PRECISION) / ComplexNumber.PRECISION);
-    boxImage.value = String(center_image + Math.round((y - MID_HEIGHT) * boundary / HEIGHT * ComplexNumber.PRECISION) / ComplexNumber.PRECISION);
+    boxReal.value = String(center_real.add(boundary.times(x - MID_WIDTH).div(WIDTH)));
+    boxImage.value = String(center_image.add(boundary.times(y - MID_HEIGHT).div(HEIGHT)));
     if (event.button == 0)
-        boundary /= 2;
+        boundary = boundary.div(2);
     else
-        boundary *= 2;
-    boxBoundary.value = String(boundary);
+        boundary = boundary.times(2);
+    boxBoundary.value = boundary.toFixed(50);
     calculate();
 }
 

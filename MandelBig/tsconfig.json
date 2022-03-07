@@ -1,0 +1,7 @@
+{
+  "compilerOptions": {
+    "lib": ["ES5", "DOM"],
+    "target": "ES5",
+    "module": "ES2020"
+  }
+}

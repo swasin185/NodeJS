@@ -2,13 +2,14 @@
   "name": "mandelbrot",
   "version": "1.0.1",
   "scripts": {
-    "build": "tsc Mandelbrot.ts & uglifyjs Mandelbrot.js -c -m -o ./public/script.js & del Mandelbrot.js",
-    "buildx": "tsc Mandelbrot.ts && uglifyjs Mandelbrot.js -c -m -o ./public/script.js && rm Mandelbrot.js"
+    "build": "tsc Mandelbrot.ts && node Mandelbrot.js"
   },
   "devDependencies": {
-    "@types/big.js": "^6.1.1"
+    "@types/big.js": "^6.1.1",
+    "@types/node": "^17.0.21"
   },
   "dependencies": {
-    "big.js": "^6.1.1"
+    "big.js": "^6.1.1",
+    "canvas": "^2.9.0"
   }
 }

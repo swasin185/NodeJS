@@ -1,19 +1,46 @@
 "use strict";
 exports.__esModule = true;
 var big_js_1 = require("big.js");
-var Complex_js_1 = require("./Complex.js");
+var canvas_1 = require("canvas");
+big_js_1["default"].DP = 20;
+var Complex = /** @class */ (function () {
+    function Complex(re, im) {
+        this.re = re;
+        this.im = im;
+    }
+    Complex.prototype.absolute = function () {
+        return this.re.pow(2).add(this.im.pow(2)).sqrt();
+    };
+    Complex.prototype.add = function (x) {
+        this.re = this.re.add(x.re);
+        this.im = this.im.add(x.im);
+    };
+    Complex.prototype.getImage = function () {
+        return this.im;
+    };
+    Complex.prototype.getReal = function () {
+        return this.re;
+    };
+    Complex.prototype.multiply = function (x) {
+        var re = this.re.times(x.re).minus(this.im.times(x.im));
+        var im = this.re.times(x.im).add(this.im.times(x.re));
+        this.re = re.round(big_js_1["default"].DP, big_js_1["default"].roundHalfUp);
+        this.im = im.round(big_js_1["default"].DP, big_js_1["default"].roundHalfUp);
+    };
+    Complex.prototype.power2 = function () {
+        this.multiply(this);
+    };
+    Complex.prototype.equals = function (x) {
+        return this.re.eq(x.re) && this.im.eq(x.im);
+    };
+    return Complex;
+}());
 // ประกาศตัวแปร Global 
 // ----------------------------------------------------------------------------
-var canvas = document.getElementById("cpxCanvas");
-var ctx = canvas.getContext("2d");
-var boxReal = document.getElementById("realValue");
-var boxImage = document.getElementById("imageValue");
-var boxBoundary = document.getElementById("boundary");
-var txtRunTime = document.getElementById("runTime");
-var WIDTH = canvas.width;
-var HEIGHT = canvas.height;
-var MID_WIDTH = canvas.width / 2;
-var MID_HEIGHT = canvas.height / 2;
+var WIDTH = 1000;
+var HEIGHT = 1000;
+var MID_WIDTH = WIDTH / 2;
+var MID_HEIGHT = HEIGHT / 2;
 var MAX_N = 51;
 var PALETTE = new Array(MAX_N);
 var level = 0;
@@ -25,6 +52,9 @@ for (var i = 0; i < MAX_N; i++) {
     PALETTE[i][(x + i + 1) % 3] = Math.floor(Math.random() * level / 2 + level / 2);
     PALETTE[i][(x + i + 2) % 3] = Math.floor(Math.random() * level / 2 + level / 2);
 }
+//const { createCanvas, loadImage } = require('canvas');
+var canvas = (0, canvas_1.createCanvas)(WIDTH, HEIGHT);
+var ctx = canvas.getContext('2d');
 var imgData = ctx.createImageData(WIDTH, HEIGHT); // width x height
 var data = imgData.data;
 var boundary;
@@ -33,42 +63,48 @@ var center_image;
 var center;
 // การทำงานเริ่มต้น
 // ----------------------------------------------------------------------------
-paint();
+//paint();
 calculate();
+var fs = require("fs");
+var buffer = canvas.toBuffer('image/png');
+fs.writeFileSync('./image.png', buffer);
 // ฟังก์ชั่น
 // ----------------------------------------------------------------------------
 function calculate() {
     console.log('calculate');
     var time = (new Date()).getTime();
-    boundary = new big_js_1["default"](boxBoundary.value);
-    center_real = new big_js_1["default"](boxReal.value);
-    center_image = new big_js_1["default"](boxImage.value);
-    center = new Complex_js_1["default"](center_real, center_image);
+    boundary = new big_js_1["default"](3);
+    center_real = new big_js_1["default"](-0.75);
+    center_image = new big_js_1["default"](0);
+    center = new Complex(center_real, center_image);
     var frontier = 2;
-    var C = new Complex_js_1["default"](new big_js_1["default"](-0.5), new big_js_1["default"](-0.5));
+    var C = new Complex(new big_js_1["default"](-0.5), new big_js_1["default"](-0.5));
     var Zn;
     var im;
     var re;
     var n = 0;
     var coor = 0;
-    var Z0;
+    var im0;
+    var re0;
     var percent = Math.round(WIDTH * HEIGHT / 100);
     var i = 0;
     for (var y = 0; y < HEIGHT; y++) {
         im = boundary.times(y - MID_HEIGHT).div(HEIGHT).add(center_image);
         for (var x_1 = 0; x_1 < WIDTH; x_1++) {
             i++;
-            if (i % percent == 0)
-                console.log(i / percent + ' %');
             re = boundary.times(x_1 - MID_WIDTH).div(WIDTH).add(center_real);
-            C = new Complex_js_1["default"](re, im);
-            Zn = new Complex_js_1["default"](re, im);
+            if (i % percent == 0)
+                console.log(i / percent + '%');
+            C = new Complex(re, im);
+            Zn = new Complex(re, im);
             n = 1;
             while (n < MAX_N && Zn.absolute().lt(frontier)) {
-                Z0 = Zn;
+                re0 = Zn.getReal();
+                im0 = Zn.getImage();
                 Zn.power2();
+                //                console.log('re=', re0, 'im=', im0);
                 Zn.add(C);
-                if (Zn.equals(Z0))
+                if (re0.eq(Zn.getReal()) && im0.eq(Zn.getImage()))
                     n = MAX_N;
                 else
                     n++;
@@ -81,23 +117,9 @@ function calculate() {
             data[++coor] = 255; // ALPHA
         }
     }
-    //console.log(data)
     paint();
     time = (new Date()).getTime() - time;
-    txtRunTime.innerHTML = "run time = " + time / 1000.0 + " seconds";
-    //console.log("run time =", time / 1000.0, "seconds")
-}
-function clickXY(event) {
-    var x = event.offsetX;
-    var y = event.offsetY;
-    boxReal.value = String(center_real.add(boundary.times(x - MID_WIDTH).div(WIDTH)));
-    boxImage.value = String(center_image.add(boundary.times(y - MID_HEIGHT).div(HEIGHT)));
-    if (event.button == 0)
-        boundary = boundary.div(2);
-    else
-        boundary = boundary.times(2);
-    boxBoundary.value = boundary.toFixed(50);
-    calculate();
+    console.log("run time =", time / 1000.0, "seconds");
 }
 function paint() {
     ctx.putImageData(imgData, 0, 0);

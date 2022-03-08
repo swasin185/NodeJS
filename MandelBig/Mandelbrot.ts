@@ -1,18 +1,54 @@
-import Big from "big.js";
-import Complex from "./Complex.js";
+import Big from 'big.js';
+import { createCanvas, loadImage } from 'canvas';
+
+Big.DP = 20;
+class Complex {
+    private re: Big;
+    private im: Big;
+    
+    public constructor(re: Big, im: Big) {
+        this.re = re;
+        this.im = im;
+    }
+
+    public absolute(): Big {
+        return this.re.pow(2).add(this.im.pow(2)).sqrt();
+    }
+
+    public add(x: Complex): void {
+        this.re = this.re.add(x.re);
+        this.im = this.im.add(x.im);
+    }
+
+    public getImage(): Big {
+        return this.im;
+    }
+
+    public getReal(): Big {
+        return this.re;
+    }
+
+    public multiply(x: Complex): void {
+        let re = this.re.times(x.re).minus(this.im.times(x.im));
+        let im = this.re.times(x.im).add(this.im.times(x.re));
+        this.re = re.round(Big.DP, Big.roundHalfUp);
+        this.im = im.round(Big.DP, Big.roundHalfUp);
+    }
+
+    public power2(): void {
+        this.multiply(this);
+    }
+
+    public equals(x: Complex): boolean {
+        return this.re.eq(x.re) && this.im.eq(x.im);
+    }
+}
 // ประกาศตัวแปร Global 
 // ----------------------------------------------------------------------------
-const canvas = document.getElementById("cpxCanvas") as HTMLCanvasElement;
-const ctx = canvas.getContext("2d") as CanvasRenderingContext2D;
-const boxReal = document.getElementById("realValue") as HTMLInputElement;
-const boxImage = document.getElementById("imageValue") as HTMLInputElement;
-const boxBoundary = document.getElementById("boundary") as HTMLInputElement;
-const txtRunTime = document.getElementById("runTime") as HTMLLabelElement;
-
-const WIDTH = canvas.width;
-const HEIGHT = canvas.height;
-const MID_WIDTH = canvas.width / 2;
-const MID_HEIGHT = canvas.height / 2;
+const WIDTH = 1000;
+const HEIGHT = 1000;
+const MID_WIDTH = WIDTH / 2;
+const MID_HEIGHT = HEIGHT / 2;
 
 const MAX_N = 51;
 const PALETTE: number[][] = new Array(MAX_N);
@@ -26,6 +62,10 @@ for (let i = 0; i < MAX_N; i++) {
     PALETTE[i][(x + i + 2) % 3] = Math.floor(Math.random() * level / 2 + level / 2);
 }
 
+//const { createCanvas, loadImage } = require('canvas');
+const canvas = createCanvas(WIDTH, HEIGHT);
+const ctx = canvas.getContext('2d');
+
 var imgData = ctx.createImageData(WIDTH, HEIGHT); // width x height
 var data = imgData.data;
 
@@ -35,17 +75,20 @@ var center_image;
 var center: Complex;
 // การทำงานเริ่มต้น
 // ----------------------------------------------------------------------------
-paint();
+//paint();
 calculate();
+var fs = require("fs");
+const buffer = canvas.toBuffer('image/png')
+fs.writeFileSync('./image.png', buffer)
 
 // ฟังก์ชั่น
 // ----------------------------------------------------------------------------
 function calculate() {
     console.log('calculate');
     let time: number = (new Date()).getTime();
-    boundary = new Big(boxBoundary.value);
-    center_real = new Big(boxReal.value);
-    center_image = new Big(boxImage.value);
+    boundary = new Big(3);
+    center_real = new Big(-0.75);
+    center_image = new Big(0);
     center = new Complex(center_real, center_image);
 
     let frontier = 2;
@@ -55,24 +98,27 @@ function calculate() {
     let re;
     let n: number = 0;
     let coor: number = 0;
-    let Z0: Complex;
+    let im0;
+    let re0;
     let percent = Math.round(WIDTH * HEIGHT / 100);
     let i = 0;
     for (let y = 0; y < HEIGHT; y++) {
         im = boundary.times(y - MID_HEIGHT).div(HEIGHT).add(center_image);
         for (let x = 0; x < WIDTH; x++) {
             i++;
-            if (i % percent == 0)
-                console.log(i / percent + ' %');
             re = boundary.times(x - MID_WIDTH).div(WIDTH).add(center_real);
+            if (i % percent == 0)
+                console.log(i / percent + '%');
             C = new Complex(re, im);
             Zn = new Complex(re, im);
             n = 1;
             while (n < MAX_N && Zn.absolute().lt(frontier)) {
-                Z0 = Zn;
+                re0 = Zn.getReal();
+                im0 = Zn.getImage();
                 Zn.power2();
+//                console.log('re=', re0, 'im=', im0);
                 Zn.add(C);
-                if (Zn.equals(Z0))
+                if (re0.eq(Zn.getReal()) && im0.eq(Zn.getImage()))
                     n = MAX_N;
                 else
                     n++;
@@ -85,24 +131,9 @@ function calculate() {
             data[++coor] = 255; // ALPHA
         }
     }
-    //console.log(data)
     paint();
     time = (new Date()).getTime() - time;
-    txtRunTime.innerHTML = "run time = " + time / 1000.0 + " seconds";
-    //console.log("run time =", time / 1000.0, "seconds")
-}
-
-function clickXY(event: MouseEvent) {
-    let x = event.offsetX;
-    let y = event.offsetY;
-    boxReal.value = String(center_real.add(boundary.times(x - MID_WIDTH).div(WIDTH)));
-    boxImage.value = String(center_image.add(boundary.times(y - MID_HEIGHT).div(HEIGHT)));
-    if (event.button == 0)
-        boundary = boundary.div(2);
-    else
-        boundary = boundary.times(2);
-    boxBoundary.value = boundary.toFixed(50);
-    calculate();
+    console.log("run time =", time / 1000.0, "seconds")
 }
 
 function paint() {
@@ -125,4 +156,3 @@ function paint() {
     ctx.lineTo(MID_WIDTH, MID_HEIGHT + 5);
     ctx.stroke();
 }
-

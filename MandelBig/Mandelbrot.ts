@@ -1,38 +1,38 @@
-import Big from 'big.js';
-import { createCanvas, loadImage } from 'canvas';
-
-Big.DP = 20;
+import BigNumber from 'bignumber.js';
+import { createCanvas } from 'canvas';
+const DP = 50;
+BigNumber.config({ DECIMAL_PLACES : DP});
 class Complex {
-    private re: Big;
-    private im: Big;
+    private re: BigNumber;
+    private im: BigNumber;
     
-    public constructor(re: Big, im: Big) {
+    public constructor(re: BigNumber, im: BigNumber) {
         this.re = re;
         this.im = im;
     }
 
-    public absolute(): Big {
-        return this.re.pow(2).add(this.im.pow(2)).sqrt();
+    public absolute(): BigNumber {
+        return this.re.pow(2).plus(this.im.pow(2)).sqrt();
     }
 
     public add(x: Complex): void {
-        this.re = this.re.add(x.re);
-        this.im = this.im.add(x.im);
+        this.re = this.re.plus(x.re);
+        this.im = this.im.plus(x.im);
     }
 
-    public getImage(): Big {
+    public getImage(): BigNumber {
         return this.im;
     }
 
-    public getReal(): Big {
+    public getReal(): BigNumber {
         return this.re;
     }
 
     public multiply(x: Complex): void {
         let re = this.re.times(x.re).minus(this.im.times(x.im));
-        let im = this.re.times(x.im).add(this.im.times(x.re));
-        this.re = re.round(Big.DP, Big.roundHalfUp);
-        this.im = im.round(Big.DP, Big.roundHalfUp);
+        let im = this.re.times(x.im).plus(this.im.times(x.re));
+        this.re = re.precision(DP, BigNumber.ROUND_HALF_UP);
+        this.im = im.precision(DP, BigNumber.ROUND_HALF_UP);
     }
 
     public power2(): void {
@@ -69,10 +69,9 @@ const ctx = canvas.getContext('2d');
 var imgData = ctx.createImageData(WIDTH, HEIGHT); // width x height
 var data = imgData.data;
 
-var boundary;
-var center_real;
-var center_image;
-var center: Complex;
+var boundary: BigNumber;
+var center_real: BigNumber;
+var center_image :BigNumber;
 // การทำงานเริ่มต้น
 // ----------------------------------------------------------------------------
 //paint();
@@ -86,27 +85,26 @@ fs.writeFileSync('./image.png', buffer)
 function calculate() {
     console.log('calculate');
     let time: number = (new Date()).getTime();
-    boundary = new Big(3);
-    center_real = new Big(-0.75);
-    center_image = new Big(0);
-    center = new Complex(center_real, center_image);
+    boundary = new BigNumber('0.01');
+    center_real = new BigNumber('-1.01');
+    center_image = new BigNumber('-0.3165');
 
     let frontier = 2;
-    let C: Complex = new Complex(new Big(-0.5), new Big(-0.5));
+    let C: Complex;
     let Zn: Complex;
-    let im;
-    let re;
+    let im: BigNumber;
+    let re: BigNumber;
     let n: number = 0;
-    let coor: number = 0;
-    let im0;
-    let re0;
+    let coor = 0;
+    let im0: BigNumber;
+    let re0: BigNumber;
     let percent = Math.round(WIDTH * HEIGHT / 100);
     let i = 0;
     for (let y = 0; y < HEIGHT; y++) {
-        im = boundary.times(y - MID_HEIGHT).div(HEIGHT).add(center_image);
+        im = boundary.times(y - MID_HEIGHT).div(HEIGHT).plus(center_image);
         for (let x = 0; x < WIDTH; x++) {
             i++;
-            re = boundary.times(x - MID_WIDTH).div(WIDTH).add(center_real);
+            re = boundary.times(x - MID_WIDTH).div(WIDTH).plus(center_real);
             if (i % percent == 0)
                 console.log(i / percent + '%');
             C = new Complex(re, im);
@@ -116,7 +114,6 @@ function calculate() {
                 re0 = Zn.getReal();
                 im0 = Zn.getImage();
                 Zn.power2();
-//                console.log('re=', re0, 'im=', im0);
                 Zn.add(C);
                 if (re0.eq(Zn.getReal()) && im0.eq(Zn.getImage()))
                     n = MAX_N;
@@ -136,7 +133,7 @@ function calculate() {
     console.log("run time =", time / 1000.0, "seconds")
 }
 
-function paint() {
+function paint(): void {
     ctx.putImageData(imgData, 0, 0);
     for (let x = 0; x <= WIDTH; x += 100) {
         ctx.moveTo(x, 0);

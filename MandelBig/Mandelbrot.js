@@ -1,19 +1,20 @@
 "use strict";
 exports.__esModule = true;
-var big_js_1 = require("big.js");
+var bignumber_js_1 = require("bignumber.js");
 var canvas_1 = require("canvas");
-big_js_1["default"].DP = 20;
+var DP = 50;
+bignumber_js_1["default"].config({ DECIMAL_PLACES: DP });
 var Complex = /** @class */ (function () {
     function Complex(re, im) {
         this.re = re;
         this.im = im;
     }
     Complex.prototype.absolute = function () {
-        return this.re.pow(2).add(this.im.pow(2)).sqrt();
+        return this.re.pow(2).plus(this.im.pow(2)).sqrt();
     };
     Complex.prototype.add = function (x) {
-        this.re = this.re.add(x.re);
-        this.im = this.im.add(x.im);
+        this.re = this.re.plus(x.re);
+        this.im = this.im.plus(x.im);
     };
     Complex.prototype.getImage = function () {
         return this.im;
@@ -23,9 +24,9 @@ var Complex = /** @class */ (function () {
     };
     Complex.prototype.multiply = function (x) {
         var re = this.re.times(x.re).minus(this.im.times(x.im));
-        var im = this.re.times(x.im).add(this.im.times(x.re));
-        this.re = re.round(big_js_1["default"].DP, big_js_1["default"].roundHalfUp);
-        this.im = im.round(big_js_1["default"].DP, big_js_1["default"].roundHalfUp);
+        var im = this.re.times(x.im).plus(this.im.times(x.re));
+        this.re = re.precision(DP, bignumber_js_1["default"].ROUND_HALF_UP);
+        this.im = im.precision(DP, bignumber_js_1["default"].ROUND_HALF_UP);
     };
     Complex.prototype.power2 = function () {
         this.multiply(this);
@@ -60,7 +61,6 @@ var data = imgData.data;
 var boundary;
 var center_real;
 var center_image;
-var center;
 // การทำงานเริ่มต้น
 // ----------------------------------------------------------------------------
 //paint();
@@ -73,12 +73,11 @@ fs.writeFileSync('./image.png', buffer);
 function calculate() {
     console.log('calculate');
     var time = (new Date()).getTime();
-    boundary = new big_js_1["default"](3);
-    center_real = new big_js_1["default"](-0.75);
-    center_image = new big_js_1["default"](0);
-    center = new Complex(center_real, center_image);
+    boundary = new bignumber_js_1["default"]('0.01');
+    center_real = new bignumber_js_1["default"]('-1.01');
+    center_image = new bignumber_js_1["default"]('-0.3165');
     var frontier = 2;
-    var C = new Complex(new big_js_1["default"](-0.5), new big_js_1["default"](-0.5));
+    var C;
     var Zn;
     var im;
     var re;
@@ -89,10 +88,10 @@ function calculate() {
     var percent = Math.round(WIDTH * HEIGHT / 100);
     var i = 0;
     for (var y = 0; y < HEIGHT; y++) {
-        im = boundary.times(y - MID_HEIGHT).div(HEIGHT).add(center_image);
+        im = boundary.times(y - MID_HEIGHT).div(HEIGHT).plus(center_image);
         for (var x_1 = 0; x_1 < WIDTH; x_1++) {
             i++;
-            re = boundary.times(x_1 - MID_WIDTH).div(WIDTH).add(center_real);
+            re = boundary.times(x_1 - MID_WIDTH).div(WIDTH).plus(center_real);
             if (i % percent == 0)
                 console.log(i / percent + '%');
             C = new Complex(re, im);
@@ -102,7 +101,6 @@ function calculate() {
                 re0 = Zn.getReal();
                 im0 = Zn.getImage();
                 Zn.power2();
-                //                console.log('re=', re0, 'im=', im0);
                 Zn.add(C);
                 if (re0.eq(Zn.getReal()) && im0.eq(Zn.getImage()))
                     n = MAX_N;

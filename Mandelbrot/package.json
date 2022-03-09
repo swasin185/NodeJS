@@ -4,5 +4,8 @@
   "scripts": {
     "build": "tsc Mandelbrot.ts & uglifyjs Mandelbrot.js -c -m -o ./public/script.js & del Mandelbrot.js",
     "buildx": "tsc Mandelbrot.ts && uglifyjs Mandelbrot.js -c -m -o ./public/script.js && rm Mandelbrot.js"
+  },
+  "devDependencies": {
+    "@types/big.js": "^6.1.1"
   }
 }

@@ -1,6 +1,5 @@
 /* Class ---------------------------------------------------------------------*/
 class ComplexNumber {
-    public static PRECISION: number = 1E15;
     private re: number;
     private im: number;
     public constructor(re: number, im: number) {
@@ -9,12 +8,12 @@ class ComplexNumber {
     }
     public absolute(): number {
         // return Math.hypot(this.re, this.im);
-        return Math.sqrt(this.re * this.re + this.im * this.im); 
+        return this.re * this.re + this.im * this.im; 
     }
 
     public add(x: ComplexNumber): void {
-        this.re = Math.round((this.re + x.re) * ComplexNumber.PRECISION) / ComplexNumber.PRECISION;
-        this.im = Math.round((this.im + x.im) * ComplexNumber.PRECISION) / ComplexNumber.PRECISION;
+        this.re = this.re + x.re;
+        this.im = this.im + x.im;
     }
 
     public getImage(): number {
@@ -27,8 +26,8 @@ class ComplexNumber {
     public multiply(x: ComplexNumber): void {
         let re = (this.re * x.re) - (this.im * x.im);
         let im = (this.re * x.im) + (this.im * x.re);
-        this.re = Math.round(re * ComplexNumber.PRECISION) / ComplexNumber.PRECISION;
-        this.im = Math.round(im * ComplexNumber.PRECISION) / ComplexNumber.PRECISION;
+        this.re = re;
+        this.im = im;
     }
 
     public power2(): void {
@@ -45,21 +44,19 @@ const boxImage = document.getElementById("imageValue") as HTMLInputElement;
 const boxBoundary = document.getElementById("boundary") as HTMLInputElement;
 const txtRunTime = document.getElementById("runTime") as HTMLLabelElement;
 
+
 const WIDTH = canvas.width;
 const HEIGHT = canvas.height;
 const MID_WIDTH = canvas.width / 2;
 const MID_HEIGHT = canvas.height / 2;
 
-const MAX_N = 51;
+const MAX_N = 500;
 const PALETTE: number[][] = new Array(MAX_N);
-let level = 0;
-let x = Math.floor(Math.random() * 3);
-for (let i = 0; i < MAX_N; i++) {
+for (let i = 0; i <= MAX_N; i++) {
     PALETTE[i] = new Array(3);
-    level = i * 5;
-    PALETTE[i][x + i % 3] = level;
-    PALETTE[i][(x + i + 1) % 3] = Math.floor(Math.random() * level / 2 + level / 2);
-    PALETTE[i][(x + i + 2) % 3] = Math.floor(Math.random() * level / 2 + level / 2);
+    PALETTE[i][0] = (i * 35) % 250;
+    PALETTE[i][1] = (i * 20) % 200;
+    PALETTE[i][2] = (i * 10) % 250;
 }
 
 var imgData = ctx.createImageData(WIDTH, HEIGHT); // width x height
@@ -86,49 +83,48 @@ function calculate() {
     let time: number = (new Date()).getTime();
     boundary = Number(boxBoundary.value);
     center_real = Number(boxReal.value);
-    center_image = Number(boxImage.value);
+    center_image = -Number(boxImage.value);
     center = new ComplexNumber(center_real, center_image);
 
-    let frontier = 2;
-    let C: ComplexNumber = new ComplexNumber(-0.5, -0.5);
+    let frontier = 2 * 2;
+    let cr = center_real - boundary / 2;
+    let ci = center_image - boundary / 2;
+    let C: ComplexNumber;
     let Zn: ComplexNumber;
     let im: number;
     let re: number;
     let n: number = 0;
-    let coor: number = 0;
-    let re0: number = 0;
-    let im0: number = 0;
-    let percent = Math.round(WIDTH * HEIGHT / 100);
+    let coor = 0;
+    let im0: number;
+    let re0: number;
     let i = 0;
+    let step = boundary / WIDTH;
+    im = ci;
     for (let y = 0; y < HEIGHT; y++) {
-        im = Math.round(((y - MID_HEIGHT) * boundary / HEIGHT + center_image) * ComplexNumber.PRECISION) / ComplexNumber.PRECISION;
+        re = cr;
         for (let x = 0; x < WIDTH; x++) {
             i++;
-            if (i % percent == 0)
-                console.log(i / percent + ' %');
-            re = Math.round(((x - MID_WIDTH) * boundary / WIDTH + center_real) * ComplexNumber.PRECISION) / ComplexNumber.PRECISION;
             C = new ComplexNumber(re, im);
             Zn = new ComplexNumber(re, im);
-            n = 1;
-            while (n < MAX_N && Zn.absolute() < frontier) {
+            n = 0;
+            re0 = null;
+            im0 = null;
+            while (n < MAX_N && Zn.absolute()<frontier && !(re0 == Zn.getReal() && im0 == Zn.getImage())) {
                 re0 = Zn.getReal();
                 im0 = Zn.getImage();
                 Zn.power2();
                 Zn.add(C);
-                if (Zn.getReal() == re0 && Zn.getImage() == im0)
-                    n = MAX_N;
-                else
-                    n++;
+                n++;
             }
-            n--;
             coor = (y * WIDTH + x) * 4;
             data[coor] = PALETTE[n][0]; // RED
             data[++coor] = PALETTE[n][1]; // GREEN
             data[++coor] = PALETTE[n][2]; // BLUE
             data[++coor] = 255; // ALPHA
+            re += step; 
         }
+        im += step;
     }
-    //console.log(data)
     paint();
     time = (new Date()).getTime() - time;
     txtRunTime.innerHTML = "run time = " + time / 1000.0 + " seconds";
@@ -138,13 +134,12 @@ function calculate() {
 function clickXY(event: MouseEvent) {
     let x = event.offsetX;
     let y = event.offsetY;
-    //console.log(center_real + " + " + center_image + "i");
-    boxReal.value = String(center_real + Math.round((x - MID_WIDTH) * boundary / WIDTH * ComplexNumber.PRECISION) / ComplexNumber.PRECISION);
-    boxImage.value = String(center_image + Math.round((y - MID_HEIGHT) * boundary / HEIGHT * ComplexNumber.PRECISION) / ComplexNumber.PRECISION);
+    boxReal.value = String(center_real + (x - MID_WIDTH) * boundary / WIDTH);
+    boxImage.value = String(-center_image - (y - MID_HEIGHT) * boundary / HEIGHT);
     if (event.button == 0)
-        boundary /= 2;
+        boundary /= 1.618034;
     else
-        boundary *= 2;
+        boundary *= 1.618034;
     boxBoundary.value = String(boundary);
     calculate();
 }

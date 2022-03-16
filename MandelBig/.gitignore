@@ -63,3 +63,5 @@ node_modules/
 
 # dotenv environment variables file
 .env
+/bign20.png
+/big20.png

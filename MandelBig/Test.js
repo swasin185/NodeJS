@@ -1,0 +1,11 @@
+"use strict";
+exports.__esModule = true;
+var bignumber_js_1 = require("bignumber.js");
+var decimal_js_light_1 = require("decimal.js-light");
+var DP = 40;
+bignumber_js_1["default"].config({ DECIMAL_PLACES: DP, POW_PRECISION: DP });
+decimal_js_light_1["default"].config({ precision: DP });
+var big = new bignumber_js_1["default"]('355').div(113);
+var dec = new decimal_js_light_1["default"]('355').div(113);
+console.log(big.toFixed());
+console.log(dec.toFixed());

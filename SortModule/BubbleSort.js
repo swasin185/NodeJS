@@ -1,12 +1,13 @@
-"use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -48,9 +49,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-exports.__esModule = true;
-exports.BubbleSort = void 0;
-var Sort_js_1 = require("./Sort.js");
+import Sort from "./Sort.js";
 var BubbleSort = /** @class */ (function (_super) {
     __extends(BubbleSort, _super);
     function BubbleSort(n, canvasId) {
@@ -71,8 +70,8 @@ var BubbleSort = /** @class */ (function (_super) {
                         if (!(i < this.arr.length && !sorted)) return [3 /*break*/, 6];
                         sorted = true;
                         _loop_1 = function (j) {
-                            return __generator(this, function (_a) {
-                                switch (_a.label) {
+                            return __generator(this, function (_b) {
+                                switch (_b.label) {
                                     case 0: return [4 /*yield*/, this_1.compareData(j, j - 1).then(function (result) { return __awaiter(_this, void 0, void 0, function () {
                                             return __generator(this, function (_a) {
                                                 switch (_a.label) {
@@ -88,7 +87,7 @@ var BubbleSort = /** @class */ (function (_super) {
                                             });
                                         }); })];
                                     case 1:
-                                        _a.sent();
+                                        _b.sent();
                                         return [2 /*return*/];
                                 }
                             });
@@ -114,5 +113,5 @@ var BubbleSort = /** @class */ (function (_super) {
         });
     };
     return BubbleSort;
-}(Sort_js_1.Sort));
-exports.BubbleSort = BubbleSort;
+}(Sort));
+export { BubbleSort };

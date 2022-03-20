@@ -1,5 +1,5 @@
-import { Sort } from './Sort.js'
-class SelectSort extends Sort {
+import Sort from "./Sort.js"
+export class SelectSort extends Sort {
     public constructor(n: number, canvasId: string) {
         super(n, canvasId);
     }
@@ -22,4 +22,3 @@ class SelectSort extends Sort {
         }
     }
 }
-export { SelectSort };

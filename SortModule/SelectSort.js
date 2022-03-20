@@ -1,12 +1,13 @@
-"use strict";
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
         return extendStatics(d, b);
     };
     return function (d, b) {
+        if (typeof b !== "function" && b !== null)
+            throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
         extendStatics(d, b);
         function __() { this.constructor = d; }
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
@@ -48,9 +49,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-exports.__esModule = true;
-exports.SelectSort = void 0;
-var Sort_js_1 = require("./Sort.js");
+import Sort from "./Sort.js";
 var SelectSort = /** @class */ (function (_super) {
     __extends(SelectSort, _super);
     function SelectSort(n, canvasId) {
@@ -66,31 +65,31 @@ var SelectSort = /** @class */ (function (_super) {
                         _super.prototype.runSort.call(this);
                         _loop_1 = function (i) {
                             var max, _loop_2, j;
-                            return __generator(this, function (_a) {
-                                switch (_a.label) {
+                            return __generator(this, function (_b) {
+                                switch (_b.label) {
                                     case 0:
                                         max = i;
                                         _loop_2 = function (j) {
-                                            return __generator(this, function (_a) {
-                                                switch (_a.label) {
+                                            return __generator(this, function (_c) {
+                                                switch (_c.label) {
                                                     case 0: return [4 /*yield*/, this_1.compareData(max, j).then(function (result) {
                                                             if (result < 0)
                                                                 max = j;
                                                         })];
                                                     case 1:
-                                                        _a.sent();
+                                                        _c.sent();
                                                         return [2 /*return*/];
                                                 }
                                             });
                                         };
                                         j = 0;
-                                        _a.label = 1;
+                                        _b.label = 1;
                                     case 1:
                                         if (!(j < i)) return [3 /*break*/, 4];
                                         return [5 /*yield**/, _loop_2(j)];
                                     case 2:
-                                        _a.sent();
-                                        _a.label = 3;
+                                        _b.sent();
+                                        _b.label = 3;
                                     case 3:
                                         j++;
                                         return [3 /*break*/, 1];
@@ -110,7 +109,7 @@ var SelectSort = /** @class */ (function (_super) {
                                                 });
                                             }); })];
                                     case 5:
-                                        _a.sent();
+                                        _b.sent();
                                         return [2 /*return*/];
                                 }
                             });
@@ -133,5 +132,5 @@ var SelectSort = /** @class */ (function (_super) {
         });
     };
     return SelectSort;
-}(Sort_js_1.Sort));
-exports.SelectSort = SelectSort;
+}(Sort));
+export { SelectSort };

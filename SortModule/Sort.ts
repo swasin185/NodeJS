@@ -1,4 +1,4 @@
-export abstract class Sort {
+export default abstract class Sort {
     protected arr: number[];
     private canvasId: string;
     private canvas: any;
@@ -53,4 +53,5 @@ export abstract class Sort {
         this.compare = 0;
     }
 }
+
 

@@ -1,5 +1,5 @@
-import {Sort} from './Sort.js'
-class BubbleSort extends Sort {
+import Sort from "./Sort.js"
+export class BubbleSort extends Sort {
     public constructor(n: number, canvasId: string) {
         super(n, canvasId);
     }
@@ -20,4 +20,3 @@ class BubbleSort extends Sort {
         }
     }
 }
-export { BubbleSort };

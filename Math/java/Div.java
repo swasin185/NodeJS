@@ -1,33 +1,39 @@
 public class Div {
     public static void main(String[] args) {
-        long เวลาเริ่มต้น = System.currentTimeMillis();
-        int ขนาดข้อมูล = 9999;
+        long start = System.currentTimeMillis();
+        int n = 9999;
         if (args.length == 1)
-            ขนาดข้อมูล = Integer.parseInt(args[0]);
-        int ตัวตั้ง = 1;
-        int ตัวหาร = ขนาดข้อมูล;
-        for (ตัวหาร = 1; ตัวหาร <= ขนาดข้อมูล; ตัวหาร++) {
-            int ผลหารจำนวนเต็ม = ตัวตั้ง / ตัวหาร;
-            int เศษเหลือ = ตัวตั้ง % ตัวหาร;
-            StringBuffer เลขทศนิยม = new StringBuffer(ตัวหาร);
-            int ทศนิยมซ้ำ = -1;
-            int[] รายการเศษเหลือ = new int[ตัวหาร];
-            int ทศนิยม = 0;
-            while (ทศนิยมซ้ำ < 0 && เศษเหลือ != 0 && ทศนิยม < ตัวหาร) {
-                รายการเศษเหลือ[เศษเหลือ] = ทศนิยม + 1;
-                เศษเหลือ *= 10;
-                เลขทศนิยม.append(เศษเหลือ / ตัวหาร);
-                เศษเหลือ = เศษเหลือ % ตัวหาร;
-                ทศนิยมซ้ำ = รายการเศษเหลือ[เศษเหลือ] - 1;
-                ทศนิยม++;
-            }
-            ทศนิยมซ้ำ = ทศนิยม - ทศนิยมซ้ำ;
-            System.out.printf("%4d/%-4d [%2d][%4d]\t%4d.", ตัวตั้ง, ตัวหาร, ทศนิยมซ้ำ, ทศนิยม,
-                    ผลหารจำนวนเต็ม);
-            System.out.println(เลขทศนิยม.substring(0,
-                    (เลขทศนิยม.length() > 50 ? 50 : เลขทศนิยม.length())));
+            n = Integer.parseInt(args[0]);
+        int dividend = 1;
+        int divisor = n;
+        
+        for (divisor = 1; divisor <= n; divisor++) {
+            System.out.println(dividend+"/"+divisor + "\t" +division(dividend, divisor));
         }
         System.out.println("ใช้เวลา " +
-                (System.currentTimeMillis() - เวลาเริ่มต้น) / 1000.0 + " วินาที");
+                (System.currentTimeMillis() - start) / 1000.0 + " วินาที");
+    }
+    public static String division(int dividend, int divisor) {
+            int[] history = new int[divisor];
+            //int quotient = dividend / divisor;
+            int remainder = dividend % divisor;
+            StringBuilder digits = new StringBuilder(".");
+            int point = 0;
+            while (remainder > 0) {
+                for (int j=0; j < point; j++) {
+                    if (history[j] == remainder) {
+                        digits.insert(j+1, "|");
+                        return digits.substring(0, (digits.length() > 50 ? 50 : digits.length())) + "..";
+                    }
+                }
+                // รายการเศษเหลือ[เศษเหลือ] = ทศนิยม + 1;
+                history[point] = remainder;
+                remainder *= 10;
+                digits.append(remainder / divisor);
+                remainder = remainder % divisor;
+                //ทศนิยมซ้ำ = รายการเศษเหลือ[เศษเหลือ] - 1;
+                point++;
+            }
+            return digits.toString();
     }
 }

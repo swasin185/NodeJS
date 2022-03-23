@@ -16,7 +16,7 @@ function main() {
             recur = history.get(dividend);
             if (history.size < 20)
                 history.set(dividend, point);
-        } while (dividend != 0 && point < divisor && recur == undefined);
+        } while (dividend != 0 && recur == undefined);
 
         if (dividend != 0)               
             digits.splice(recur, 0, "|");

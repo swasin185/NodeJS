@@ -23,7 +23,8 @@ public class Div {
                 for (int j=0; j < point; j++) {
                     if (history[j] == remainder) {
                         digits.insert(j+1, "|");
-                        return digits.substring(0, (digits.length() > 50 ? 50 : digits.length())) + "..";
+                        digits.append("|");
+                        return digits.substring(0, (digits.length() > 50 ? 50 : digits.length()));
                     }
                 }
                 // รายการเศษเหลือ[เศษเหลือ] = ทศนิยม + 1;

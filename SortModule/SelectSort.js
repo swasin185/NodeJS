@@ -133,4 +133,4 @@ var SelectSort = /** @class */ (function (_super) {
     };
     return SelectSort;
 }(Sort));
-export { SelectSort };
+export default SelectSort;

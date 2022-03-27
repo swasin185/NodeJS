@@ -50,68 +50,105 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 import Sort from "./Sort.js";
-var BubbleSort = /** @class */ (function (_super) {
-    __extends(BubbleSort, _super);
-    function BubbleSort(n, canvasId) {
+var QuickSort = /** @class */ (function (_super) {
+    __extends(QuickSort, _super);
+    function QuickSort(n, canvasId) {
         return _super.call(this, n, canvasId) || this;
     }
-    BubbleSort.prototype.runSort = function () {
+    QuickSort.prototype.runSort = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var sorted, i, _loop_1, this_1, j;
-            var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _super.prototype.runSort.call(this);
-                        sorted = false;
-                        i = 1;
-                        _a.label = 1;
+                        return [4 /*yield*/, this.quickSort(0, this.arr.length - 1)];
                     case 1:
-                        if (!(i < this.arr.length && !sorted)) return [3 /*break*/, 6];
-                        sorted = true;
-                        _loop_1 = function (j) {
-                            return __generator(this, function (_b) {
-                                switch (_b.label) {
-                                    case 0: return [4 /*yield*/, this_1.compareData(j, j - 1).then(function (result) { return __awaiter(_this, void 0, void 0, function () {
-                                            return __generator(this, function (_a) {
-                                                switch (_a.label) {
-                                                    case 0:
-                                                        if (!(result < 0)) return [3 /*break*/, 2];
-                                                        return [4 /*yield*/, _super.prototype.swapData.call(this, j, j - 1)];
-                                                    case 1:
-                                                        _a.sent();
-                                                        sorted = false;
-                                                        _a.label = 2;
-                                                    case 2: return [2 /*return*/];
-                                                }
-                                            });
-                                        }); })];
-                                    case 1:
-                                        _b.sent();
-                                        return [2 /*return*/];
-                                }
-                            });
-                        };
-                        this_1 = this;
-                        j = 1;
-                        _a.label = 2;
-                    case 2:
-                        if (!(j < this.arr.length - i + 1)) return [3 /*break*/, 5];
-                        return [5 /*yield**/, _loop_1(j)];
-                    case 3:
                         _a.sent();
-                        _a.label = 4;
-                    case 4:
-                        j++;
-                        return [3 /*break*/, 2];
-                    case 5:
-                        i++;
-                        return [3 /*break*/, 1];
-                    case 6: return [2 /*return*/];
+                        return [2 /*return*/];
                 }
             });
         });
     };
-    return BubbleSort;
+    QuickSort.prototype.quickSort = function (lo, hi) {
+        return __awaiter(this, void 0, void 0, function () {
+            var pivot, l, h, x;
+            var _this = this;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        pivot = Math.floor((lo + hi) / 2);
+                        l = lo;
+                        h = hi;
+                        x = -1;
+                        _a.label = 1;
+                    case 1:
+                        if (!(l < h)) return [3 /*break*/, 9];
+                        _a.label = 2;
+                    case 2:
+                        if (!(x < 0)) return [3 /*break*/, 4];
+                        return [4 /*yield*/, this.compareData(pivot, h).then(function (result) {
+                                if (result < 0)
+                                    h--;
+                                x = result;
+                            })];
+                    case 3:
+                        _a.sent();
+                        return [3 /*break*/, 2];
+                    case 4:
+                        if (!(l < h && x >= 0)) return [3 /*break*/, 6];
+                        return [4 /*yield*/, this.compareData(pivot, l).then(function (result) {
+                                if (result >= 0)
+                                    l++;
+                                x = result;
+                            })];
+                    case 5:
+                        _a.sent();
+                        return [3 /*break*/, 4];
+                    case 6:
+                        if (!(l < h)) return [3 /*break*/, 8];
+                        if (h == pivot)
+                            pivot = l;
+                        return [4 /*yield*/, this.swapData(l, h)];
+                    case 7:
+                        _a.sent();
+                        _a.label = 8;
+                    case 8: return [3 /*break*/, 1];
+                    case 9:
+                        if (!(pivot < h)) return [3 /*break*/, 11];
+                        return [4 /*yield*/, this.compareData(pivot, h).then(function (result) { return __awaiter(_this, void 0, void 0, function () {
+                                return __generator(this, function (_a) {
+                                    switch (_a.label) {
+                                        case 0:
+                                            if (!(result !== 0)) return [3 /*break*/, 2];
+                                            return [4 /*yield*/, _super.prototype.swapData.call(this, h, pivot)];
+                                        case 1:
+                                            _a.sent();
+                                            _a.label = 2;
+                                        case 2: return [2 /*return*/];
+                                    }
+                                });
+                            }); })];
+                    case 10:
+                        _a.sent();
+                        pivot = h;
+                        _a.label = 11;
+                    case 11:
+                        if (!(lo < pivot - 1)) return [3 /*break*/, 13];
+                        return [4 /*yield*/, this.quickSort(lo, pivot - 1)];
+                    case 12:
+                        _a.sent();
+                        _a.label = 13;
+                    case 13:
+                        if (!(hi > pivot + 1)) return [3 /*break*/, 15];
+                        return [4 /*yield*/, this.quickSort(pivot + 1, hi)];
+                    case 14:
+                        _a.sent();
+                        _a.label = 15;
+                    case 15: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    return QuickSort;
 }(Sort));
-export default BubbleSort;
+export default QuickSort;

@@ -45,11 +45,23 @@ public class Div {
             int point = 0;
             startRepeat = null;
             while (remainder > 0) {
+<<<<<<< HEAD
                 startRepeat = history.get(remainder);
                 if (startRepeat != null)
                    return digits.toString();
                 if (point < 20)
                     history.put(remainder, point);
+=======
+                for (int j=0; j < point; j++) {
+                    if (history[j] == remainder) {
+                        digits.insert(j+1, "|");
+                        digits.append("|");
+                        return digits.substring(0, (digits.length() > 50 ? 50 : digits.length()));
+                    }
+                }
+                // รายการเศษเหลือ[เศษเหลือ] = ทศนิยม + 1;
+                history[point] = remainder;
+>>>>>>> bd2686914152c90309e9db8ea7f1da3535467f13
                 remainder *= 10;
                 digits.append(remainder / divisor);
                 remainder = remainder % divisor;

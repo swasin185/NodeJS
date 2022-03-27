@@ -1,5 +1,5 @@
 import Sort from "./Sort.js"
-export class SelectSort extends Sort {
+export default class SelectSort extends Sort {
     public constructor(n: number, canvasId: string) {
         super(n, canvasId);
     }

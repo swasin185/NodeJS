@@ -1,0 +1,9 @@
+{
+  "type" : "module",
+  "dependencies": {
+    "mdb-reader": "^2.2.2"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.21"
+  }
+}

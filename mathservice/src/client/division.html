@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Long Division</title>
+    <style>
+        .block {
+            width: 120px;
+            color: navy;
+            padding: 14px 28px;
+            font-size: 20px;
+            text-align: center;
+        }
+
+        .textbox {
+            width: 100px;
+            display: inline-block;
+            margin-right: 5px;
+            font-size: 20px;
+            text-align: right;
+        }
+
+
+        .resultbox {
+            width: 100px;
+            display: inline-block;
+            margin-right: 5px;
+            font-size: 20px;
+            color: red;
+            text-align: right;
+        }
+
+        .remainderbox {
+            float: left;
+            width: 10%;
+            height: 500px;
+            margin-right: 5px;
+            font-size: 20px;
+            text-align: right;
+        }
+
+        .decimalbox {
+            float: right;
+            width: 85%;
+            height: 200px;
+            margin-right: 5px;
+            font-size: 20px;
+            text-align: left;
+        }
+    </style>
+</head>
+
+<body bgcolor="orange">
+    <table style="text-align: center; border:0px solid red; width:100%;">
+        <tr>
+            <td width="10%"/>
+            <td width="100px">
+                <input class="textbox" id="txtDividend" type="text" value="1"></input>
+                <hr>
+                <input class="textbox" id="txtDivisor" type="text" value="9999"></input>
+            </td>
+            <td style="text-align: left;">
+                <button class="block" onclick="callAPI()">หารยาว</button>
+            </td>
+        </tr>
+    </table>
+    <hr>
+    ผลหารจำนวนเต็ม: <input class="resultbox" id="txtQuotient" type="text" value="" label="Quotient"></input>
+    ขนาดทศนิยม: <input class="resultbox" id="txtLength" type="text" value="" label="Length"></input>
+    ตำแหน่งทศนิยมซ้ำ: <input class="resultbox" id="txtRepeat" type="text" value="" label="Repeat"></input>
+    <hr>
+    เศษเหลือ
+    <br>
+    <textarea class="remainderbox" id="txtRemainders" value="" readonly></textarea>
+    <textarea class="decimalbox" id="txtDecimal" value="" readonly></textarea>
+</body>
+<script>
+    var dividend = document.getElementById("txtDividend")
+    var divisor = document.getElementById("txtDivisor")
+    var quotient = document.getElementById("txtQuotient")
+    var length = document.getElementById("txtLength")
+    var repeat = document.getElementById("txtRepeat")
+    var remainders = document.getElementById("txtRemainders")
+    var decimal = document.getElementById("txtDecimal")
+    async function callAPI() {
+        url = 'http://localhost:8000/api/longDivision?dividend=' + dividend.value + '&divisor=' + divisor.value;
+        const result = await fetch(url)
+        // const obj = JSON.parse(await result.json()) // use with JSON.stringify()
+        const obj = await result.json();
+        console.log(obj)
+
+        let mark = "".padStart(obj.repeatPoint, ' ') + "|\n"
+
+        decimal.value = mark + '.' + obj.decimal
+        quotient.value = obj.quotient
+        length.value = obj.decimal.length
+        repeat.value = obj.repeatPoint
+        remainders.value = null
+        for (let i =0; i<20 && i<obj.decimal.length; i++) 
+           remainders.value+= obj.remainderList[i] + "\n"
+    }
+
+</script>
+
+</html>

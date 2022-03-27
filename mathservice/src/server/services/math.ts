@@ -1,4 +1,5 @@
 import Converter from '../lib/Converter.js'
+import LongDivision from '../lib/LongDivision.js'
 import Prime from '../lib/Prime.js'
 
 export default (server: any, apiURL: string) => {
@@ -124,7 +125,7 @@ export default (server: any, apiURL: string) => {
 
     server.get(apiURL + 'chart', (req, res) => {
         res.setHeader('Content-type', 'text/javscript')
-        res.setHeader('Content-disposition', 'attachment; filename=prime.txt')
+        res.setHeader('Content-disposition', 'attachment; filename=Chart.js')
         res.sendFile(process.cwd() + '/dist/client/lib/Chart.js')
     })
 
@@ -146,6 +147,19 @@ export default (server: any, apiURL: string) => {
             const baseIn = Number(urlParams.get('baseIn'))
             const baseOut = Number(urlParams.get('baseOut'))
             res.json({ x: x, baseIn: baseIn, baseOut: baseOut, y: Converter.convert(x, baseIn, baseOut) })
+        } else {
+            res.status(500).json({ error: 'input error' })
+        }
+    })
+
+    server.get(apiURL + 'longDivision', (req, res) => {
+        const urlParams = new URLSearchParams(new URL('http:/' + req.url).search)
+        if (urlParams && urlParams.get('dividend') && urlParams.get('divisor')) {
+            const dividend = Number(urlParams.get('dividend'))
+            const divisor = Number(urlParams.get('divisor'))
+            let result = new LongDivision(dividend, divisor);
+            //res.json(JSON.stringify(result))
+            res.json(result)
         } else {
             res.status(500).json({ error: 'input error' })
         }

@@ -5,7 +5,7 @@
     <title>Long Division</title>
     <style>
         .block {
-            width: 120px;
+            width: 150px;
             color: navy;
             padding: 14px 28px;
             font-size: 20px;
@@ -53,7 +53,7 @@
 <body bgcolor="orange">
     <table style="text-align: center; border:0px solid red; width:100%;">
         <tr>
-            <td width="10%"/>
+            <td width="10%" />
             <td width="100px">
                 <input class="textbox" id="txtDividend" type="text" value="1"></input>
                 <hr>
@@ -68,6 +68,7 @@
     ผลหารจำนวนเต็ม: <input class="resultbox" id="txtQuotient" type="text" value="" label="Quotient"></input>
     ขนาดทศนิยม: <input class="resultbox" id="txtLength" type="text" value="" label="Length"></input>
     ตำแหน่งทศนิยมซ้ำ: <input class="resultbox" id="txtRepeat" type="text" value="" label="Repeat"></input>
+    <button class="block" onclick="showDetail()">แสดงวิธี</button>
     <hr>
     เศษเหลือ
     <br>
@@ -82,24 +83,48 @@
     var repeat = document.getElementById("txtRepeat")
     var remainders = document.getElementById("txtRemainders")
     var decimal = document.getElementById("txtDecimal")
+    var result = undefined
+    const step = 100
     async function callAPI() {
         url = 'http://localhost:8000/api/longDivision?dividend=' + dividend.value + '&divisor=' + divisor.value;
-        const result = await fetch(url)
+        const response = await fetch(url)
         // const obj = JSON.parse(await result.json()) // use with JSON.stringify()
-        const obj = await result.json();
-        console.log(obj)
+        result = await response.json()
+        console.log(result)
+        let mark = ""
+        if (result.repeatPoint > 0)
+            mark = "".padStart(result.repeatPoint, ' ') + "-".padStart(result.decimal.length - result.repeatPoint + 1, "-") + "\n"
 
-        let mark = "".padStart(obj.repeatPoint, ' ') + "|\n"
-
-        decimal.value = mark + '.' + obj.decimal
-        quotient.value = obj.quotient
-        length.value = obj.decimal.length
-        repeat.value = obj.repeatPoint
+        decimal.value = mark + '.' + result.decimal
+        if (result.decimal.length > 0)
+            decimal.value += "_"
+        quotient.value = result.quotient
+        length.value = result.decimal.length
+        repeat.value = result.repeatPoint
         remainders.value = null
-        for (let i =0; i<20 && i<obj.decimal.length; i++) 
-           remainders.value+= obj.remainderList[i] + "\n"
+        for (let i = 0; i < step && i < result.decimal.length; i++)
+            remainders.value += result.remainderList[i] + "\n"
     }
 
+    function showDetail() {
+        document.write("<pre>")
+        document.write(result.quotient.toString().padStart(14))
+        if (result.decimal.length > 0)
+            document.write("." + result.decimal)
+        if (result.repeatPoint > 0) {
+            let repeat = result.decimal.substr(result.repeatPoint - 1,
+                result.decimal.length - result.repeatPoint + 1)
+            document.write(repeat.padEnd(step, repeat))
+        }
+        document.write("\n")
+        document.write(" ".padEnd(8) + "\n".padStart(150, '_'))
+        document.write(result.divisor.toString().padStart(7) + "|" + result.dividend.toString().padStart(7) + "\n")
+        for (let i = 0; i < step && i < result.decimal.length; i++) {
+            document.write(String(result.remainderList[i]).padStart(15 + i))
+            document.write("0\n")
+        }
+        document.write("</pre>")
+    }
 </script>
 
 </html>

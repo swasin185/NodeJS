@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <title>Math Graph</title>
+</head>
+
+<body>
+    <canvas id="Graph" width="400" height="300" style="background-color:lightgrey"></canvas>
+</body>
+
+<script>
+    const canvas = document.getElementById("Graph")
+    const pencil = canvas.getContext("2d")
+    const width_2 = canvas.width / 2
+    const height_2 = canvas.height / 2
+    paint()
+
+    function paint() {
+        // pencil.clearRect(0, 0, canvas.width, canvas.height)
+        drawGraphAxis()
+        drawPoint(0, 0)
+    }
+
+    function drawGraphAxis() {
+        pencil.strokeStyle = "navy"
+        pencil.beginPath()
+        pencil.moveTo(0, height_2)
+        pencil.lineTo(canvas.width, height_2)
+        pencil.moveTo(width_2, 0)
+        pencil.lineTo(width_2, canvas.height)
+        pencil.closePath()
+        pencil.stroke()
+        pencil.strokeText("X", canvas.width - 10, height_2 - 5)
+        pencil.strokeText("Y", width_2 + 5, 10)
+        pencil.strokeText("(0, 0)", width_2 - 25, height_2 + 10)
+    }
+
+    function drawPoint(x, y) {
+        x = width_2 + x
+        y = height_2 - y
+        pencil.strokeStyle = "red"
+        pencil.beginPath()
+        pencil.moveTo(x - 2, y)
+        pencil.lineTo(x + 2, y)
+        pencil.moveTo(x, y - 2)
+        pencil.lineTo(x, y + 2)
+        pencil.stroke()
+    }
+</script>
+
+</html>

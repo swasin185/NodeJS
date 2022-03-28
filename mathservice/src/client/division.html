@@ -42,7 +42,7 @@
         .decimalbox {
             float: right;
             width: 85%;
-            height: 200px;
+            height: 400px;
             margin-right: 5px;
             font-size: 20px;
             text-align: left;
@@ -92,11 +92,15 @@
         result = await response.json()
         console.log(result)
         let mark = ""
-        if (result.repeatPoint > 0)
-            mark = "".padStart(result.repeatPoint, ' ') + "-".padStart(result.decimal.length - result.repeatPoint + 1, "-") + "\n"
-
+        if (result.repeatPoint > 0) {
+            let repeat = result.decimal.length - result.repeatPoint + 1
+            if (result.decimal.length > step)
+                mark = "".padStart(result.repeatPoint, ' ') + "-".padStart(step - result.repeatPoint + 1, "-") + "["+ repeat +"]" + "\n"
+            else
+                mark = "".padStart(result.repeatPoint, ' ') + "-".padStart(result.decimal.length - result.repeatPoint + 1, "-") + "\n"
+        }
         decimal.value = mark + '.' + result.decimal
-        if (result.decimal.length > 0)
+        if (result.repeatPoint > 0)
             decimal.value += "_"
         quotient.value = result.quotient
         length.value = result.decimal.length

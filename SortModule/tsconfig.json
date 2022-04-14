@@ -2,6 +2,6 @@
   "compilerOptions": {
     "lib": ["ESNext", "DOM"],
     "target": "ES3",
-	  "module": "ESNext"
+    "module": "ESNext"
   }
 }

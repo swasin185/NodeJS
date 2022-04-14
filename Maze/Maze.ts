@@ -26,6 +26,7 @@ class Address {
 		return b!=undefined && this.i==b.i && this.j==b.j;
     }
 }
+
 class Pioneer {
     public locate : Address;
  	public walk : number = 0;
@@ -176,7 +177,7 @@ async function generateMaze() {
 			if (choice == NONE) {
 				choice = goBack(worker);
 				if (!backward) { 
-					connnectDEADEND(worker, choice);
+					connectDEADEND(worker, choice);
 					backward = true;
 				}
 			} else 
@@ -208,7 +209,7 @@ function howFarFromFinish(point : Address) : number {
 		return Math.abs(found.i-point.i) + Math.abs(found.j-point.j);
 } 
 
-function connnectDEADEND(point : Address, direction : number) : void {
+function connectDEADEND(point : Address, direction : number) : void {
 	if (point.i > 1 && direction == SOUTH && map[point.i-1][point.j] == WALL && 
 	    map[point.i][point.j] - map[point.i-2][point.j] > m)
 		maze[point.i-1][point.j] = WAY;

@@ -1,13 +1,13 @@
 function main() {
-    for (var divisor = 1; divisor <= 9999; divisor++) {
-        var dividend = 1;
-        var point = 0;
-        var digits = [];
-        var history_1 = new Map();
-        var hist = [];
-        var recur = -1;
+    for (let divisor = 1; divisor <= 9999; divisor++) {
+        let dividend = 1;
+        let point = 0;
+        let digits = [];
+        let history = new Map();
+        let hist = [];
+        let recur = -1;
         do {
-            var quotient = Math.floor(dividend / divisor);
+            let quotient = Math.floor(dividend / divisor);
             dividend = dividend % divisor * 10;
             if (point == 0)
                 digits.push(".");

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Maze2</title>
+	<style>
+		.button {
+			text-align: center;
+			background-color: #0354AE;
+			padding: 10px 20px;
+			border: 2px solid;
+			border-radius: .5rem;
+			margin-top: 5px;
+			margin-bottom: 5px;
+			color: cyan;
+			cursor: pointer;
+			font-size: 16px;
+			width: 160px;
+		}
+	</style>
+</head>
+
+<body bgcolor="black">
+	<div id="toolbar"
+		style="background-color: white; width: 165px; float: left; padding:10px 10px; border:2px solid; margin-right: 20px;">
+		<label id="sizeLabel" for="sizeInput">Size:</label>
+		<input type="number" id="sizeInput" min="10" max="500" step="10" value="40"
+			style="width:50px; float: right; text-align: right;" />
+		<input type="range" id="sizeSlider" min="10" max="500" step="10" value="40" />
+		<label id="connectLabel" for="connInput">Connect:</label>
+		<input type="number" id="connInput" min="0" max="1" step="0.1" value="0.5"
+			style="width:50px; float: right; text-align: right;" />
+		<input type="range" id="connSlider" min="0" max="1" step="0.1" value="0.5" />
+		<br>
+		<!-- <input type="checkbox" id="delay"></input><label for="delay">Delay Mode</label> -->
+		<label id="delayLabel" for="delayInput">Delay:</label>
+		<input type="number" id="delayInput" min="0" max="100" step="1" value="0"
+			style="width:50px; float: right; text-align: right;" />
+		<input type="range" id="delaySlider" min="0" max="100" step="1" value="0" />
+		<hr>
+		<input type="button" class="button" id="generate" value="Generate" />
+		<br>
+		<input type="button" class="button" id="generate" value="Reset" onclick="maze.reset()" />
+		<br>
+		<input type="button" class="button" value="Solve" onclick="maze.solveMaze(delay.value)" />
+		<br>
+		<input type="button" class="button" value="Team Solve" onclick="maze.teamSolveMaze()" />
+	</div>
+	<canvas id="maze2" width="800" height="800" style="background-color: darkslategrey; color: white" onclick="maze.clickXY(event)"></canvas>
+</body>
+<script src="Maze2.js"></script>
+
+<script defer type="text/javascript">
+	var sizeInput = document.getElementById("sizeInput");
+	var sizeSlider = document.getElementById("sizeSlider");
+	var connInput = document.getElementById("connInput");
+	var connSlider = document.getElementById("connSlider");
+	var maze = new Maze2("maze2", sizeInput.value);
+	var generate = document.getElementById("generate");
+	var delay = document.getElementById("delayInput");
+
+	sizeSlider.oninput = function () {
+		sizeInput.value = this.value;
+	}
+
+	sizeInput.oninput = function () {
+		sizeSlider.value = this.value;
+	}
+
+	connSlider.oninput = function () {
+		connInput.value = this.value;
+	}
+
+	connInput.oninput = function () {
+		connSlider.value = this.value;
+	}
+
+	delaySlider.oninput = function () {
+		delayInput.value = this.value;
+	}
+
+	delayInput.oninput = function () {
+		delaySlider.value = this.value;
+	}
+
+	generate.onclick = function () {
+		maze.init(sizeInput.value);
+		maze.generate(connInput.value, delay.value);
+	}
+	console.clear();
+</script>
+
+</html>

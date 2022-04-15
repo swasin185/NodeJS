@@ -2,6 +2,8 @@
     "compilerOptions": {
       "lib": ["esNext", "DOM"],
       "target": "esNext",
-      "module": "ESNext"
+      "module": "ESNext",
+      "sourceMap": true,
+      "outDir": "dist"
     }
   }

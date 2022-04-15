@@ -1,5 +1,5 @@
 class Maze2 {
-    static GOLDEN = 1.61807;
+    static GOLDEN = 1.618034;
     static NONE = 0;
     static NORTH = 1;
     static WEST = 2;
@@ -17,6 +17,7 @@ class Maze2 {
     ctx;
     imgData;
     map;
+    portalMap;
     width;
     height;
     dx;
@@ -72,7 +73,7 @@ class Maze2 {
                 this.map[i] = new Array(size);
                 this.map[i].fill(Maze2.WALL);
             }
-            const normal = 500;
+            const normal = 1000;
             this.dx = Math.ceil(normal / size);
             this.dy = Math.ceil(normal / size);
             this.width = size * this.dx;
@@ -94,7 +95,7 @@ class Maze2 {
                 else
                     imgArr[i] = this.bgColor[remainder];
             }
-            if (this.dx > 1)
+            if (this.dx > 2)
                 for (let y = this.dy; y < this.height; y += this.dy)
                     for (let x = this.dx; x < this.width; x += this.dx)
                         imgArr[(y * this.width + x) * 4 + 3] = this.dot;
@@ -133,22 +134,22 @@ class Maze2 {
     paintPath() {
         let imgArr = this.imgData.data;
         for (let i = 1; i <= this._size_2; i++)
-            for (let j = 1; j <= this._size_2; j++)
-                if (this.map[i][j] > Maze2.WAY) {
+            for (let j = 1; j <= this._size_2; j++) {
+                if (this.portalMap[i][j] > 0)
+                    this.paintArea(imgArr, i, j, this.portalColor);
+                else if (this.map[i][j] > Maze2.WAY) {
                     let x = Math.ceil(this.map[i][j] / this.maxWalk * 99);
                     this.paintArea(imgArr, i, j, this.colors[x]);
                 }
                 else if (this.map[i][j] == Maze2.END)
                     this.paintArea(imgArr, i, j, this.endColor);
+            }
         this.teams.forEach((runner => {
             if (runner.isActive())
                 this.paintArea(imgArr, runner.getLocation().i, runner.getLocation().j, this.runnerColor);
             else
                 this.paintArea(imgArr, runner.getLocation().i, runner.getLocation().j, this.endColor);
         }));
-        this.portals.forEach(portal => {
-            this.paintArea(imgArr, portal.i, portal.j, this.portalColor);
-        });
         this.path.forEach(area => {
             this.paintArea(imgArr, area.i, area.j, this.pathColor);
         });
@@ -176,7 +177,7 @@ class Maze2 {
             console.time("generate");
             this.teams = [new Runner(this, 1, 1), new Runner(this, 1, this._size_2),
                 new Runner(this, this._size_2, 1), new Runner(this, this._size_2, this._size_2)];
-            while (this.teams.some((runner) => { return runner.isActive(); })) {
+            while (this.running && this.teams.some((runner) => { return runner.isActive(); })) {
                 for (let runner of this.teams)
                     if (runner.isActive()) {
                         runner.randomWallDirection();
@@ -210,33 +211,36 @@ class Maze2 {
         }
     }
     clickXY(event) {
-        //if (!this.running) {
-        this.running = true;
-        let i = Math.floor(event.offsetY / this.dx);
-        let j = Math.floor(event.offsetX / this.dy);
-        if (this.map[i][j] != Maze2.WALL) {
-            window.alert("i:" + i + " j:" + j + " = " + this.map[i][j]);
-            //this.startArea.set(i, j);
-            //this.paintMaze();
-        }
-        this.running = false;
-        //}
-    }
-    reset() {
         if (!this.running) {
             this.running = true;
-            this.maxWalk = 0;
-            this.teams = [];
-            this.portals = [];
-            this.path = [];
-            for (let i = 1; i <= this._size_2; i++)
-                for (let j = 1; j <= this._size_2; j++)
-                    if (this.map[i][j] != Maze2.WALL)
-                        this.map[i][j] = Maze2.WAY;
-            this.paintMaze();
-            this.paintPath();
+            let i = Math.floor(event.offsetY / this.dx);
+            let j = Math.floor(event.offsetX / this.dy);
+            if (this.map[i][j] != Maze2.WALL) {
+                //window.alert("i:" + i + " j:" + j + " = " + this.map[i][j]);
+                this.finishArea.set(i, j);
+                this.paintMaze();
+                this.paintPath();
+            }
             this.running = false;
         }
+    }
+    reset() {
+        this.running = false;
+        this.maxWalk = 0;
+        this.teams = [];
+        this.portals = [];
+        this.portalMap = new Array(this.size);
+        for (let i = 0; i < this.size; i++) {
+            this.portalMap[i] = new Array(this.size);
+            this.portalMap[i].fill(0);
+        }
+        this.path = [];
+        for (let i = 1; i <= this._size_2; i++)
+            for (let j = 1; j <= this._size_2; j++)
+                if (this.map[i][j] != Maze2.WALL)
+                    this.map[i][j] = Maze2.WAY;
+        this.paintMaze();
+        this.paintPath();
     }
     createPath(point) {
         let path = new Array(this.map[point.i][point.j] - 1);
@@ -258,30 +262,42 @@ class Maze2 {
     }
     addPortal(area) {
         if (this.path.length == 0) {
+            this.portalMap[area.i][area.j] = 1;
+            /*
             let i = 0;
-            while (i < this.portals.length && !this.portals[i].equals(area))
-                i++;
+            while (i < this.portals.length && !this.portals[i].equals(area)) i++;
             if (i == this.portals.length) {
-                if (i > 0 && this.map[area.i][area.j] < this.map[this.portals[0].i][this.portals[0].j]) {
-                    let points = [];
-                    for (let portal of this.portals)
-                        points.push(this.map[portal.i][portal.j]);
-                    console.log(this.map[area.i][area.j], points);
-                    throw new Error("Add Portal");
-                }
+                //				if (i > 0 && this.map[area.i][area.j] < this.map[this.portals[0].i][this.portals[0].j]) {
+                //					let points = [];
+                //					for (let portal of this.portals)
+                //						points.push(this.map[portal.i][portal.j]);
+                //					console.log(this.map[area.i][area.j], points);
+                //					throw new Error("Add Portal");
+                //				}
                 this.portals.push(new Coordinate(area.i, area.j));
             }
+            */
         }
     }
     removePortal(area) {
+        this.portalMap[area.i][area.j] = 0;
+        /*
         let i = 0;
-        while (i < this.portals.length && !this.portals[i].equals(area))
-            i++;
-        if (i < this.portals.length) {
+        while (i < this.portals.length && !this.portals[i].equals(area)) i++;
+        if (i < this.portals.length)
             this.portals.splice(i, 1);
-        }
+            */
     }
     addNewRunner(walk) {
+        for (let i = 1; i <= this._size_2; i++)
+            for (let j = 1; j <= this._size_2; j++)
+                if (this.portalMap[i][j] > 0 && walk < this.map[i][j]) {
+                    let newRunner = new Runner(this, i, j);
+                    if (this.path.length > 0)
+                        newRunner.setBoundary(this.path.length);
+                    this.teams.push(newRunner);
+                }
+        /*
         let i = 0;
         while (i < this.portals.length && walk < this.map[this.portals[i].i][this.portals[i].j]) {
             let portal = this.portals[i];
@@ -290,11 +306,7 @@ class Maze2 {
                 newRunner.setBoundary(this.path.length);
             this.teams.push(newRunner);
             i++;
-        }
-        // let points = [];
-        // for (let portal of this.portals)
-        //     points.push(this.map[portal.i][portal.j]);
-        // console.log(walk, points);
+        }*/
     }
     async solveMaze(delay = 0) {
         this.reset();
@@ -302,15 +314,14 @@ class Maze2 {
             this.running = true;
             this.teams = [new Runner(this, this.startArea.i, this.startArea.j)];
             console.time("Solve Maze");
-            while (this.teams.some((runner) => { return runner.isActive(); })) {
+            while (this.running && this.teams.some((runner) => { return runner.isActive(); })) {
                 for (let runner of this.teams)
                     if (runner.isActive()) {
                         if (runner.getLocation().equals(this.finishArea)) { // ถ้าพบเป้าหมาย ให้สร้างเส้นทางกลับไปจุดเริ่มต้น
                             runner.setDirection(Maze2.NONE);
                             this.path = this.createPath(this.finishArea);
                             this.teams.forEach(r => {
-                                if (r.isActive())
-                                    r.setBoundary(this.path.length);
+                                r.setBoundary(this.path.length);
                             });
                         }
                         else
@@ -328,9 +339,8 @@ class Maze2 {
                             this.removePortal(runner.getLocation());
                         }
                         if (runner.getDirection() == Maze2.NONE) { // ถ้าไม่มีเส้นทางใหม่ ให้กลับบ้าน
-                            //runner.goBackUntilNewPath();
+                            // runner.goBackUntilNewPath();
                             runner.goBack();
-                            //  console.log(runner.toString());
                         }
                         if (runner.getDirection() == Maze2.NONE) { // ถ้ากลับจนสุดแล้ว ให้เปลี่ยนไปเริ่มที่จุดพักต่อไป
                             this.addNewRunner(this.map[runner.getLocation().i][runner.getLocation().j]);
@@ -347,6 +357,7 @@ class Maze2 {
             this.paintMaze();
             this.paintPath();
             this.running = false;
+            window.alert("Finish Solve Maze " + this.path.length);
         }
     }
 }
@@ -442,8 +453,6 @@ class Runner {
                 this.locate.i++;
             else if (this.direction == Maze2.EAST)
                 this.locate.j++;
-            // this.backward = map[this.locate.i][this.locate.j] > Maze2.WAY &&
-            //     map[this.locate.i][this.locate.j] == this.walk - 1;
             if (this.isBackward()) {
                 this.walk = map[this.locate.i][this.locate.j];
             }
@@ -561,7 +570,6 @@ class Runner {
         let canGoBack;
         do {
             this.goBack();
-            //if (!this.exceedBoundary())
             canGoBack = this.direction > Maze2.NONE;
             if (canGoBack) {
                 this.move();

@@ -3,6 +3,6 @@
     "lib": ["esNext", "DOM"],
     "target": "esNext",
     "module": "esNext",
-    "outDir": "./public",
+    "outDir": "./public"
   }
 }

@@ -82,7 +82,7 @@ class Maze2 {
 				this.map[i] = new Array(size);
 				this.map[i].fill(Maze2.WALL);
 			}
-			const normal = 1000;
+			const normal = 500;
 			this.dx = Math.ceil(normal / size);
 			this.dy = Math.ceil(normal / size);
 			this.width = size * this.dx;
@@ -126,6 +126,15 @@ class Maze2 {
 			}
 			coor += this._width4_dx4;
 		}
+	}
+	
+	private hidePath() : void {
+		let imgArr = this.imgData.data;
+		for (let i = 1; i <= this._size_2; i++)
+			for (let j = 1; j <= this._size_2; j++)
+				if (this.map[i][j] == Maze2.WAY)
+					this.paintArea(imgArr, i, j, this.bgColor);
+		this.ctx.putImageData(this.imgData, 0, 0);
 	}
 
 	private paintMaze(): void {
@@ -178,6 +187,14 @@ class Maze2 {
 		this.ctx.putImageData(this.imgData, 0, 0);
 	}
 
+	public getPathLength(): number {
+		return this.path.length;
+	}
+
+	public getFinishDistanct(area: Coordinate): number {
+		return Math.abs(this.finishArea.i - area.i) + Math.abs(this.finishArea.j - area.j);
+	}
+
 	public setMap(coor: Coordinate, value: number): void {
 		if (value > this.maxWalk)
 			this.maxWalk = value;
@@ -199,7 +216,8 @@ class Maze2 {
 			this.teams = [new Runner(this, 1, 1), new Runner(this, 1, this._size_2),
 			new Runner(this, this._size_2, 1), new Runner(this, this._size_2, this._size_2)];
 			while (this.running && this.teams.some((runner) => { return runner.isActive() })) {
-				for (let runner of this.teams)
+				//for (let runner of this.teams)
+				this.teams.forEach(runner => {
 					if (runner.isActive()) {
 						runner.randomWallDirection();
 						if (runner.getDirection() == Maze2.NONE) {
@@ -211,7 +229,8 @@ class Maze2 {
 						}
 						runner.move();
 					}
-				if (delay > 0) {
+				});
+				if (delay > 10) {
 					this.paintPath();
 					await new Promise((r) => { setTimeout(r, delay) });
 				}
@@ -330,9 +349,9 @@ class Maze2 {
 		for (let i = 1; i <= this._size_2; i++)
 			for (let j = 1; j <= this._size_2; j++)
 				if (this.portalMap[i][j] > 0 && walk < this.map[i][j]) {
+					this.portalMap[i][j] = 0;
 					let newRunner = new Runner(this, i, j);
-					if (this.path.length > 0)
-						newRunner.setBoundary(this.path.length);
+					newRunner.setBoundary();
 					this.teams.push(newRunner);
 				}
 		/*
@@ -351,19 +370,21 @@ class Maze2 {
 		this.reset();
 		if (!this.running) {
 			this.running = true;
+			this.hidePath();
 			this.teams = [new Runner(this, this.startArea.i, this.startArea.j)];
 			console.time("Solve Maze");
 			while (this.running && this.teams.some((runner) => { return runner.isActive() })) {
-				for (let runner of this.teams)
+				//for (let runner of this.teams)
+				this.teams.forEach(runner => {
 					if (runner.isActive()) {
 						if (runner.getLocation().equals(this.finishArea)) { // ถ้าพบเป้าหมาย ให้สร้างเส้นทางกลับไปจุดเริ่มต้น
 							runner.setDirection(Maze2.NONE);
 							this.path = this.createPath(this.finishArea);
 							this.teams.forEach(r => {
-								r.setBoundary(this.path.length);
+								r.setBoundary();
 							});
-							console.log("teams=",this.teams.length);
-//							this.teams = this.teams.filter(runner => { return runner.isActive() });
+							this.teams = this.teams.filter(runner => { return runner.isActive() });
+							console.log("teams=", this.teams.length);
 						} else
 							runner.findNewPath(); // หาเส้นทางใหม่
 
@@ -390,6 +411,7 @@ class Maze2 {
 
 						runner.move();
 					}
+				});
 				if (delay > 0) {
 					this.paintPath();
 					await new Promise((r) => { setTimeout(r, delay) });
@@ -398,7 +420,7 @@ class Maze2 {
 			console.timeEnd("Solve Maze");
 			this.paintMaze();
 			this.paintPath();
-				this.running = false;
+			this.running = false;
 		}
 	}
 }
@@ -487,8 +509,10 @@ class Runner {
 		this.locate = locate;
 	}
 
-	public setBoundary(boundary: number): void {
-		this.boundary = boundary;
+	public setBoundary(): void {
+		if (this.maze.getPathLength() > 0) {
+			this.boundary = this.maze.getPathLength() - this.maze.getFinishDistanct(this.getLocation());
+		}
 	}
 
 	public move(): void {

@@ -63,10 +63,8 @@ class BS {
                 found = BS.findIndex(array, rand);
             } while (rand == array[found]);
             if (rand > array[found])
-                array.splice(found + 1, 0, rand);
-            else
-                array.splice(found, 0, rand);
-            //array.sort(BS.compare);
+                found++;
+            array.splice(found, 0, rand);
         }
         return array;
     }
@@ -84,23 +82,16 @@ class BS {
     }
 
     static combineArray(array1: number[], array2: number[]): number[] {
-        // let array3: number[] = Array.from(array1);
-        // for (let x of array2)
-        //     if (BS.findArray(array1, x) == -1)
-        //         array3.push(x);
-        // array3.sort(BS.compare);
         let array3: number[] = new Array(0);
         let i = 0;
         let j = 0;
         while (i < array1.length && j < array2.length) {
-            if (array1[i] == array2[j]) {
+			if (array1[i] <= array2[j]) {
+				if (array1[i] == array2[j])
+                	j++; 
                 array3.push(array1[i++]);
-                j++;
-            } else if (array1[i] < array2[j]) {
-                array3.push(array1[i++]);
-            } else {
+            } else 
                 array3.push(array2[j++]);
-            }
         }
         while (i < array1.length)
             array3.push(array1[i++]);
@@ -116,13 +107,12 @@ class BS {
         let i = -1;
         while (max >= min) {
             i = Math.floor((max + min) / 2);
-            if (key == array[i]) {
+            if (key == array[i]) 
                 return i;
-            } else if (key < array[i]) {
+            else if (key < array[i]) 
                 max = i - 1;
-            } else {
+            else 
                 min = i + 1;
-            }
         }
         return i;
     }

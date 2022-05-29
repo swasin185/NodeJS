@@ -139,11 +139,8 @@ export class QuickSort extends Sort {
     let h = hi;
     let x = -1;
     while (l < h) {
-      while (x < 0)
-        await this.compareData(pivot, h).then((result) => {
-          if (result < 0) h--;
-          x = result;
-        });
+      while (await this.compareData(pivot, h) < 0) 
+        h--;
       while (l < h && x >= 0)
         await this.compareData(pivot, l).then((result) => {
           if (result >= 0) l++;

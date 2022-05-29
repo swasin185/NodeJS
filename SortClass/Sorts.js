@@ -1,17 +1,3 @@
-"use strict";
-var __extends = (this && this.__extends) || (function () {
-    var extendStatics = function (d, b) {
-        extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
-        return extendStatics(d, b);
-    };
-    return function (d, b) {
-        extendStatics(d, b);
-        function __() { this.constructor = d; }
-        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
-    };
-})();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -21,47 +7,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
-            }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
-};
-exports.__esModule = true;
-exports.QuickSort = exports.InsertSort = exports.SelectSort = exports.BubbleSort = void 0;
-var Sort = /** @class */ (function () {
-    function Sort(n, canvasId) {
+export default class Sort {
+    constructor(n, canvasId) {
         this.swap = 0;
         this.compare = 0;
         this.temp = 0;
         this.canvasId = canvasId;
         this.arr = new Array(n);
-        for (var i = 0; i < this.arr.length; i++)
+        for (let i = 0; i < this.arr.length; i++)
             this.arr[i] = i + 1;
-        for (var i = 0; i < this.arr.length; i++) {
-            var a = this.arr[i];
-            var x = Math.floor(Math.random() * this.arr.length);
+        for (let i = 0; i < this.arr.length; i++) {
+            let a = this.arr[i];
+            let x = Math.floor(Math.random() * this.arr.length);
             this.arr[i] = this.arr[x];
             this.arr[x] = a;
         }
@@ -69,367 +26,164 @@ var Sort = /** @class */ (function () {
         this.ctx = this.canvas.getContext("2d");
         this.repaint();
     }
-    Sort.prototype.repaint = function () {
+    repaint() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        for (var i = 0; i < this.arr.length; i++) {
+        for (let i = 0; i < this.arr.length; i++) {
             //this.ctx.fillRect(x, y, width, height)
             this.ctx.fillRect(10 + i * 3, 150, 2, -this.arr[i]);
         }
         this.ctx.fillText("compare=" + this.compare + " swap=" + this.swap, 30, 190);
-    };
-    Sort.prototype.swapData = function (i, j) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        this.swap++;
-                        this.temp = this.arr[i];
-                        this.arr[i] = this.arr[j];
-                        this.arr[j] = this.temp;
-                        this.repaint();
-                        return [4 /*yield*/, new Promise(function (r) { return setTimeout(r, 10); })];
-                    case 1:
-                        _a.sent();
-                        return [2 /*return*/];
-                }
-            });
+    }
+    swapData(i, j) {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.swap++;
+            this.temp = this.arr[i];
+            this.arr[i] = this.arr[j];
+            this.arr[j] = this.temp;
+            this.repaint();
+            yield new Promise((r) => setTimeout(r, 10));
         });
-    };
-    Sort.prototype.compareData = function (x, y) {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        this.compare++;
-                        return [4 /*yield*/, new Promise(function (r) { return setTimeout(r, 10); })];
-                    case 1:
-                        _a.sent();
-                        return [2 /*return*/, this.arr[x] - this.arr[y]];
-                }
-            });
+    }
+    compareData(x, y) {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.compare++;
+            yield new Promise((r) => setTimeout(r, 10));
+            return this.arr[x] - this.arr[y];
         });
-    };
-    Sort.prototype.runSort = function () {
+    }
+    runSort() {
         this.swap = 0;
         this.compare = 0;
-    };
-    return Sort;
-}());
-exports["default"] = Sort;
-var BubbleSort = /** @class */ (function (_super) {
-    __extends(BubbleSort, _super);
-    function BubbleSort(n, canvasId) {
-        return _super.call(this, n, canvasId) || this;
     }
-    BubbleSort.prototype.runSort = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            var sorted, i, _loop_1, this_1, j;
-            var _this = this;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        _super.prototype.runSort.call(this);
-                        sorted = false;
-                        i = 1;
-                        _a.label = 1;
-                    case 1:
-                        if (!(i < this.arr.length && !sorted)) return [3 /*break*/, 6];
-                        sorted = true;
-                        _loop_1 = function (j) {
-                            return __generator(this, function (_a) {
-                                switch (_a.label) {
-                                    case 0: return [4 /*yield*/, this_1.compareData(j, j - 1).then(function (result) { return __awaiter(_this, void 0, void 0, function () {
-                                            return __generator(this, function (_a) {
-                                                switch (_a.label) {
-                                                    case 0:
-                                                        if (!(result < 0)) return [3 /*break*/, 2];
-                                                        return [4 /*yield*/, _super.prototype.swapData.call(this, j, j - 1)];
-                                                    case 1:
-                                                        _a.sent();
-                                                        sorted = false;
-                                                        _a.label = 2;
-                                                    case 2: return [2 /*return*/];
-                                                }
-                                            });
-                                        }); })];
-                                    case 1:
-                                        _a.sent();
-                                        return [2 /*return*/];
-                                }
-                            });
-                        };
-                        this_1 = this;
-                        j = 1;
-                        _a.label = 2;
-                    case 2:
-                        if (!(j < this.arr.length - i + 1)) return [3 /*break*/, 5];
-                        return [5 /*yield**/, _loop_1(j)];
-                    case 3:
-                        _a.sent();
-                        _a.label = 4;
-                    case 4:
-                        j++;
-                        return [3 /*break*/, 2];
-                    case 5:
-                        i++;
-                        return [3 /*break*/, 1];
-                    case 6: return [2 /*return*/];
-                }
-            });
-        });
-    };
-    return BubbleSort;
-}(Sort));
-exports.BubbleSort = BubbleSort;
-var SelectSort = /** @class */ (function (_super) {
-    __extends(SelectSort, _super);
-    function SelectSort(n, canvasId) {
-        return _super.call(this, n, canvasId) || this;
+}
+export class BubbleSort extends Sort {
+    constructor(n, canvasId) {
+        super(n, canvasId);
     }
-    SelectSort.prototype.runSort = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            var _loop_2, this_2, i;
-            var _this = this;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        _super.prototype.runSort.call(this);
-                        _loop_2 = function (i) {
-                            var max, _loop_3, j;
-                            return __generator(this, function (_a) {
-                                switch (_a.label) {
-                                    case 0:
-                                        max = i;
-                                        _loop_3 = function (j) {
-                                            return __generator(this, function (_a) {
-                                                switch (_a.label) {
-                                                    case 0: return [4 /*yield*/, this_2.compareData(max, j).then(function (result) {
-                                                            if (result < 0)
-                                                                max = j;
-                                                        })];
-                                                    case 1:
-                                                        _a.sent();
-                                                        return [2 /*return*/];
-                                                }
-                                            });
-                                        };
-                                        j = 0;
-                                        _a.label = 1;
-                                    case 1:
-                                        if (!(j < i)) return [3 /*break*/, 4];
-                                        return [5 /*yield**/, _loop_3(j)];
-                                    case 2:
-                                        _a.sent();
-                                        _a.label = 3;
-                                    case 3:
-                                        j++;
-                                        return [3 /*break*/, 1];
-                                    case 4:
-                                        this_2.compare++;
-                                        return [4 /*yield*/, this_2.compareData(i, max).then(function (result) { return __awaiter(_this, void 0, void 0, function () {
-                                                return __generator(this, function (_a) {
-                                                    switch (_a.label) {
-                                                        case 0:
-                                                            if (!(result < 0)) return [3 /*break*/, 2];
-                                                            return [4 /*yield*/, _super.prototype.swapData.call(this, i, max)];
-                                                        case 1:
-                                                            _a.sent();
-                                                            _a.label = 2;
-                                                        case 2: return [2 /*return*/];
-                                                    }
-                                                });
-                                            }); })];
-                                    case 5:
-                                        _a.sent();
-                                        return [2 /*return*/];
-                                }
-                            });
-                        };
-                        this_2 = this;
-                        i = this.arr.length - 1;
-                        _a.label = 1;
-                    case 1:
-                        if (!(i > 0)) return [3 /*break*/, 4];
-                        return [5 /*yield**/, _loop_2(i)];
-                    case 2:
-                        _a.sent();
-                        _a.label = 3;
-                    case 3:
-                        i--;
-                        return [3 /*break*/, 1];
-                    case 4: return [2 /*return*/];
-                }
-            });
+    runSort() {
+        const _super = Object.create(null, {
+            runSort: { get: () => super.runSort },
+            swapData: { get: () => super.swapData }
         });
-    };
-    return SelectSort;
-}(Sort));
-exports.SelectSort = SelectSort;
-var InsertSort = /** @class */ (function (_super) {
-    __extends(InsertSort, _super);
-    function InsertSort(n, canvasId) {
-        return _super.call(this, n, canvasId) || this;
+        return __awaiter(this, void 0, void 0, function* () {
+            _super.runSort.call(this);
+            let sorted = false;
+            for (let i = 1; i < this.arr.length && !sorted; i++) {
+                sorted = true;
+                for (let j = 1; j < this.arr.length - i + 1; j++) {
+                    yield this.compareData(j, j - 1).then((result) => __awaiter(this, void 0, void 0, function* () {
+                        if (result < 0) {
+                            yield _super.swapData.call(this, j, j - 1);
+                            sorted = false;
+                        }
+                    }));
+                }
+            }
+        });
     }
-    InsertSort.prototype.runSort = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            var _loop_4, this_3, i;
-            var _this = this;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        _super.prototype.runSort.call(this);
-                        _loop_4 = function (i) {
-                            var j, x;
-                            return __generator(this, function (_a) {
-                                switch (_a.label) {
-                                    case 0:
-                                        j = i;
-                                        x = -1;
-                                        _a.label = 1;
-                                    case 1:
-                                        if (!(x < 0)) return [3 /*break*/, 3];
-                                        return [4 /*yield*/, this_3.compareData(j, j - 1).then(function (result) { return __awaiter(_this, void 0, void 0, function () {
-                                                return __generator(this, function (_a) {
-                                                    switch (_a.label) {
-                                                        case 0:
-                                                            if (!(result < 0)) return [3 /*break*/, 2];
-                                                            return [4 /*yield*/, this.swapData(j, j - 1)];
-                                                        case 1:
-                                                            _a.sent();
-                                                            j--;
-                                                            _a.label = 2;
-                                                        case 2:
-                                                            x = result;
-                                                            return [2 /*return*/];
-                                                    }
-                                                });
-                                            }); })];
-                                    case 2:
-                                        _a.sent();
-                                        return [3 /*break*/, 1];
-                                    case 3: return [2 /*return*/];
-                                }
-                            });
-                        };
-                        this_3 = this;
-                        i = 1;
-                        _a.label = 1;
-                    case 1:
-                        if (!(i < this.arr.length)) return [3 /*break*/, 4];
-                        return [5 /*yield**/, _loop_4(i)];
-                    case 2:
-                        _a.sent();
-                        _a.label = 3;
-                    case 3:
-                        i++;
-                        return [3 /*break*/, 1];
-                    case 4: return [2 /*return*/];
-                }
-            });
-        });
-    };
-    return InsertSort;
-}(Sort));
-exports.InsertSort = InsertSort;
-var QuickSort = /** @class */ (function (_super) {
-    __extends(QuickSort, _super);
-    function QuickSort(n, canvasId) {
-        return _super.call(this, n, canvasId) || this;
+}
+export class SelectSort extends Sort {
+    constructor(n, canvasId) {
+        super(n, canvasId);
     }
-    QuickSort.prototype.runSort = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        _super.prototype.runSort.call(this);
-                        return [4 /*yield*/, this.quickSort(0, this.arr.length - 1)];
-                    case 1:
-                        _a.sent();
-                        return [2 /*return*/];
-                }
-            });
+    runSort() {
+        const _super = Object.create(null, {
+            runSort: { get: () => super.runSort },
+            swapData: { get: () => super.swapData }
         });
-    };
-    QuickSort.prototype.quickSort = function (lo, hi) {
-        return __awaiter(this, void 0, void 0, function () {
-            var pivot, l, h, x;
-            var _this = this;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        pivot = Math.floor((lo + hi) / 2);
-                        l = lo;
-                        h = hi;
-                        x = -1;
-                        _a.label = 1;
-                    case 1:
-                        if (!(l < h)) return [3 /*break*/, 9];
-                        _a.label = 2;
-                    case 2:
-                        if (!(x < 0)) return [3 /*break*/, 4];
-                        return [4 /*yield*/, this.compareData(pivot, h).then(function (result) {
-                                if (result < 0)
-                                    h--;
-                                x = result;
-                            })];
-                    case 3:
-                        _a.sent();
-                        return [3 /*break*/, 2];
-                    case 4:
-                        if (!(l < h && x >= 0)) return [3 /*break*/, 6];
-                        return [4 /*yield*/, this.compareData(pivot, l).then(function (result) {
-                                if (result >= 0)
-                                    l++;
-                                x = result;
-                            })];
-                    case 5:
-                        _a.sent();
-                        return [3 /*break*/, 4];
-                    case 6:
-                        if (!(l < h)) return [3 /*break*/, 8];
-                        if (h == pivot)
-                            pivot = l;
-                        return [4 /*yield*/, this.swapData(l, h)];
-                    case 7:
-                        _a.sent();
-                        _a.label = 8;
-                    case 8: return [3 /*break*/, 1];
-                    case 9:
-                        if (!(pivot < h)) return [3 /*break*/, 11];
-                        return [4 /*yield*/, this.compareData(pivot, h).then(function (result) { return __awaiter(_this, void 0, void 0, function () {
-                                return __generator(this, function (_a) {
-                                    switch (_a.label) {
-                                        case 0:
-                                            if (!(result !== 0)) return [3 /*break*/, 2];
-                                            return [4 /*yield*/, _super.prototype.swapData.call(this, h, pivot)];
-                                        case 1:
-                                            _a.sent();
-                                            _a.label = 2;
-                                        case 2: return [2 /*return*/];
-                                    }
-                                });
-                            }); })];
-                    case 10:
-                        _a.sent();
-                        pivot = h;
-                        _a.label = 11;
-                    case 11:
-                        if (!(lo < pivot - 1)) return [3 /*break*/, 13];
-                        return [4 /*yield*/, this.quickSort(lo, pivot - 1)];
-                    case 12:
-                        _a.sent();
-                        _a.label = 13;
-                    case 13:
-                        if (!(hi > pivot + 1)) return [3 /*break*/, 15];
-                        return [4 /*yield*/, this.quickSort(pivot + 1, hi)];
-                    case 14:
-                        _a.sent();
-                        _a.label = 15;
-                    case 15: return [2 /*return*/];
+        return __awaiter(this, void 0, void 0, function* () {
+            _super.runSort.call(this);
+            for (let i = this.arr.length - 1; i > 0; i--) {
+                let max = i;
+                for (let j = 0; j < i; j++) {
+                    yield this.compareData(max, j).then((result) => {
+                        if (result < 0)
+                            max = j;
+                    });
                 }
-            });
+                this.compare++;
+                yield this.compareData(i, max).then((result) => __awaiter(this, void 0, void 0, function* () {
+                    if (result < 0)
+                        yield _super.swapData.call(this, i, max);
+                }));
+            }
         });
-    };
-    return QuickSort;
-}(Sort));
-exports.QuickSort = QuickSort;
+    }
+}
+export class InsertSort extends Sort {
+    constructor(n, canvasId) {
+        super(n, canvasId);
+    }
+    runSort() {
+        const _super = Object.create(null, {
+            runSort: { get: () => super.runSort }
+        });
+        return __awaiter(this, void 0, void 0, function* () {
+            _super.runSort.call(this);
+            for (let i = 1; i < this.arr.length; i++) {
+                let j = i;
+                let x = -1;
+                while (x < 0) {
+                    yield this.compareData(j, j - 1).then((result) => __awaiter(this, void 0, void 0, function* () {
+                        if (result < 0) {
+                            yield this.swapData(j, j - 1);
+                            j--;
+                        }
+                        x = result;
+                    }));
+                }
+            }
+        });
+    }
+}
+export class QuickSort extends Sort {
+    constructor(n, canvasId) {
+        super(n, canvasId);
+    }
+    runSort() {
+        const _super = Object.create(null, {
+            runSort: { get: () => super.runSort }
+        });
+        return __awaiter(this, void 0, void 0, function* () {
+            _super.runSort.call(this);
+            yield this.quickSort(0, this.arr.length - 1);
+        });
+    }
+    quickSort(lo, hi) {
+        const _super = Object.create(null, {
+            swapData: { get: () => super.swapData }
+        });
+        return __awaiter(this, void 0, void 0, function* () {
+            let pivot = Math.floor((lo + hi) / 2);
+            let l = lo;
+            let h = hi;
+            let x = -1;
+            while (l < h) {
+                while ((yield this.compareData(pivot, h)) < 0)
+                    h--;
+                while (l < h && x >= 0)
+                    yield this.compareData(pivot, l).then((result) => {
+                        if (result >= 0)
+                            l++;
+                        x = result;
+                    });
+                if (l < h) {
+                    if (h == pivot)
+                        pivot = l;
+                    yield this.swapData(l, h);
+                }
+            }
+            if (pivot < h) {
+                yield this.compareData(pivot, h).then((result) => __awaiter(this, void 0, void 0, function* () {
+                    if (result !== 0)
+                        yield _super.swapData.call(this, h, pivot);
+                }));
+                pivot = h;
+            }
+            if (lo < pivot - 1)
+                yield this.quickSort(lo, pivot - 1);
+            if (hi > pivot + 1)
+                yield this.quickSort(pivot + 1, hi);
+        });
+    }
+}

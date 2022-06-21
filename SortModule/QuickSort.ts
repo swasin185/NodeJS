@@ -14,27 +14,24 @@ export default class QuickSort extends Sort {
       let pivot = Math.floor((lo + hi) / 2);
       let l = lo;
       let h = hi;
-      let x = -1;
+      let x: any = -1;
       while (l < h) {
-        while (x < 0)
-          await this.compareData(pivot, h).then((result) => {
-            if (result < 0) h--;
-            x = result;
-          });
-        while (l < h && x >= 0)
-          await this.compareData(pivot, l).then((result) => {
-            if (result >= 0) l++;
-            x = result;
-          });
+        while (x < 0) {
+          x = await this.compareData(pivot, h);
+          if (x < 0) h--;
+        }
+        while (l < h && x >= 0) {
+          x = await this.compareData(pivot, l)
+          if (x >= 0) l++;
+        }
         if (l < h) {
           if (h == pivot) pivot = l;
           await this.swapData(l, h);
         }
       }
       if (pivot < h) {
-        await this.compareData(pivot, h).then(async (result) => {
-          if (result !== 0) await super.swapData(h, pivot);
-        });
+        x = await this.compareData(pivot, h);
+        if (x !== 0) await super.swapData(h, pivot);
         pivot = h;
       }
       if (lo < pivot - 1) await this.quickSort(lo, pivot - 1);

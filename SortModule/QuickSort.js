@@ -72,7 +72,6 @@ var QuickSort = /** @class */ (function (_super) {
     QuickSort.prototype.quickSort = function (lo, hi) {
         return __awaiter(this, void 0, void 0, function () {
             var pivot, l, h, x;
-            var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -86,23 +85,19 @@ var QuickSort = /** @class */ (function (_super) {
                         _a.label = 2;
                     case 2:
                         if (!(x < 0)) return [3 /*break*/, 4];
-                        return [4 /*yield*/, this.compareData(pivot, h).then(function (result) {
-                                if (result < 0)
-                                    h--;
-                                x = result;
-                            })];
+                        return [4 /*yield*/, this.compareData(pivot, h)];
                     case 3:
-                        _a.sent();
+                        x = _a.sent();
+                        if (x < 0)
+                            h--;
                         return [3 /*break*/, 2];
                     case 4:
                         if (!(l < h && x >= 0)) return [3 /*break*/, 6];
-                        return [4 /*yield*/, this.compareData(pivot, l).then(function (result) {
-                                if (result >= 0)
-                                    l++;
-                                x = result;
-                            })];
+                        return [4 /*yield*/, this.compareData(pivot, l)];
                     case 5:
-                        _a.sent();
+                        x = _a.sent();
+                        if (x >= 0)
+                            l++;
                         return [3 /*break*/, 4];
                     case 6:
                         if (!(l < h)) return [3 /*break*/, 8];
@@ -114,37 +109,31 @@ var QuickSort = /** @class */ (function (_super) {
                         _a.label = 8;
                     case 8: return [3 /*break*/, 1];
                     case 9:
-                        if (!(pivot < h)) return [3 /*break*/, 11];
-                        return [4 /*yield*/, this.compareData(pivot, h).then(function (result) { return __awaiter(_this, void 0, void 0, function () {
-                                return __generator(this, function (_a) {
-                                    switch (_a.label) {
-                                        case 0:
-                                            if (!(result !== 0)) return [3 /*break*/, 2];
-                                            return [4 /*yield*/, _super.prototype.swapData.call(this, h, pivot)];
-                                        case 1:
-                                            _a.sent();
-                                            _a.label = 2;
-                                        case 2: return [2 /*return*/];
-                                    }
-                                });
-                            }); })];
+                        if (!(pivot < h)) return [3 /*break*/, 13];
+                        return [4 /*yield*/, this.compareData(pivot, h)];
                     case 10:
-                        _a.sent();
-                        pivot = h;
-                        _a.label = 11;
+                        x = _a.sent();
+                        if (!(x !== 0)) return [3 /*break*/, 12];
+                        return [4 /*yield*/, _super.prototype.swapData.call(this, h, pivot)];
                     case 11:
-                        if (!(lo < pivot - 1)) return [3 /*break*/, 13];
-                        return [4 /*yield*/, this.quickSort(lo, pivot - 1)];
-                    case 12:
                         _a.sent();
+                        _a.label = 12;
+                    case 12:
+                        pivot = h;
                         _a.label = 13;
                     case 13:
-                        if (!(hi > pivot + 1)) return [3 /*break*/, 15];
-                        return [4 /*yield*/, this.quickSort(pivot + 1, hi)];
+                        if (!(lo < pivot - 1)) return [3 /*break*/, 15];
+                        return [4 /*yield*/, this.quickSort(lo, pivot - 1)];
                     case 14:
                         _a.sent();
                         _a.label = 15;
-                    case 15: return [2 /*return*/];
+                    case 15:
+                        if (!(hi > pivot + 1)) return [3 /*break*/, 17];
+                        return [4 /*yield*/, this.quickSort(pivot + 1, hi)];
+                    case 16:
+                        _a.sent();
+                        _a.label = 17;
+                    case 17: return [2 /*return*/];
                 }
             });
         });

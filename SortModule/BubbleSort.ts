@@ -7,15 +7,15 @@ export default class BubbleSort extends Sort {
     public async runSort() {
         super.runSort();
         let sorted = false;
+        let x: any = -1;
         for (let i = 1; i < this.arr.length && !sorted; i++) {
             sorted = true;
             for (let j = 1; j < this.arr.length - i + 1; j++) {
-                await this.compareData(j, j - 1).then(async result => {
-                    if (result < 0) {
-                        await super.swapData(j, j - 1);
-                        sorted = false;
-                    }
-                });
+                x = await this.compareData(j, j - 1);
+                if (x < 0) {
+                  await super.swapData(j, j - 1);
+                  sorted = false;
+                }
             }
         }
     }

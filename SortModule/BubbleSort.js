@@ -57,57 +57,38 @@ var BubbleSort = /** @class */ (function (_super) {
     }
     BubbleSort.prototype.runSort = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var sorted, i, _loop_1, this_1, j;
-            var _this = this;
+            var sorted, x, i, j;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _super.prototype.runSort.call(this);
                         sorted = false;
+                        x = -1;
                         i = 1;
                         _a.label = 1;
                     case 1:
-                        if (!(i < this.arr.length && !sorted)) return [3 /*break*/, 6];
+                        if (!(i < this.arr.length && !sorted)) return [3 /*break*/, 7];
                         sorted = true;
-                        _loop_1 = function (j) {
-                            return __generator(this, function (_b) {
-                                switch (_b.label) {
-                                    case 0: return [4 /*yield*/, this_1.compareData(j, j - 1).then(function (result) { return __awaiter(_this, void 0, void 0, function () {
-                                            return __generator(this, function (_a) {
-                                                switch (_a.label) {
-                                                    case 0:
-                                                        if (!(result < 0)) return [3 /*break*/, 2];
-                                                        return [4 /*yield*/, _super.prototype.swapData.call(this, j, j - 1)];
-                                                    case 1:
-                                                        _a.sent();
-                                                        sorted = false;
-                                                        _a.label = 2;
-                                                    case 2: return [2 /*return*/];
-                                                }
-                                            });
-                                        }); })];
-                                    case 1:
-                                        _b.sent();
-                                        return [2 /*return*/];
-                                }
-                            });
-                        };
-                        this_1 = this;
                         j = 1;
                         _a.label = 2;
                     case 2:
-                        if (!(j < this.arr.length - i + 1)) return [3 /*break*/, 5];
-                        return [5 /*yield**/, _loop_1(j)];
+                        if (!(j < this.arr.length - i + 1)) return [3 /*break*/, 6];
+                        return [4 /*yield*/, this.compareData(j, j - 1)];
                     case 3:
-                        _a.sent();
-                        _a.label = 4;
+                        x = _a.sent();
+                        if (!(x < 0)) return [3 /*break*/, 5];
+                        return [4 /*yield*/, _super.prototype.swapData.call(this, j, j - 1)];
                     case 4:
+                        _a.sent();
+                        sorted = false;
+                        _a.label = 5;
+                    case 5:
                         j++;
                         return [3 /*break*/, 2];
-                    case 5:
+                    case 6:
                         i++;
                         return [3 /*break*/, 1];
-                    case 6: return [2 /*return*/];
+                    case 7: return [2 /*return*/];
                 }
             });
         });

@@ -57,76 +57,43 @@ var SelectSort = /** @class */ (function (_super) {
     }
     SelectSort.prototype.runSort = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var _loop_1, this_1, i;
-            var _this = this;
+            var x, i, max, j;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         _super.prototype.runSort.call(this);
-                        _loop_1 = function (i) {
-                            var max, _loop_2, j;
-                            return __generator(this, function (_b) {
-                                switch (_b.label) {
-                                    case 0:
-                                        max = i;
-                                        _loop_2 = function (j) {
-                                            return __generator(this, function (_c) {
-                                                switch (_c.label) {
-                                                    case 0: return [4 /*yield*/, this_1.compareData(max, j).then(function (result) {
-                                                            if (result < 0)
-                                                                max = j;
-                                                        })];
-                                                    case 1:
-                                                        _c.sent();
-                                                        return [2 /*return*/];
-                                                }
-                                            });
-                                        };
-                                        j = 0;
-                                        _b.label = 1;
-                                    case 1:
-                                        if (!(j < i)) return [3 /*break*/, 4];
-                                        return [5 /*yield**/, _loop_2(j)];
-                                    case 2:
-                                        _b.sent();
-                                        _b.label = 3;
-                                    case 3:
-                                        j++;
-                                        return [3 /*break*/, 1];
-                                    case 4:
-                                        this_1.compare++;
-                                        return [4 /*yield*/, this_1.compareData(i, max).then(function (result) { return __awaiter(_this, void 0, void 0, function () {
-                                                return __generator(this, function (_a) {
-                                                    switch (_a.label) {
-                                                        case 0:
-                                                            if (!(result < 0)) return [3 /*break*/, 2];
-                                                            return [4 /*yield*/, _super.prototype.swapData.call(this, i, max)];
-                                                        case 1:
-                                                            _a.sent();
-                                                            _a.label = 2;
-                                                        case 2: return [2 /*return*/];
-                                                    }
-                                                });
-                                            }); })];
-                                    case 5:
-                                        _b.sent();
-                                        return [2 /*return*/];
-                                }
-                            });
-                        };
-                        this_1 = this;
+                        x = -1;
                         i = this.arr.length - 1;
                         _a.label = 1;
                     case 1:
-                        if (!(i > 0)) return [3 /*break*/, 4];
-                        return [5 /*yield**/, _loop_1(i)];
+                        if (!(i > 0)) return [3 /*break*/, 9];
+                        max = i;
+                        j = 0;
+                        _a.label = 2;
                     case 2:
-                        _a.sent();
-                        _a.label = 3;
+                        if (!(j < i)) return [3 /*break*/, 5];
+                        return [4 /*yield*/, this.compareData(max, j)];
                     case 3:
+                        x = _a.sent();
+                        if (x < 0)
+                            max = j;
+                        _a.label = 4;
+                    case 4:
+                        j++;
+                        return [3 /*break*/, 2];
+                    case 5: return [4 /*yield*/, this.compareData(i, max)];
+                    case 6:
+                        // this.compare++;
+                        x = _a.sent();
+                        if (!(x < 0)) return [3 /*break*/, 8];
+                        return [4 /*yield*/, _super.prototype.swapData.call(this, i, max)];
+                    case 7:
+                        _a.sent();
+                        _a.label = 8;
+                    case 8:
                         i--;
                         return [3 /*break*/, 1];
-                    case 4: return [2 /*return*/];
+                    case 9: return [2 /*return*/];
                 }
             });
         });

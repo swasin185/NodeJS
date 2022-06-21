@@ -7,12 +7,11 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-export default class Sort {
+class Sort {
     constructor(n, canvasId) {
         this.swap = 0;
         this.compare = 0;
         this.temp = 0;
-        this.canvasId = canvasId;
         this.arr = new Array(n);
         for (let i = 0; i < this.arr.length; i++)
             this.arr[i] = i + 1;
@@ -49,6 +48,7 @@ export default class Sort {
             this.compare++;
             yield new Promise((r) => setTimeout(r, 10));
             return this.arr[x] - this.arr[y];
+            //return new Promise((resolve) => { return this.arr[x] - this.arr[y]; });
         });
     }
     runSort() {
@@ -56,7 +56,7 @@ export default class Sort {
         this.compare = 0;
     }
 }
-export class BubbleSort extends Sort {
+class BubbleSort extends Sort {
     constructor(n, canvasId) {
         super(n, canvasId);
     }
@@ -68,21 +68,21 @@ export class BubbleSort extends Sort {
         return __awaiter(this, void 0, void 0, function* () {
             _super.runSort.call(this);
             let sorted = false;
+            let x = -1;
             for (let i = 1; i < this.arr.length && !sorted; i++) {
                 sorted = true;
                 for (let j = 1; j < this.arr.length - i + 1; j++) {
-                    yield this.compareData(j, j - 1).then((result) => __awaiter(this, void 0, void 0, function* () {
-                        if (result < 0) {
-                            yield _super.swapData.call(this, j, j - 1);
-                            sorted = false;
-                        }
-                    }));
+                    x = yield this.compareData(j, j - 1);
+                    if (x < 0) {
+                        yield _super.swapData.call(this, j, j - 1);
+                        sorted = false;
+                    }
                 }
             }
         });
     }
 }
-export class SelectSort extends Sort {
+class SelectSort extends Sort {
     constructor(n, canvasId) {
         super(n, canvasId);
     }
@@ -93,24 +93,23 @@ export class SelectSort extends Sort {
         });
         return __awaiter(this, void 0, void 0, function* () {
             _super.runSort.call(this);
+            let x = -1;
             for (let i = this.arr.length - 1; i > 0; i--) {
                 let max = i;
                 for (let j = 0; j < i; j++) {
-                    yield this.compareData(max, j).then((result) => {
-                        if (result < 0)
-                            max = j;
-                    });
+                    x = yield this.compareData(max, j);
+                    if (x < 0)
+                        max = j;
                 }
                 this.compare++;
-                yield this.compareData(i, max).then((result) => __awaiter(this, void 0, void 0, function* () {
-                    if (result < 0)
-                        yield _super.swapData.call(this, i, max);
-                }));
+                x = yield this.compareData(i, max);
+                if (x < 0)
+                    yield _super.swapData.call(this, i, max);
             }
         });
     }
 }
-export class InsertSort extends Sort {
+class InsertSort extends Sort {
     constructor(n, canvasId) {
         super(n, canvasId);
     }
@@ -124,19 +123,17 @@ export class InsertSort extends Sort {
                 let j = i;
                 let x = -1;
                 while (x < 0) {
-                    yield this.compareData(j, j - 1).then((result) => __awaiter(this, void 0, void 0, function* () {
-                        if (result < 0) {
-                            yield this.swapData(j, j - 1);
-                            j--;
-                        }
-                        x = result;
-                    }));
+                    x = yield this.compareData(j, j - 1);
+                    if (x < 0) {
+                        yield this.swapData(j, j - 1);
+                        j--;
+                    }
                 }
             }
         });
     }
 }
-export class QuickSort extends Sort {
+class QuickSort extends Sort {
     constructor(n, canvasId) {
         super(n, canvasId);
     }
@@ -159,14 +156,16 @@ export class QuickSort extends Sort {
             let h = hi;
             let x = -1;
             while (l < h) {
-                while ((yield this.compareData(pivot, h)) < 0)
-                    h--;
-                while (l < h && x >= 0)
-                    yield this.compareData(pivot, l).then((result) => {
-                        if (result >= 0)
-                            l++;
-                        x = result;
-                    });
+                while (x < 0) {
+                    x = yield this.compareData(pivot, h);
+                    if (x < 0)
+                        h--;
+                }
+                while (l < h && x >= 0) {
+                    x = yield this.compareData(pivot, l);
+                    if (x >= 0)
+                        l++;
+                }
                 if (l < h) {
                     if (h == pivot)
                         pivot = l;
@@ -174,10 +173,9 @@ export class QuickSort extends Sort {
                 }
             }
             if (pivot < h) {
-                yield this.compareData(pivot, h).then((result) => __awaiter(this, void 0, void 0, function* () {
-                    if (result !== 0)
-                        yield _super.swapData.call(this, h, pivot);
-                }));
+                x = yield this.compareData(pivot, h);
+                if (x !== 0)
+                    yield _super.swapData.call(this, h, pivot);
                 pivot = h;
             }
             if (lo < pivot - 1)

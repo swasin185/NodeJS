@@ -164,6 +164,8 @@ class Maze2 {
 					this.paintArea(imgArr, i, j, this.colors[x]);
 				} else if (this.map[i][j] == Maze2.END)
 					this.paintArea(imgArr, i, j, this.endColor);
+				// else if (this.map[i][j] == Maze2.WALL)
+				// 	this.paintArea(imgArr, i, j, this.bgColor);
 			}
 
 		this.teams.forEach((runner => {
@@ -195,10 +197,7 @@ class Maze2 {
 	}
 
 	public getFinishDistanct(area: Coordinate): number {
-		if (this.found)
-			return Math.abs(this.finishArea.i - area.i) + Math.abs(this.finishArea.j - area.j);
-		else
-			return this.size << 1;
+		return (Math.abs(this.finishArea.i - area.i) + Math.abs(this.finishArea.j - area.j));
 	}
 
 	public setMap(coor: Coordinate, value: number): void {
@@ -300,7 +299,7 @@ class Maze2 {
 		let path: Coordinate[] = new Array(this.map[point.i][point.j] - 1);
 		let i = point.i;
 		let j = point.j;
-		let x = 0;
+		let x = path.length - 1;
 		let w = 0;
 		do {
 			w = this.map[i][j];
@@ -317,9 +316,25 @@ class Maze2 {
 				//throw new Error("Path Error!");
 				return path;
 			}
-			path[x++] = new Coordinate(i, j);
+			path[x--] = new Coordinate(i, j);
 		} while (i != this.startArea.i || j != this.startArea.j);
 		return path;
+	}
+
+	private updatePath(point: Coordinate): void {
+		let found = false;
+		let idx = -1;
+		while (!found && idx < this.path.length) {
+			idx++;
+			found = point.equals(this.path[idx]);
+		}
+		if (found) {
+			if (this.map[point.i][point.j] < idx) {
+				let path = this.createPath(point);
+				this.path = path.concat(this.path.slice(idx, this.path.length));
+				console.log('update path', this.path.length, idx);
+			}
+		} 
 	}
 
 	private addPortal(area: Coordinate): void {
@@ -369,15 +384,14 @@ class Maze2 {
 							runner.findNewPath(); // หาเส้นทางใหม่
 						if (runner.getDirection() > Maze2.NONE) {
 							if (runner.beyondBoundary()) {
-								//if (!this.found)
-									this.addPortal(runner.getLocation());
-								//else
-								//	this.removePortal(runner.getLocation());
+								this.addPortal(runner.getLocation());
 								runner.setDirection(Maze2.NONE);
 							} else if (this.found && runner.beyondShortestPath()) {
 								this.removePortal(runner.getLocation());
 								runner.setDirection(Maze2.NONE);
-							}
+							} 
+							if (this.found) 
+								this.updatePath(runner.getLocation());
 						} else
 							this.removePortal(runner.getLocation());
 						if (runner.getDirection() == Maze2.NONE) // ถ้าไม่มีเส้นทางใหม่ ให้กลับบ้าน
@@ -612,23 +626,48 @@ class Runner {
 	}
 
 	public findNewPath(): void {
-		let select = Maze2.NONE;
-		let directions = Maze2.NONE;
-		if (this.locate.i > 1 && this.isNextLocation(this.locate.i - 1, this.locate.j))
-			directions += Maze2.NORTH;
-		if (this.locate.j > 1 && this.isNextLocation(this.locate.i, this.locate.j - 1))
-			directions += Maze2.WEST;
-		if (this.locate.i < this.maze._size_2 && this.isNextLocation(this.locate.i + 1, this.locate.j))
-			directions += Maze2.SOUTH;
-		if (this.locate.j < this.maze._size_2 && this.isNextLocation(this.locate.i, this.locate.j + 1))
-			directions += Maze2.EAST;
-		if (directions > Maze2.NONE) {
-			this.backward = false;
-			select = Maze2.EAST;
-			while ((select & directions) == 0 && select > Maze2.NONE)
-				select >>= 1;
+		this.direction = Maze2.NONE;
+		let direct = Maze2.NONE;
+		let idx = this.id % 4;
+		if (this.locate.i > 1 && this.isNextLocation(this.locate.i - 1, this.locate.j)) {
+			if (idx == 0)
+				this.direction = Maze2.NORTH;
+			direct += Maze2.NORTH;
 		}
-		this.direction = select;
+		if (this.direction == Maze2.NONE && this.locate.j > 1 && this.isNextLocation(this.locate.i, this.locate.j - 1)) {
+			if (idx == 1)
+				this.direction = Maze2.WEST;
+			direct += Maze2.WEST;
+		}
+		if (this.direction == Maze2.NONE && this.locate.i < this.maze._size_2 && this.isNextLocation(this.locate.i + 1, this.locate.j)) {
+			if (idx == 2)
+				this.direction = Maze2.SOUTH;
+			direct += Maze2.SOUTH;
+		}
+		if (this.direction == Maze2.NONE && this.locate.j < this.maze._size_2 && this.isNextLocation(this.locate.i, this.locate.j + 1)) {
+			if (idx == 3)
+				this.direction = Maze2.EAST;
+			direct += Maze2.EAST;
+		}
+		if (direct > Maze2.NONE) {
+			this.backward = false;
+			if (this.direction == Maze2.NONE) {
+				if (idx == 0)
+					this.direction = Maze2.EAST;
+				else if (idx == 1)
+					this.direction = Maze2.NORTH;
+				else if (idx == 2)
+					this.direction = Maze2.WEST;
+				else
+					this.direction = Maze2.SOUTH;
+				while ((this.direction & direct) == Maze2.NONE)
+					if (this.direction == Maze2.NORTH)
+						this.direction = Maze2.EAST;
+					else
+						this.direction >>= 1;
+			}
+		} else 
+			this.direction == Maze2.NONE;
 	}
 
 	public beyondBoundary(): boolean {

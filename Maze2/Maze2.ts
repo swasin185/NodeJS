@@ -55,7 +55,7 @@ class Maze2 {
 		return this.maxWalk;
 	}
 
-	constructor(canvasId: string = "canvas", size: number = 40) {
+	constructor(canvasId: string = "canvas", size: number = 500) {
 		this.colors[0] = this.wayColor;
 		for (let i = 1; i < this.colors.length; i++)
 			this.colors[i] = [Math.round(i * 2.5), 205 - (i * 2), 200];
@@ -276,6 +276,7 @@ class Maze2 {
 	}
 
 	public reset() {
+		Runner.resetId();
 		this.running = false;
 		this.maxWalk = 0;
 		this.teams = [];
@@ -301,7 +302,7 @@ class Maze2 {
 		let j = point.j;
 		let x = path.length - 1;
 		let w = 0;
-		do {
+		while (i != this.startArea.i || j != this.startArea.j) {
 			w = this.map[i][j];
 			if (i > 1 && this.map[i - 1][j] > 0 && w - this.map[i - 1][j] > 0)
 				i--;
@@ -317,11 +318,11 @@ class Maze2 {
 				return path;
 			}
 			path[x--] = new Coordinate(i, j);
-		} while (i != this.startArea.i || j != this.startArea.j);
+		}
 		return path;
 	}
 
-	private updatePath(point: Coordinate): void {
+	private isUpdatePath(point: Coordinate): boolean {
 		let found = false;
 		let idx = -1;
 		while (!found && idx < this.path.length) {
@@ -330,11 +331,13 @@ class Maze2 {
 		}
 		if (found) {
 			if (this.map[point.i][point.j] < idx) {
+				console.log('update path', this.path.length, this.map[point.i][point.j], idx);
 				let path = this.createPath(point);
 				this.path = path.concat(this.path.slice(idx, this.path.length));
-				console.log('update path', this.path.length, idx);
+				return true;
 			}
 		} 
+		return false;
 	}
 
 	private addPortal(area: Coordinate): void {
@@ -353,14 +356,14 @@ class Maze2 {
 
 	private addNewRunner(walk: number): void {
 		let i = 0;
-		while (i < this.portals.length && walk < this.map[this.portals[i].i][this.portals[i].j]) {
+		while (i < this.portals.length && 
+			(walk < this.map[this.portals[i].i][this.portals[i].j])) {
 			let portal = this.portals[i];
 			let newRunner = new Runner(this, portal.i, portal.j);
-			//if (this.path.length > 0)
-			//	newRunner.setBoundary();
 			this.teams.push(newRunner);
 			i++;
 		}
+		this.portals.splice(0, i); // TODO ถ้าลบ Portals เลยทำให้ไม่ต้องมีการรอ
 	}
 
 	public async solveMaze(delay: number = 0) {
@@ -377,8 +380,6 @@ class Maze2 {
 						activeCount++;
 						if (runner.getLocation().equals(this.finishArea)) {
 							runner.setDirection(Maze2.NONE);
-							if (this.found)
-								this.path = this.createPath(this.finishArea);
 							this.found = true;
 						} else
 							runner.findNewPath(); // หาเส้นทางใหม่
@@ -391,7 +392,7 @@ class Maze2 {
 								runner.setDirection(Maze2.NONE);
 							} 
 							if (this.found) 
-								this.updatePath(runner.getLocation());
+								this.isUpdatePath(runner.getLocation());
 						} else
 							this.removePortal(runner.getLocation());
 						if (runner.getDirection() == Maze2.NONE) // ถ้าไม่มีเส้นทางใหม่ ให้กลับบ้าน
@@ -410,7 +411,7 @@ class Maze2 {
 					activeCount = 1;
 					this.running = true;
 				} else if (activeCount < this.teams.length / 2) {
-					console.log("teams=", activeCount, this.teams.length);
+					//console.log("teams=", activeCount, this.teams.length);
 					this.teams = this.teams.filter(runner => { return runner.isActive() });
 				}
 				if (delay > 0) {
@@ -419,6 +420,7 @@ class Maze2 {
 				}
 			}
 			console.timeEnd("Solve Maze");
+			console.log("Total Runner =",Runner.getMaxId())
 			this.paintMaze();
 			this.paintPath();
 			this.running = false;
@@ -459,6 +461,14 @@ class Runner {
 	private route: Coordinate[];
 	private boundary = 20;
 	private backward = false;
+
+	public static resetId(): void {
+		Runner.autoid = 0;
+	}
+
+	public static getMaxId(): number {
+		return Runner.autoid;
+	}
 
 	public toString(): string {
 		return this.id + " : " + this.walk + " | " + this.direction + " = " + this.boundary;

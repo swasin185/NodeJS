@@ -33,17 +33,19 @@
 			style="width:50px; float: right; text-align: right;" />
 		<input type="range" id="connSlider" min="0" max="1" step="0.1" value="0.5" />
 		<br>
-		<!-- <input type="checkbox" id="delay"></input><label for="delay">Delay Mode</label> -->
 		<label id="delayLabel" for="delayInput">Delay:</label>
-		<input type="number" id="delayInput" min="0" max="100" step="1" value="0"
+		<input type="number" id="delayInput" min="0" max="100" step="1" value="10"
 			style="width:50px; float: right; text-align: right;" />
-		<input type="range" id="delaySlider" min="0" max="100" step="1" value="0" />
+		<input type="range" id="delaySlider" min="0" max="100" step="1" value="10" />
+		<br>
+		<label for="wait">waiting</label>
+		<input type="checkbox" id="waiting" checked=true />
 		<hr>
 		<input type="button" class="button" id="generate" value="Generate" />
 		<br>
 		<input type="button" class="button" id="generate" value="Reset" onclick="maze.reset()" />
 		<br>
-		<input type="button" class="button" value="Solve" onclick="maze.solveMaze(delay.value)" />
+		<input type="button" class="button" value="Run" onclick="maze.solveMaze(delay.value, waiting.checked)" />
 		<br>
 	</div>
 	<canvas id="maze2" width="800" height="800" style="background-color: darkslategrey; color: white" onclick="maze.clickXY(event)"></canvas>
@@ -58,6 +60,7 @@
 	var maze = new Maze2("maze2", sizeInput.value);
 	var generate = document.getElementById("generate");
 	var delay = document.getElementById("delayInput");
+	var waiting = document.getElementById("waiting");
 
 	sizeSlider.oninput = function () {
 		sizeInput.value = this.value;

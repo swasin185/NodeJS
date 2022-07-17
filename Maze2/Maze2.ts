@@ -25,6 +25,7 @@ class Maze2 {
 	private height: number;
 	private dx: number;
 	private dy: number;
+	private waiting : boolean = false;
 
 	public _dx4: number;
 	public _width4: number;
@@ -225,7 +226,7 @@ class Maze2 {
 					if (runner.isActive()) {
 						runner.randomWallDirection();
 						if (runner.getDirection() == Maze2.NONE) {
-							runner.goBack();
+							runner.routeBack();
 							if (Math.random() < connect)
 								runner.breakTheWall();
 							runner.move();
@@ -331,7 +332,7 @@ class Maze2 {
 		}
 		if (found) {
 			if (this.map[point.i][point.j] < idx) {
-				console.log('update path', this.path.length, this.map[point.i][point.j], idx);
+				// console.log('update path', this.path.length, idx);
 				let path = this.createPath(point);
 				this.path = path.concat(this.path.slice(idx, this.path.length));
 				return true;
@@ -356,22 +357,23 @@ class Maze2 {
 
 	private addNewRunner(walk: number): void {
 		let i = 0;
-		while (i < this.portals.length && 
-			(walk < this.map[this.portals[i].i][this.portals[i].j])) {
-			let portal = this.portals[i];
-			let newRunner = new Runner(this, portal.i, portal.j);
-			this.teams.push(newRunner);
-			i++;
+		let portal = this.portals[i];
+		while (i < this.portals.length && (walk < this.map[portal.i][portal.j])) {
+			this.teams.push(new Runner(this, portal.i, portal.j));
+			portal = this.portals[++i];
 		}
-		this.portals.splice(0, i); // TODO ถ้าลบ Portals เลยทำให้ไม่ต้องมีการรอ
+		if (!this.waiting)
+			this.portals.splice(0, i);
 	}
 
-	public async solveMaze(delay: number = 0) {
+	public async solveMaze(delay: number = 0, waiting: boolean = true) {
+		this.waiting = waiting;
 		this.reset();
 		if (!this.running) {
 			this.running = true;
 			this.teams = [new Runner(this, this.startArea.i, this.startArea.j)];
-			console.time("Solve Maze");
+			console.time("First Found");
+			console.time("Optimal Path");
 			let activeCount = 1;
 			while (this.running && activeCount > 0) {
 				activeCount = 0;
@@ -403,6 +405,8 @@ class Maze2 {
 					}
 				});
 				if (this.found && this.getPathLength() == 0) {
+					console.timeEnd("First Found");
+					console.log("Runner", Runner.getMaxId(), "Avg.Move", Math.round(Runner.getTotalDistance() / Runner.getMaxId()));
 					let path = this.createPath(this.finishArea);
 					this.reset();
 					this.found = true;
@@ -419,8 +423,8 @@ class Maze2 {
 					await new Promise((r) => { setTimeout(r, delay) });
 				}
 			}
-			console.timeEnd("Solve Maze");
-			console.log("Total Runner =",Runner.getMaxId())
+			console.timeEnd("Optimal Path");
+			console.log("Runner", Runner.getMaxId(), "Avg.Move", Math.round(Runner.getTotalDistance() / Runner.getMaxId()));
 			this.paintMaze();
 			this.paintPath();
 			this.running = false;
@@ -452,6 +456,7 @@ class Coordinate {
 
 class Runner {
 	private static autoid = 0;
+	private static totalDistance = 0;
 	private id: number = ++Runner.autoid;
 	private maze: Maze2;
 	private locate: Coordinate;
@@ -464,11 +469,17 @@ class Runner {
 
 	public static resetId(): void {
 		Runner.autoid = 0;
+		Runner.totalDistance = 0;
 	}
 
 	public static getMaxId(): number {
 		return Runner.autoid;
 	}
+
+	public static getTotalDistance(): number {
+		return Runner.totalDistance;
+	}
+
 
 	public toString(): string {
 		return this.id + " : " + this.walk + " | " + this.direction + " = " + this.boundary;
@@ -546,6 +557,7 @@ class Runner {
 			} else {
 				this.route.push(new Coordinate(prior_i, prior_j));
 				this.walk++;
+				Runner.totalDistance++;
 				this.maze.setMap(this.locate, this.walk);
 			}
 		}
@@ -602,7 +614,7 @@ class Runner {
 		}
 	}
 
-	public goBack(): void {
+	public routeBack(): void {
 		this.direction = Maze2.NONE;
 		if (this.route.length > 0) {
 			let prior = this.route.pop();
@@ -691,7 +703,7 @@ class Runner {
 	public goBackUntilNewPath(): void {
 		let canGoBack: boolean;
 		do {
-			this.goBack();
+			this.routeBack();
 			canGoBack = this.direction > Maze2.NONE;
 			if (canGoBack) {
 				this.move();
@@ -704,7 +716,7 @@ class Runner {
 	public goBackUntilNewWall(): void {
 		let canGoBack: boolean;
 		do {
-			this.goBack();
+			this.routeBack();
 			canGoBack = this.direction > Maze2.NONE;
 			if (canGoBack) {
 				this.move();

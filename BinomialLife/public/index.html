@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Binomial Life</title>
+	<style>
+		.button {
+			text-align: center;
+			background-color: #0354AE;
+			padding: 10px 20px;
+			border: 2px solid;
+			border-radius: .5rem;
+			margin-top: 5px;
+			margin-bottom: 5px;
+			color: cyan;
+			cursor: pointer;
+			font-size: 16px;
+			width: 160px;
+		}
+	</style>
+</head>
+
+<body bgcolor="black">
+	<div id="toolbar"
+		style="background-color: white; width: 165px; float: left; padding:10px 10px; border:2px solid; margin-right: 20px;">
+		<label id="ageLabel" for="ageInput">Age:</label>
+		<input type="number" id="ageInput" min="10" max="1000" step="10" value="100"
+			style="width:100px; float: right; text-align: right;" />
+			<hr>
+		<label id="popLabel" for="popInput">Population:</label>
+		<input type="number" id="popInput" min="10" max="10000" step="10" value="100"
+			style="width:100px; float: right; text-align: right;" />
+		<input type="button" class="button" id="runBtn" value="Run" />
+	</div>
+	<canvas id="Binomial" width="1000" height="1000" style="background-color: black; color: white; border:1px solid;"></canvas>
+</body>
+<script src="Binomial.js"></script>
+
+<script defer type="text/javascript">
+	var ageInput = document.getElementById("ageInput");
+	var popInput = document.getElementById("popInput");
+	var binomial = new Binomial("Binomial", ageInput.value, popInput.value);
+	var waiting = document.getElementById("waiting");
+	var runButton = document.getElementById("runBtn");
+	runButton.onclick = function () {
+		binomial.run(ageInput.value, popInput.value);
+	}
+	console.clear();
+</script>
+
+</html>

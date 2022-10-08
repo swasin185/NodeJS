@@ -9,11 +9,9 @@ var Average = /** @class */ (function () {
     };
     Average.incAvg = function (data) {
         var avg = 0;
-        for (var i = 0; i < data.length; i++) {
+        for (var i = 0; i < data.length; i++)
             avg = avg * (i / (i + 1)) + data[i] / (i + 1);
-            avg = Math.round(avg * 1E6) / 1E6;
-        }
-        return avg;
+        return Math.round(avg * 1E6) / 1E6;
     };
     return Average;
 }());

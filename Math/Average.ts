@@ -8,11 +8,9 @@ class Average {
 
     static incAvg(data: number[]): number {
         let avg = 0;
-        for (let i = 0; i < data.length; i++) {
+        for (let i = 0; i < data.length; i++)
             avg = avg * (i / (i + 1)) + data[i] / (i + 1)
-            avg = Math.round(avg * 1E6) / 1E6;
-        }
-        return avg;
+        return Math.round(avg * 1E6) / 1E6;
     }
     static {
         console.log("Incremental Average Sum");

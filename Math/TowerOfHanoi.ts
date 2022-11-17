@@ -15,7 +15,7 @@
 let count = 1
 toh(3, '0', '1', '2')
 console.log("*************** Non Recursive ToH ***************")
-towerOfHanoi(5, 'A', 'B', 'C')
+towerOfHanoi2(3, 'A', 'B', 'C')
 
 function toh(rings, from, temp, to) {
     if (rings > 0) {
@@ -44,5 +44,23 @@ function towerOfHanoi(rings, from, temp, to) {
         poleOfRings[rings - 1] = to
         count++
         temp = (temp + next) % 3
+    }
+}
+
+function towerOfHanoi2(rings, from, temp, to) {
+    const poles = [from, temp, to]
+    const loop = Math.pow(2, rings)
+    count = 1
+    const step = 2 - (rings % 2)
+    let fromIdx = 0
+    let toIdx = 0
+    let tempIdx = step
+    while (count < loop) {
+        rings = 1
+        toIdx = 3 - fromIdx - tempIdx
+        console.log(count.toString(2), '\tmove O', rings, 'from |', fromIdx, 'to |', toIdx, 'temp =', tempIdx)
+        
+        count++
+        tempIdx = (tempIdx + step) % 3
     }
 }

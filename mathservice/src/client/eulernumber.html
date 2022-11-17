@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Euler's Number (e)</title>
+</head>
+
+<body bgcolor="grey">
+    <canvas id="euler" width="800" height="800" style="background-color:navy ;border:1px solid"
+        onclick="chart1.clickXY(event);"></canvas>
+</body>
+<script src="http://localhost:8000/api/chart"></script>
+<script>
+    let dataX = new Array(100);
+    let dataY = new Array(dataX.length);
+    let x = 1;
+    for (let i = 0; i < dataX.length; i++) {
+        dataY[i] = Math.pow(10 / x, x / 10);
+        dataX[i] = x++;
+    }
+    chart1 = new Chart('euler', dataX, dataY);
+</script>
+
+</html>

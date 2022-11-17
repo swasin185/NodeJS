@@ -38,6 +38,7 @@ var Binomial = /** @class */ (function () {
     function Binomial(canvasId) {
         if (canvasId === void 0) { canvasId = "canvas"; }
         this.bgColor = [0x0, 0x0, 0x0];
+        this.white = [0xFF, 0xFF, 0xFF];
         this.colors = new Array(1);
         this.age = 0;
         this.population = 0;
@@ -45,17 +46,11 @@ var Binomial = /** @class */ (function () {
         this.running = false;
         this.colors = new Array(100);
         for (var i = 0; i < this.colors.length; i++)
-            this.colors[i] = [Math.round(i * 2.5), 205 - (i * 2), 200];
+            this.colors[i] = [Math.round(i * 2.5), 205 - (i * 2), 100];
         this.cvs = document.getElementById(canvasId);
         this.ctx = this.cvs.getContext("2d");
         this.ctx.fillStyle = this.cvs.style.backgroundColor;
         this.ctx.strokeStyle = this.cvs.style.color;
-        // this.bgColor[Maze2.RED] = parseInt(this.ctx.fillStyle.substring(1, 3), 16);
-        // this.bgColor[Maze2.GREEN] = parseInt(this.ctx.fillStyle.substring(3, 5), 16);
-        // this.bgColor[Maze2.BLUE] = parseInt(this.ctx.fillStyle.substring(5, 7), 16);
-        // this.wayColor[Maze2.RED] = parseInt(this.ctx.strokeStyle.substring(1, 3), 16);
-        // this.wayColor[Maze2.GREEN] = parseInt(this.ctx.strokeStyle.substring(3, 5), 16);
-        // this.wayColor[Maze2.BLUE] = parseInt(this.ctx.strokeStyle.substring(5, 7), 16);
     }
     Binomial.prototype.init = function (age, population) {
         if (age === void 0) { age = 100; }
@@ -66,7 +61,7 @@ var Binomial = /** @class */ (function () {
             this.age = age;
             this.population = population;
             this.bArray = [[0]];
-            var normal = age;
+            var normal = 1000;
             this.dx = Math.ceil(normal / age);
             this.dy = Math.ceil(normal / age);
             this.size = age;
@@ -78,7 +73,7 @@ var Binomial = /** @class */ (function () {
             this._width4 = this.width * 4;
             this._width4_dx4 = this._width4 - this._dx4;
             this.imgData = this.ctx.createImageData(this.width, this.height);
-            this.imgData.data.fill(0x7F);
+            this.imgData.data.fill(0x0);
             this.bArray = new Array(age);
             for (var i = 0; i < age; i++)
                 this.bArray[i] = [];
@@ -87,22 +82,39 @@ var Binomial = /** @class */ (function () {
     };
     Binomial.prototype.paintArea = function (imgArr, i, j, color) {
         var coor = (i * this.dy * this._width4 + (j * this._dx4));
-        //		for (let by = 0; by < this.dy; by++) {
-        //			for (let bx = 0; bx < this.dx; bx++) {
-        imgArr[coor++] = color[Binomial.RED];
-        imgArr[coor++] = color[Binomial.GREEN];
-        imgArr[coor++] = color[Binomial.BLUE];
-        coor++;
-        //			}
-        //			coor += this._width4_dx4;
-        //		}
+        for (var by = 0; by < this.dy; by++) {
+            for (var bx = 0; bx < this.dx; bx++) {
+                imgArr[coor++] = color[Binomial.RED];
+                imgArr[coor++] = color[Binomial.GREEN];
+                imgArr[coor++] = color[Binomial.BLUE];
+                imgArr[coor++] = 0xFF;
+            }
+            coor += this._width4_dx4;
+        }
     };
     Binomial.prototype.paint = function () {
         var imgArr = this.imgData.data;
-        for (var i = 0; i < this.size; i++)
-            for (var j = 0; j < this.size; j++) {
-                if (this.bArray[i] != undefined && this.bArray[i][j] != undefined && this.bArray[i][j] > 0) {
-                    this.paintArea(imgArr, i, j, this.colors[this.bArray[i][j] % this.colors.length]);
+        var x = 0;
+        var y = 0;
+        for (var i = 0; i < this.bArray.length; i++)
+            for (var j = 0; j < this.bArray[i].length; j++) {
+                if (this.bArray[i] != undefined && this.bArray[i][j] != undefined) {
+                    if (this.bArray[i][j] > 0) {
+                        //this.paintArea(imgArr, i, j, this.colors[this.bArray[i][j] % this.colors.length]);
+                        var x_1 = Math.floor((i + j) / 2);
+                        if (this.bArray[x_1] != undefined && this.bArray[x_1][x_1] != undefined) {
+                            if (this.bArray[x_1][x_1] == 0)
+                                y = 0;
+                            else {
+                                y = Math.round((this.bArray[i][j] / this.bArray[x_1][x_1]) * this.colors.length);
+                                if (y >= this.colors.length)
+                                    y = this.colors.length - 1;
+                            }
+                        }
+                        else
+                            y = 0;
+                        this.paintArea(imgArr, i, j, this.colors[y]);
+                    }
                 }
                 else {
                     this.paintArea(imgArr, i, j, this.bgColor);
@@ -156,6 +168,5 @@ var Binomial = /** @class */ (function () {
     Binomial.RED = 0;
     Binomial.GREEN = 1;
     Binomial.BLUE = 2;
-    Binomial.ALPHA = 3;
     return Binomial;
 }());

@@ -125,14 +125,13 @@ export default class Prime {
         // Prime.createPrimeArray(String(p));
         // }
 
-        let time: number = (new Date()).getTime()
+        console.time("create prime")
         let lp = Prime.getLastPrime()
         while (Prime.getLength() < n) {
             lp = lp.add(2)
             this.createPrimeArray(lp.toFixed())
         }
-        time = ((new Date()).getTime() - time) / 1000
-        console.log('Calculate Prime = ', time, ' seconds')
+        console.timeEnd("create prime")
         this.saveFile()
     }
 
@@ -183,6 +182,8 @@ export default class Prime {
     }
 
     public static sumReciprocal (n: number): number {
+        if (n > Prime.getLength()) 
+            Prime.createPrimeArrayCount(n);
         const lp = Prime.primeArray[n - 1]
         const n2 = lp.mul(lp)
         let sum = Prime.ZERO
@@ -191,52 +192,60 @@ export default class Prime {
         let k = 0
         while (barr.next()) {
             x = Prime.ONE
-            for (let i = 0; i < n && x.lte(n2); i++) {
-                if (barr.isExists(i)) {
+            for (let i = 0; i < n && x.lte(n2); i++)
+                if (barr.isExists(i)) 
                     x = x.mul(Prime.primeArray[i])
-                    if (x.gt(n2)) barr.jump()
-                }
-            }
             if (x.lte(n2)) {
                 k++
-                x = Prime.ONE.div(x)
-                if (barr.count() % 2 === 0) sum = sum.sub(x)
-                else sum = sum.add(x)
-            }
+                // x = Prime.ONE.div(x)
+                x = n2.div(x).sub(0.5).round();
+                if (barr.count() % 2 === 0)
+                    sum = sum.sub(x)
+                else
+                    sum = sum.add(x)
+            } else 
+                barr.fillRemainBits()
         }
-        console.log(n, n2.toString(), 'run =', k, '\t', sum.toNumber(), '\t', Prime.ONE.sub(sum).mul(n2).toString())
-        return sum.toNumber()
+        let count: Big = n2.sub(sum).add(n).sub(1)
+        console.log('sum of reciprocal ', n2.toString(), 'set =', k, '\t count=', count)
+        return count.toNumber();
         // return k / n2.toNumber()
     }
 
-    public static primeFunction (n: number): number {
-        const lp = Prime.primeArray[n - 1].toNumber()
-        const n2 = lp * lp
-        let m = 0
-        let time: number = (new Date()).getTime()
+    /*
+     * Legendre's Formula
+     * Binary permutaion & Inclusive/Exclusive Set & Floor function
+     * count(prime <= x) = x - set of divisor + set of (prime <= root(x)) - 1 (one is not prime)
+     */
+    public static primeCount (n: number): number {
+        if (n > Prime.getLength()) 
+            Prime.createPrimeArrayCount(n);
+        console.time("prime counting function")
         const barr = new BinaryArray(n)
-        let x = 1
+        const pn = Prime.primeArray[n - 1].toNumber()
+        const x = pn * pn
+        let sum = 0
+        let c = 1
         let k = 0
-        console.log('bits =', n, '\t', 'max prime =', lp, 'p^2 =', n2)
         while (barr.next()) {
-            x = 1
-            for (let i = 0; i < n && x <= n2; i++) {
-                if (barr.isExists(i)) {
-                    x *= Prime.primeArray[i].toNumber()
-                    if (x > n2) { barr.jump() }
-                }
-            }
-            if (x <= n2) {
+            c = 1
+            for (let i = 0; i < n && c <= x; i++) 
+                if (barr.isExists(i)) 
+                    c *= Prime.primeArray[i].toNumber()
+            if (c <= x) {
                 k++
-                x = Math.floor(n2 / x)
-                if (barr.count() % 2 === 0) x = -x
-                m += x
+                c = Math.floor(x / c)
+                if (barr.count() % 2 == 0) // -1 power count
+                    sum -= c
+                else 
+                    sum += c
+            } else {
+                barr.fillRemainBits()
             }
         }
-        time = ((new Date()).getTime() - time) / 1000
-        const primeCount = n2 - m + n - 1
-        console.log('prime count =', primeCount, ' run =', k, '\ttime =', time, ' seconds')
+        const primeCount = x - sum + n - 1
+        console.log('prime count =', primeCount, 'under', x)
+        console.timeEnd("prime counting function")
         return primeCount
-        // return k / primeCount
     }
 }

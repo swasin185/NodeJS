@@ -7,8 +7,9 @@
     "serve": "nodemon dist/server/Server.js",
     "build": "tsc && cp ./src/client/*.html ./dist/client",
     "fix": "npx eslint --fix src/**/*.ts",
-    "hanoi": "tsc & node dist/server/lib/TowerHanoi.js",
-    "sort": "tsc & node dist/server/lib/QuickSort.js"
+    "hanoi": "tsc && node dist/server/lib/TowerHanoi.js",
+    "sort": "tsc && node dist/server/lib/QuickSort.js",
+    "test": "tsc && node dist/server/lib/Test.js"
   },
   "devDependencies": {
     "@types/big.js": "^6.0.0",

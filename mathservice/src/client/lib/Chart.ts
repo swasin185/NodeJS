@@ -1,22 +1,22 @@
 class Chart {
-    private static COLORS = ['magenta', 'cyan', 'lime', 'white', 'yellow', 'orange', 'pink', 'red'];
-    private cv: HTMLCanvasElement;
-    private cx: CanvasRenderingContext2D;
-    private dataX: number[];
-    private dataY: number[];
-    private xAxis: number;
-    private yAxis: number;
-    private dx: number;
-    private dy: number;
+    protected static COLORS = ['magenta', 'cyan', 'lime', 'white', 'yellow', 'orange', 'pink', 'red'];
+    protected cv: HTMLCanvasElement;
+    protected cx: CanvasRenderingContext2D;
+    protected dataX: number[];
+    protected dataY: number[];
+    protected xAxis: number;
+    protected yAxis: number;
+    protected dx: number;
+    protected dy: number;
 
-    private minX: number;
-    private maxX: number;
+    protected minX: number;
+    protected maxX: number;
 
-    private minY: number;
-    private maxY: number;
+    protected minY: number;
+    protected maxY: number;
 
-    private imgData;
-    private color: string;
+    protected imgData;
+    protected color: string;
 
     constructor(canvasName: string, dataX: number[], dataY: number[]) {
         this.cv = document.getElementById(canvasName) as HTMLCanvasElement
@@ -39,7 +39,7 @@ class Chart {
         this.plot()
     }
 
-    private findMinMax(): void {
+    protected findMinMax(): void {
         this.minX = this.dataX[0]
         this.maxX = this.dataX[0]
         this.minY = this.dataY[0]
@@ -140,11 +140,5 @@ class Chart {
             this.dataY[i] = Math.sin(2 * Math.PI * (i + 1) / n)
         }
         this.createChart(this.dataX, this.dataY)
-    }
-
-    public clickClick(event: MouseEvent) {
-        const x = event.offsetX
-        const y = event.offsetY
-        console.log('X=', x, ' Y=', y)
     }
 }

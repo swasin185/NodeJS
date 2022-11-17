@@ -2,7 +2,6 @@ class Binomial {
 	private static RED = 0;
 	private static GREEN = 1;
 	private static BLUE = 2;
-	private static ALPHA = 3;
 
 	private cvs: HTMLCanvasElement;
 	private ctx: CanvasRenderingContext2D;
@@ -13,6 +12,7 @@ class Binomial {
 	private dy: number;
 
 	private bgColor: number[] = [0x0, 0x0, 0x0];
+	private white: number[] = [0xFF, 0xFF, 0xFF];
 	private colors: number[][] = new Array(1);
 
 	private age: number = 0;
@@ -29,18 +29,11 @@ class Binomial {
 	constructor(canvasId: string = "canvas") {
 		this.colors = new Array(100);
 		for (let i = 0; i < this.colors.length; i++)
-			this.colors[i] = [Math.round(i * 2.5), 205 - (i * 2), 200];
+			this.colors[i] = [Math.round(i * 2.5), 205 - (i * 2), 100];
 		this.cvs = document.getElementById(canvasId) as HTMLCanvasElement;
 		this.ctx = this.cvs.getContext("2d") as CanvasRenderingContext2D;
 		this.ctx.fillStyle = this.cvs.style.backgroundColor;
 		this.ctx.strokeStyle = this.cvs.style.color;
-
-		// this.bgColor[Maze2.RED] = parseInt(this.ctx.fillStyle.substring(1, 3), 16);
-		// this.bgColor[Maze2.GREEN] = parseInt(this.ctx.fillStyle.substring(3, 5), 16);
-		// this.bgColor[Maze2.BLUE] = parseInt(this.ctx.fillStyle.substring(5, 7), 16);
-		// this.wayColor[Maze2.RED] = parseInt(this.ctx.strokeStyle.substring(1, 3), 16);
-		// this.wayColor[Maze2.GREEN] = parseInt(this.ctx.strokeStyle.substring(3, 5), 16);
-		// this.wayColor[Maze2.BLUE] = parseInt(this.ctx.strokeStyle.substring(5, 7), 16);
 	}
 
 	public init(age: number = 100, population: number = 100): void {
@@ -50,7 +43,7 @@ class Binomial {
 			this.age = age;
 			this.population = population;
 			this.bArray = [[0]];
-			const normal = age;
+			const normal = 1000;
 			this.dx = Math.ceil(normal / age);
 			this.dy = Math.ceil(normal / age);
 			this.size = age;
@@ -62,7 +55,7 @@ class Binomial {
 			this._width4 = this.width * 4;
 			this._width4_dx4 = this._width4 - this._dx4;
 			this.imgData = this.ctx.createImageData(this.width, this.height);
-			this.imgData.data.fill(0x7F);
+			this.imgData.data.fill(0x0);
 			this.bArray = new Array(age);
 			for (let i = 0; i < age; i++)
 				this.bArray[i] = [];
@@ -72,23 +65,39 @@ class Binomial {
 
 	private paintArea(imgArr: Uint8ClampedArray, i: number, j: number, color: number[]) {
 		let coor = (i * this.dy * this._width4 + (j * this._dx4));
-//		for (let by = 0; by < this.dy; by++) {
-//			for (let bx = 0; bx < this.dx; bx++) {
+		for (let by = 0; by < this.dy; by++) {
+			for (let bx = 0; bx < this.dx; bx++) {
 				imgArr[coor++] = color[Binomial.RED];
 				imgArr[coor++] = color[Binomial.GREEN];
 				imgArr[coor++] = color[Binomial.BLUE];
-				coor++;
-//			}
-//			coor += this._width4_dx4;
-//		}
+				imgArr[coor++] = 0xFF;
+			}
+			coor += this._width4_dx4;
+		}
 	}
 
 	private paint(): void {
 		let imgArr = this.imgData.data;
-		for (let i = 0; i < this.size; i++)
-			for (let j = 0; j < this.size; j++) {
-				if (this.bArray[i] != undefined && this.bArray[i][j] != undefined && this.bArray[i][j] > 0) {
-					this.paintArea(imgArr, i, j, this.colors[this.bArray[i][j] % this.colors.length]);
+		let x = 0
+		let y = 0
+		for (let i = 0; i < this.bArray.length; i++)
+			for (let j = 0; j < this.bArray[i].length; j++) {
+				if (this.bArray[i] != undefined && this.bArray[i][j] != undefined) {
+					if (this.bArray[i][j] > 0) {
+						//this.paintArea(imgArr, i, j, this.colors[this.bArray[i][j] % this.colors.length]);
+						let x = Math.floor((i+j) / 2)
+						if (this.bArray[x] != undefined && this.bArray[x][x] != undefined) {
+							if (this.bArray[x][x] == 0)
+								y = 0
+							else {
+								y = Math.round((this.bArray[i][j] / this.bArray[x][x]) * this.colors.length)
+								if (y >= this.colors.length)
+									y = this.colors.length - 1
+							}
+						} else
+							y  = 0
+						this.paintArea(imgArr, i, j, this.colors[y]);
+					}
 				} else {
 					this.paintArea(imgArr, i, j, this.bgColor);
 				}

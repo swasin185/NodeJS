@@ -15,11 +15,10 @@ export default class BinaryArray {
         let b = ''
         let j = 0
         for (let i = 0; i < this.arr.length; i++) {
-            if (this.bits >= (i + 1) * BinaryArray.BITS) {
+            if (this.bits >= (i + 1) * BinaryArray.BITS) 
                 j = BinaryArray.BITS
-            } else {
+            else
                 j = this.bits % BinaryArray.BITS
-            }
             b = this.arr[i].toString(2)
             while (b.length < j) b = '0' + b
             s = b + ' ' + s
@@ -29,42 +28,41 @@ export default class BinaryArray {
 
     public next(): boolean {
         let carry: number = 1
-        for (let i = 0; i < this.arr.length && carry !== 0; i++) {
-            if (carry !== 0) {
-                for (
-                    let j = 0;
-                    (j <= (this.bits - 1) % BinaryArray.BITS ||
-                        (j < BinaryArray.BITS && i !== this.arr.length - 1)) &&
-                    carry !== 0;
-                    j++
-                ) {
-                    carry &= this.arr[i]
-                    carry <<= 1
-                }
-
-                if (carry !== 0) {
-                    this.arr[i] = 0
-                    carry = 1
-                } else this.arr[i]++
+        for (let i = 0; i < this.arr.length && carry != 0; i++) {
+            for (
+                let j = 0;
+                (j <= (this.bits - 1) % BinaryArray.BITS ||
+                    (j < BinaryArray.BITS && i != this.arr.length - 1)) &&
+                carry != 0;
+                j++
+            ) {
+                carry &= this.arr[i]
+                carry <<= 1
             }
+
+            if (carry != 0) {
+                this.arr[i] = 0
+                carry = 1
+            } else this.arr[i]++
         }
-        return carry === 0
+        return carry == 0
     }
 
-    public jump(): void {
+    /*
+     * fill 1's bit for next pattern is 1 bit less
+     * 1010001 fill 1011111 ->  1100000
+     * 1010001 fill 1111111 -> 10000000
+     */
+    public fillRemainBits(): void {
         let c = this.count()
         for (let i = this.arr.length - 1; i >= 0; i--) {
-            if (c === 1 && i < this.arr.length - 1) {
-                this.arr[i] = BinaryArray.FULL
-            } else {
-                let mask = BinaryArray.LEFT
-                while (mask >= 1) {
-                    if (c === 1) this.arr[i] |= mask
-                    else if ((this.arr[i] & mask) !== 0) {
-                        c--
-                    }
-                    mask >>= 1
-                }
+            let mask = BinaryArray.LEFT
+            while (mask >= 1) {
+                if (c == 1) 
+                    this.arr[i] |= mask
+                else if ((this.arr[i] & mask) != 0)
+                    c--
+                mask >>= 1
             }
         }
     }
@@ -73,8 +71,7 @@ export default class BinaryArray {
         // n - 1 bit
         return (
             (this.arr[Math.floor(bit / BinaryArray.BITS)] &
-                (1 << bit % BinaryArray.BITS)) >
-            0
+                (1 << bit % BinaryArray.BITS)) > 0
         )
     }
 
@@ -109,9 +106,8 @@ export default class BinaryArray {
         for (let i = 0; i < this.arr.length; i++) {
             let mask = 1
             for (let j = 0; j < BinaryArray.BITS; j++) {
-                if ((this.arr[i] & mask) > 0) {
+                if ((this.arr[i] & mask) > 0)
                     c++
-                }
                 mask <<= 1
             }
         }

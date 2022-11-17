@@ -12,10 +12,10 @@
  *     4 #######      |         |
  * --------------------------------------
  */
-let count = 1;
+var count = 1;
 toh(3, '0', '1', '2');
 console.log("*************** Non Recursive ToH ***************");
-towerOfHanoi(5, 'A', 'B', 'C');
+towerOfHanoi2(3, 'A', 'B', 'C');
 function toh(rings, from, temp, to) {
     if (rings > 0) {
         toh(rings - 1, from, to, temp);
@@ -25,12 +25,12 @@ function toh(rings, from, temp, to) {
     }
 }
 function towerOfHanoi(rings, from, temp, to) {
-    const poles = [from, temp, to];
-    const poleOfRings = new Array(rings);
+    var poles = [from, temp, to];
+    var poleOfRings = new Array(rings);
     poleOfRings.fill(0);
-    const loop = Math.pow(2, rings);
+    var loop = Math.pow(2, rings);
     count = 1;
-    const next = 2 - (rings % 2);
+    var next = 2 - (rings % 2);
     temp = next;
     while (count < loop) {
         rings = 1;
@@ -41,5 +41,20 @@ function towerOfHanoi(rings, from, temp, to) {
         poleOfRings[rings - 1] = to;
         count++;
         temp = (temp + next) % 3;
+    }
+}
+function towerOfHanoi2(rings, from, temp, to) {
+    var poles = [from, temp, to];
+    var loop = Math.pow(2, rings);
+    count = 1;
+    var step = 2 - (rings % 2);
+    var fromIdx = 1;
+    var toIdx = 2;
+    var tempIdx = step;
+    while (count < loop) {
+        rings = 1;
+        console.log(count.toString(2), '\tmove O', rings, 'from |', fromIdx, 'to |', toIdx, 'temp =', tempIdx);
+        count++;
+        tempIdx = (tempIdx + step) % 3;
     }
 }

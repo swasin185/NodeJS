@@ -11,8 +11,8 @@
 </body>
 <script src="Chart.js"></script>
 <script>
-    let iteration = 80;
-    let n = 300000;
+    let iteration = 64;
+    let n = 3E6;
     let xData = new Array(n);
     let yData = new Array(n);
     let i = 0;
@@ -20,10 +20,10 @@
     while (i < n && x < 0.2) {
         x += 0.0002;
         let z = 0;
-        let loop = iteration - (iteration * x * x / 4) - 1;
+        let skip = iteration - Math.ceil(iteration * Math.abs(x) / 2);
         for (let j = 0; i < n && j < iteration & z < Math.PI; j++) {
             z = z * z + x;
-            if (j > loop) {
+            if (j >= skip) {
                 xData[i] = x;
                 yData[i] = z;
                 i++;

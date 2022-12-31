@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Converter</title>
+  </head>
+  <style>
+    body {
+      background-color: black;
+      color: greenyellow;
+      height: 100%;
+      width: 100%;
+    }
+  
+    .center {
+      margin: auto;
+      border: 2px solid darkgrey;
+      vertical-align: middle;
+      /* padding: 10px; */
+    }
+  
+    .txt {
+      font-style: normal;
+      font-weight: bold;
+      font-size: larger;
+      color: green;
+      /* background-color: yellow; */
+    }
+  
+    .button {
+      background-color: green;
+      /* Green */
+      border: 1;
+      color: white;
+      font-weight: bold;
+      padding: 15px 32px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+    }
+  </style>
+  <body>
+    <h1 style="text-align: center; color:greenyellow;">
+      Number's Base Converter
+    </h1>
+    <table style="padding:5px;" class="center">
+      <tr>
+        <td>Input Value : </td>
+        <td>
+          <input class="txt" id="numInput" type="text" value="" style="width: 500px; text-align: right;"></input>
+        </td>
+        <td>Base: </td>
+        <td><input class="txt" id="baseInput" type="number" value="10" step="1" min="2" max="36"
+            style="width: 60px; text-align: right;"></input></td>
+      </tr>
+      <tr>
+        <td colspan="4">
+          <hr>
+        </td>
+      </tr>
+      <tr>
+        <td>Convert Value : </td>
+        <td><input class="txt" id="numConvert" type="text" value="" readonly="true"
+            style="width: 500px; text-align: right; background-color: yellow;"></input>
+          <br>
+          <input class="txt" id="fracConvert" type="text" value="" readonly="true"
+            style="width: 500px; text-align: right; background-color: cyan;"></input></td>
+    
+        <td>Base : </td>
+        <td><input class="txt" id="baseConvert" type="number" value="2" step="1" min="2" max="36"
+            style="width: 60px; text-align: right;"></input></td>
+      </tr>
+      <tr>
+        <td colspan="4" align="center">
+          <hr>
+          <input class="button" id="btnConvert" type="Button" value="Convert"></input>
+        </td>
+      </tr>
+    </table>
+    <hr>
+    <h1 style="text-align: center; color:greenyellow;">
+      GCD Calculate!
+    </h1>
+    <table style="padding:5px;" class="center">
+      <tr>
+        <td>a : </td>
+        <td>
+          <input class="txt" id="a" type="text" value="" style="width: 300px; text-align: right;"></input>
+        </td>
+      </tr>
+      <tr>
+        <td>b : </td>
+        <td>
+          <input class="txt" id="b" type="text" value="" style="width: 300px; text-align: right;"></input>
+        </td>
+      </tr>
+      <tr>
+        <td colspan="4">
+          <hr>
+        </td>
+      </tr>
+      <tr>
+        <td>GCD : </td>
+        <td><input class="txt" id="gcd" type="text" value="" readonly="true"
+            style="width: 150px; text-align: right; background-color: yellow;"></input>
+          <input class="txt" id="ratio" type="text" value="" readonly="true"
+            style="width: 150px; text-align: right; background-color: orange;"></input></td>
+      </tr>
+      <tr>
+        <td colspan="4" align="center">
+          <hr>
+          <input class="button" id="btnGcd" type="Button" value="Calculate"></input>
+        </td>
+      </tr>
+    </table>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

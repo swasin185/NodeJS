@@ -1,10 +1,12 @@
 {
   "name": "bigconverter",
-
   "scripts": {
-    "build": "tsc Converter.ts & uglifyjs Converter.js -c -m -o ./public/script.js & del Converter.js"
+    "build": "tsc"
   },
   "devDependencies": {
-    "@types/big.js": "^6.0.0"
+    "@types/big.js": "^6.1.6"
+  },
+  "dependencies": {
+    "big.js": "^6.2.1"
   }
 }

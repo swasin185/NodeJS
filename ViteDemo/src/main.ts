@@ -1,3 +1,11 @@
+// import { setupCounter } from './counter'
+
+//document.querySelector<HTMLDivElement>('#app')!.innerHTML = ``
+
+//setupCounter(document.querySelector<HTMLButtonElement>('#counter')!)
+
+import Big from "big.js";
+
 const baseInput = document.getElementById("baseInput") as HTMLInputElement;
 const numInput = document.getElementById("numInput") as HTMLInputElement;
 const baseConvert = document.getElementById("baseConvert") as HTMLInputElement;
@@ -9,7 +17,10 @@ const bText = document.getElementById("b") as HTMLInputElement;
 const gcdText = document.getElementById("gcd") as HTMLInputElement;
 const ratio = document.getElementById("ratio") as HTMLInputElement;
 
-
+const btnConvert = document.getElementById("btnConvert") as HTMLButtonElement;
+btnConvert.addEventListener('click', () => calculate());
+const btnGcd = document.getElementById("btnGcd") as HTMLButtonElement;
+btnGcd.addEventListener('click', () => gcd());
 
 Big.DP = 50;
 
@@ -112,7 +123,6 @@ function gcd() {
         a = gcd;
         gcd = b;
     }
-    let d = Big(0);
     let r = '';
     while (!b.eq(0)) {
         if (r == '' && a.div(b).gt(b.mul(1000))) {

@@ -1,9 +1,10 @@
+export {};
 const cv = document.getElementById("cpxCanvas") as HTMLCanvasElement;
 const cx = cv.getContext("2d") as CanvasRenderingContext2D;
 const WIDTH = cv.width;
 const HEIGHT = cv.height;
 const MID_WIDTH = cv.width / 2;
-const MID_HEIGHT = cv.height / 2;
+// const MID_HEIGHT = cv.height / 2;
 
 const COLORS = ['magenta', 'cyan', 'red', 'lime', 'yellow', 'orange', 'blue'];
 const PI2 = Math.PI * 2;
@@ -13,8 +14,8 @@ const RESISTANCE = 0.6;
 const n = 16;
 
 class Sprite {
-    protected x: number;              // horizontal position
-    protected y: number;              // vertical position
+    protected x: number = 0;              // horizontal position
+    protected y: number = 0;              // vertical position
     protected radius: number = 5;     // pixel 
     protected color: string = 'yellow'; // color name
     constructor(x: number, y: number, color: string, r: number) {
@@ -67,8 +68,8 @@ class Sprite {
 
 class Ball extends Sprite {
     private static ID = 0;
-    private dx: number;
-    private dy: number;
+    private dx: number = 0;
+    private dy: number = 0;
     private speed: number = 0;
     private direction: number = -PI_2;
     private gravity = GRAVITY;
@@ -208,12 +209,15 @@ class Pin extends Sprite {
 class Box extends Sprite {
     private static ID = 0;
     private id: number = Box.ID++;
-    private size: number;
+    // private size: number = 0;
     private count: number = 0;
     pascal: number = 0;
     constructor(x: number, y: number) {
         super(x, y, 'black', 5);
-        this.size = this.radius * 2;
+    //    this.size = this.radius * 2;
+    }
+    public getId() : number {
+        return this.id;
     }
     draw(): void {
         // cx.fillStyle = this.color;
@@ -360,34 +364,33 @@ async function calculate() {
     }
 }
 
-function paintLine() {
-    let x = MID_WIDTH;
-    let y = 20;
-    let size = 45;
-    cx.shadowBlur = 10;
-    cx.shadowColor = 'blue';
+// function paintLine() {
+//     let x = MID_WIDTH;
+//     let y = 20;
+//     let size = 45;
+//     cx.shadowBlur = 10;
+//     cx.shadowColor = 'blue';
 
-    let mid = size / 2;
-    size *= Math.sqrt(3) / 2;
-    let six = mid / Math.cos(Math.PI / 6);
-    for (let i = 0; i < n; i++) {
-        x = MID_WIDTH - (i * mid);
-        for (let j = 0; j <= i; j++) {
-            cx.strokeStyle = 'grey';
-            cx.beginPath();
-            cx.moveTo(x - mid, y + size);
-            cx.lineTo(x - mid, y + size - six);
-            cx.lineTo(x, y);
-            cx.moveTo(x + mid, y + size);
-            cx.lineTo(x + mid, y + size - six);
-            cx.lineTo(x, y);
-            cx.stroke();
-            x += mid * 2;
-        }
-        y += size;
-    }
-
-}
+//     let mid = size / 2;
+//     size *= Math.sqrt(3) / 2;
+//     let six = mid / Math.cos(Math.PI / 6);
+//     for (let i = 0; i < n; i++) {
+//         x = MID_WIDTH - (i * mid);
+//         for (let j = 0; j <= i; j++) {
+//             cx.strokeStyle = 'grey';
+//             cx.beginPath();
+//             cx.moveTo(x - mid, y + size);
+//             cx.lineTo(x - mid, y + size - six);
+//             cx.lineTo(x, y);
+//             cx.moveTo(x + mid, y + size);
+//             cx.lineTo(x + mid, y + size - six);
+//             cx.lineTo(x, y);
+//             cx.stroke();
+//             x += mid * 2;
+//         }
+//         y += size;
+//     }
+// }
 
 function paint() {
     cx.clearRect(0, 0, cv.width, cv.height);
@@ -405,9 +408,9 @@ function round(x: number): number {
     return Math.round(x * 1000) / 1000;
 }
 
-function clickXY(e: MouseEvent) {
-    for (let box of boxs) {
-        if (box.isClickIn(e.offsetX, e.offsetY))
-            console.log(box);
-    }
-}
+// function clickXY(e: MouseEvent) {
+//     for (let box of boxs) {
+//         if (box.isClickIn(e.offsetX, e.offsetY))
+//             console.log(box);
+//     }
+// }

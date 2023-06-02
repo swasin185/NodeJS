@@ -1,4 +1,4 @@
-class Maze2 {
+export default class Maze2 {
 	public static GOLDEN: number = 1.618034;
 	public static NONE: number = 0;
 	public static NORTH: number = 1;
@@ -15,22 +15,22 @@ class Maze2 {
 	private static BLUE = 2;
 	private static ALPHA = 3;
 
-	private size: number;
+	private size: number = 0;
 	private cvs: HTMLCanvasElement;
 	private ctx: CanvasRenderingContext2D;
-	private imgData: ImageData;
-	private map: number[][];
-	private portals: Coordinate[];
-	private width: number;
-	private height: number;
-	private dx: number;
-	private dy: number;
-	private waiting : boolean = false;
+	private imgData: ImageData = new ImageData(1, 1)
+	private map: number[][] = [[]];
+	private portals: Coordinate[] = [];
+	private width: number = 0;
+	private height: number = 0;
+	private dx: number = 0;
+	private dy: number = 0;
+	private waiting: boolean = false;
 
-	public _dx4: number;
-	public _width4: number;
-	public _width4_dx4: number;
-	public _size_2: number;
+	public _dx4: number = 0;
+	public _width4: number = 0;
+	public _width4_dx4: number = 0;
+	public _size_2: number = 0;
 
 	private bgColor: number[] = [0, 0, 0];
 	private wayColor: number[] = [0xFF, 0xFF, 0xFF];
@@ -43,9 +43,9 @@ class Maze2 {
 	private dot: number = 0x0F;
 	private colors: number[][] = new Array(100);
 
-	private startArea: Coordinate;
-	private finishArea: Coordinate;
-	private found: boolean;
+	private startArea: Coordinate = new Coordinate(0, 0);
+	private finishArea: Coordinate = new Coordinate(-1, -1);
+	private found: boolean = false;
 
 	private running = false;
 	private maxWalk: number = 0;
@@ -92,7 +92,7 @@ class Maze2 {
 			this.cvs.width = this.width;
 			this.cvs.height = this.height;
 			this.imgData = this.ctx.createImageData(this.width, this.height);
-			let imgArr = this.imgData.data;
+			const imgArr = this.imgData.data;
 			this._dx4 = this.dx * 4;
 			this._width4 = this.width * 4;
 			this._width4_dx4 = this._width4 - this._dx4;
@@ -131,7 +131,7 @@ class Maze2 {
 	}
 
 	private hidePath(): void {
-		let imgArr = this.imgData.data;
+		const imgArr = this.imgData?.data;
 		for (let i = 1; i <= this._size_2; i++)
 			for (let j = 1; j <= this._size_2; j++)
 				if (this.map[i][j] == Maze2.WAY)
@@ -140,7 +140,7 @@ class Maze2 {
 	}
 
 	private paintMaze(): void {
-		let imgArr = this.imgData.data;
+		const imgArr = this.imgData?.data;
 		for (let i = 1; i <= this._size_2; i++)
 			for (let j = 1; j <= this._size_2; j++)
 				if (this.map[i][j] == Maze2.WAY)
@@ -157,11 +157,11 @@ class Maze2 {
 	}
 
 	private paintPath(): void {
-		let imgArr = this.imgData.data;
+		const imgArr = this.imgData.data;
 		for (let i = 1; i <= this._size_2; i++)
 			for (let j = 1; j <= this._size_2; j++) {
 				if (this.map[i][j] > Maze2.WAY) {
-					let x = Math.ceil(this.map[i][j] / this.maxWalk * 99);
+					const x = Math.ceil(this.map[i][j] / this.maxWalk * 99);
 					this.paintArea(imgArr, i, j, this.colors[x]);
 				} else if (this.map[i][j] == Maze2.END)
 					this.paintArea(imgArr, i, j, this.endColor);
@@ -187,7 +187,8 @@ class Maze2 {
 		if (this.startArea != undefined)
 			this.paintArea(imgArr, this.startArea.i, this.startArea.j, this.startColor);
 
-		if (this.finishArea != undefined && this.found)
+		// if (this.finishArea != undefined && this.found)
+		if (this.finishArea != undefined)
 			this.paintArea(imgArr, this.finishArea.i, this.finishArea.j, this.finishColor);
 
 		this.ctx.putImageData(this.imgData, 0, 0);
@@ -214,7 +215,6 @@ class Maze2 {
 	public async generate(connect: number = 0.5, delay: number = 0) {
 		connect = Number(connect);
 		delay = Number(delay);
-		this.finishArea = undefined;
 		this.reset();
 		if (!this.running) {
 			this.running = true;
@@ -237,7 +237,7 @@ class Maze2 {
 				});
 				if (delay > 10) {
 					this.paintPath();
-					await new Promise((r) => { setTimeout(r, delay) });
+					await new Promise((r) => setTimeout(r, delay));
 				}
 			}
 
@@ -264,11 +264,11 @@ class Maze2 {
 	public clickXY(event: MouseEvent): void {
 		if (!this.running) {
 			this.running = true;
-			let i = Math.floor(event.offsetY / this.dx);
-			let j = Math.floor(event.offsetX / this.dy);
+			const i = Math.floor(event.offsetY / this.dx);
+			const j = Math.floor(event.offsetX / this.dy);
 			if (this.map[i][j] != Maze2.WALL) {
 				window.alert("set finish to i:" + i + " j:" + j);
-				this.finishArea.set(i, j);
+				this.finishArea?.set(i, j);
 				this.paintMaze();
 				this.paintPath();
 			}
@@ -298,7 +298,7 @@ class Maze2 {
 	}
 
 	private createPath(point: Coordinate): Coordinate[] {
-		let path: Coordinate[] = new Array(this.map[point.i][point.j] - 1);
+		const path: Coordinate[] = new Array(this.map[point.i][point.j] - 1);
 		let i = point.i;
 		let j = point.j;
 		let x = path.length - 1;
@@ -333,11 +333,11 @@ class Maze2 {
 		if (found) {
 			if (this.map[point.i][point.j] < idx) {
 				// console.log('update path', this.path.length, idx);
-				let path = this.createPath(point);
+				const path = this.createPath(point);
 				this.path = path.concat(this.path.slice(idx, this.path.length));
 				return true;
 			}
-		} 
+		}
 		return false;
 	}
 
@@ -392,8 +392,8 @@ class Maze2 {
 							} else if (this.found && runner.beyondShortestPath()) {
 								this.removePortal(runner.getLocation());
 								runner.setDirection(Maze2.NONE);
-							} 
-							if (this.found) 
+							}
+							if (this.found)
 								this.isUpdatePath(runner.getLocation());
 						} else
 							this.removePortal(runner.getLocation());
@@ -407,7 +407,7 @@ class Maze2 {
 				if (this.found && this.getPathLength() == 0) {
 					console.timeEnd("First Found");
 					console.log("Runner", Runner.getMaxId(), "Avg.Move", Math.round(Runner.getTotalDistance() / Runner.getMaxId()));
-					let path = this.createPath(this.finishArea);
+					const path = this.createPath(this.finishArea);
 					this.reset();
 					this.found = true;
 					this.path = path
@@ -420,7 +420,7 @@ class Maze2 {
 				}
 				if (delay > 0) {
 					this.paintPath();
-					await new Promise((r) => { setTimeout(r, delay) });
+					await new Promise((r) => setTimeout(r, delay));
 				}
 			}
 			console.timeEnd("Optimal Path");
@@ -433,8 +433,8 @@ class Maze2 {
 }
 
 class Coordinate {
-	public i: number;
-	public j: number;
+	public i: number = 0;
+	public j: number = 0;
 	constructor(i: number, j: number) {
 		this.set(i, j);
 	}
@@ -538,12 +538,12 @@ class Runner {
 	}
 
 	public move(): void {
-		let map = this.maze.getMap();
+		const map = this.maze.getMap();
 		if (this.direction == Maze2.NONE) {
 			this.setActive(false);
 		} else {
-			let prior_i = this.locate.i;
-			let prior_j = this.locate.j;
+			const prior_i = this.locate.i;
+			const prior_j = this.locate.j;
 			if (this.direction == Maze2.NORTH)
 				this.locate.i--;
 			else if (this.direction == Maze2.WEST)
@@ -568,7 +568,7 @@ class Runner {
 	}
 
 	public randomWallDirection(): void {
-		let map = this.maze.getMap();
+		const map = this.maze.getMap();
 		if (this.atJunction(this.getLocation())) {
 			let choice = 0;
 			let direct = Maze2.NONE;
@@ -617,7 +617,7 @@ class Runner {
 	public routeBack(): void {
 		this.direction = Maze2.NONE;
 		if (this.route.length > 0) {
-			let prior = this.route.pop();
+			const prior = this.route.pop() || new Coordinate(0, 0);
 			if (prior.i < this.locate.i)
 				this.direction = Maze2.NORTH;
 			else if (prior.j < this.locate.j)
@@ -631,12 +631,12 @@ class Runner {
 	}
 
 	public isNextLocation(i: number, j: number): boolean {
-		let map = this.maze.getMap();
+		const map = this.maze.getMap();
 		return (map[i][j] == Maze2.WAY || (this.maze.isFounded() && map[i][j] - map[this.locate.i][this.locate.j] > 1));
 	}
 
 	public breakTheWall(): void {
-		let map = this.maze.getMap();
+		const map = this.maze.getMap();
 		if (this.locate.i > 1 && this.direction == Maze2.SOUTH && map[this.locate.i - 1][this.locate.j] == Maze2.WALL)
 			map[this.locate.i - 1][this.locate.j] = Maze2.END;
 		else if (this.locate.j > 1 && this.direction == Maze2.EAST && map[this.locate.i][this.locate.j - 1] == Maze2.WALL)
@@ -650,7 +650,7 @@ class Runner {
 	public findNewPath(): void {
 		this.direction = Maze2.NONE;
 		let direct = Maze2.NONE;
-		let idx = this.id % 4;
+		const idx = this.id % 4;
 		if (this.locate.i > 1 && this.isNextLocation(this.locate.i - 1, this.locate.j)) {
 			if (idx == 0)
 				this.direction = Maze2.NORTH;
@@ -688,7 +688,7 @@ class Runner {
 					else
 						this.direction >>= 1;
 			}
-		} else 
+		} else
 			this.direction == Maze2.NONE;
 	}
 

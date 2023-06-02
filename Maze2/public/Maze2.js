@@ -13,7 +13,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     function verb(n) { return function (v) { return step([n, v]); }; }
     function step(op) {
         if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
+        while (g && (g = 0, op[0] && (_ = 0)), _) try {
             if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
             if (y = 0, t) op = [op[0] & 2, t.value];
             switch (op[0]) {
@@ -38,7 +38,19 @@ var Maze2 = /** @class */ (function () {
     function Maze2(canvasId, size) {
         if (canvasId === void 0) { canvasId = "canvas"; }
         if (size === void 0) { size = 500; }
+        this.size = 0;
+        this.imgData = new ImageData(1, 1);
+        this.map = [[]];
+        this.portals = [];
+        this.width = 0;
+        this.height = 0;
+        this.dx = 0;
+        this.dy = 0;
         this.waiting = false;
+        this._dx4 = 0;
+        this._width4 = 0;
+        this._width4_dx4 = 0;
+        this._size_2 = 0;
         this.bgColor = [0, 0, 0];
         this.wayColor = [0xFF, 0xFF, 0xFF];
         this.endColor = [0x80, 0x1F, 0x1F];
@@ -49,6 +61,9 @@ var Maze2 = /** @class */ (function () {
         this.portalColor = [0, 0, 0xFF];
         this.dot = 0x0F;
         this.colors = new Array(100);
+        this.startArea = new Coordinate(0, 0);
+        this.finishArea = new Coordinate(-1, -1);
+        this.found = false;
         this.running = false;
         this.maxWalk = 0;
         this.teams = [];
@@ -127,7 +142,8 @@ var Maze2 = /** @class */ (function () {
         }
     };
     Maze2.prototype.hidePath = function () {
-        var imgArr = this.imgData.data;
+        var _a;
+        var imgArr = (_a = this.imgData) === null || _a === void 0 ? void 0 : _a.data;
         for (var i = 1; i <= this._size_2; i++)
             for (var j = 1; j <= this._size_2; j++)
                 if (this.map[i][j] == Maze2.WAY)
@@ -135,7 +151,8 @@ var Maze2 = /** @class */ (function () {
         this.ctx.putImageData(this.imgData, 0, 0);
     };
     Maze2.prototype.paintMaze = function () {
-        var imgArr = this.imgData.data;
+        var _a;
+        var imgArr = (_a = this.imgData) === null || _a === void 0 ? void 0 : _a.data;
         for (var i = 1; i <= this._size_2; i++)
             for (var j = 1; j <= this._size_2; j++)
                 if (this.map[i][j] == Maze2.WAY)
@@ -176,7 +193,8 @@ var Maze2 = /** @class */ (function () {
         });
         if (this.startArea != undefined)
             this.paintArea(imgArr, this.startArea.i, this.startArea.j, this.startColor);
-        if (this.finishArea != undefined && this.found)
+        // if (this.finishArea != undefined && this.found)
+        if (this.finishArea != undefined)
             this.paintArea(imgArr, this.finishArea.i, this.finishArea.j, this.finishColor);
         this.ctx.putImageData(this.imgData, 0, 0);
     };
@@ -204,7 +222,6 @@ var Maze2 = /** @class */ (function () {
                     case 0:
                         connect = Number(connect);
                         delay = Number(delay);
-                        this.finishArea = undefined;
                         this.reset();
                         if (!!this.running) return [3 /*break*/, 5];
                         this.running = true;
@@ -229,7 +246,7 @@ var Maze2 = /** @class */ (function () {
                         });
                         if (!(delay > 10)) return [3 /*break*/, 3];
                         this.paintPath();
-                        return [4 /*yield*/, new Promise(function (r) { setTimeout(r, delay); })];
+                        return [4 /*yield*/, new Promise(function (r) { return setTimeout(r, delay); })];
                     case 2:
                         _a.sent();
                         _a.label = 3;
@@ -255,13 +272,14 @@ var Maze2 = /** @class */ (function () {
         });
     };
     Maze2.prototype.clickXY = function (event) {
+        var _a;
         if (!this.running) {
             this.running = true;
             var i = Math.floor(event.offsetY / this.dx);
             var j = Math.floor(event.offsetX / this.dy);
             if (this.map[i][j] != Maze2.WALL) {
                 window.alert("set finish to i:" + i + " j:" + j);
-                this.finishArea.set(i, j);
+                (_a = this.finishArea) === null || _a === void 0 ? void 0 : _a.set(i, j);
                 this.paintMaze();
                 this.paintPath();
             }
@@ -421,7 +439,7 @@ var Maze2 = /** @class */ (function () {
                         }
                         if (!(delay > 0)) return [3 /*break*/, 3];
                         this.paintPath();
-                        return [4 /*yield*/, new Promise(function (r) { setTimeout(r, delay); })];
+                        return [4 /*yield*/, new Promise(function (r) { return setTimeout(r, delay); })];
                     case 2:
                         _a.sent();
                         _a.label = 3;
@@ -453,8 +471,11 @@ var Maze2 = /** @class */ (function () {
     Maze2.ALPHA = 3;
     return Maze2;
 }());
+export default Maze2;
 var Coordinate = /** @class */ (function () {
     function Coordinate(i, j) {
+        this.i = 0;
+        this.j = 0;
         this.set(i, j);
     }
     Coordinate.prototype.set = function (i, j) {
@@ -616,7 +637,7 @@ var Runner = /** @class */ (function () {
     Runner.prototype.routeBack = function () {
         this.direction = Maze2.NONE;
         if (this.route.length > 0) {
-            var prior = this.route.pop();
+            var prior = this.route.pop() || new Coordinate(0, 0);
             if (prior.i < this.locate.i)
                 this.direction = Maze2.NORTH;
             else if (prior.j < this.locate.j)

@@ -43,12 +43,13 @@
 		<hr>
 		<input type="button" class="button" id="generate" value="Generate" />
 		<br>
-		<input type="button" class="button" id="generate" value="Reset" onclick="maze.reset()" />
+		<input type="button" class="button" id="reset" value="Reset" onclick="maze.reset()" />
 		<br>
 		<input type="button" class="button" value="Run" onclick="maze.solveMaze(delay.value, waiting.checked)" />
 		<br>
 	</div>
-	<canvas id="maze2" width="800" height="800" style="background-color: darkslategrey; color: white" onclick="maze.clickXY(event)"></canvas>
+	<canvas id="maze2" width="800" height="800" style="background-color: darkslategrey; color: white"
+		onclick="maze.clickXY(event)"></canvas>
 </body>
 <script src="Maze2.js"></script>
 

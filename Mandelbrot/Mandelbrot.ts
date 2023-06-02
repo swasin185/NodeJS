@@ -8,7 +8,7 @@ class ComplexNumber {
     }
     public absolute(): number {
         // return Math.hypot(this.re, this.im);
-        return this.re * this.re + this.im * this.im; 
+        return this.re * this.re + this.im * this.im;
     }
 
     public add(x: ComplexNumber): void {
@@ -109,7 +109,7 @@ function calculate() {
             n = 0;
             re0 = null;
             im0 = null;
-            while (n < MAX_N && Zn.absolute()<frontier && !(re0 == Zn.getReal() && im0 == Zn.getImage())) {
+            while (n < MAX_N && Zn.absolute() < frontier && !(re0 == Zn.getReal() && im0 == Zn.getImage())) {
                 re0 = Zn.getReal();
                 im0 = Zn.getImage();
                 Zn.power2();
@@ -121,7 +121,7 @@ function calculate() {
             data[++coor] = PALETTE[n][1]; // GREEN
             data[++coor] = PALETTE[n][2]; // BLUE
             data[++coor] = 255; // ALPHA
-            re += step; 
+            re += step;
         }
         im += step;
     }

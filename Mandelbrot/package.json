@@ -6,6 +6,7 @@
     "buildx": "tsc Mandelbrot.ts && uglifyjs Mandelbrot.js -c -m -o ./public/script.js && rm Mandelbrot.js"
   },
   "devDependencies": {
-    "@types/big.js": "^6.1.1"
+    "@types/big.js": "^6.1.1",
+    "@types/node": "^18.15.11"
   }
 }

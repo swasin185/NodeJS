@@ -1,4 +1,4 @@
-export default class Maze2 {
+class Maze2 {
 	public static GOLDEN: number = 1.618034;
 	public static NONE: number = 0;
 	public static NORTH: number = 1;

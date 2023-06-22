@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "lib": ["esNext", "DOM"],
-    "target": "es3",
+    "target": "esnext",
     "module": "esNext",
     "outDir": "./public"
   }

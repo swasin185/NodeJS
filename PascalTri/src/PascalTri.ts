@@ -1,4 +1,4 @@
-export {};
+export { };
 const cv = document.getElementById("cpxCanvas") as HTMLCanvasElement;
 const cx = cv.getContext("2d") as CanvasRenderingContext2D;
 const WIDTH = cv.width;
@@ -214,9 +214,9 @@ class Box extends Sprite {
     pascal: number = 0;
     constructor(x: number, y: number) {
         super(x, y, 'black', 5);
-    //    this.size = this.radius * 2;
+        //    this.size = this.radius * 2;
     }
-    public getId() : number {
+    public getId(): number {
         return this.id;
     }
     draw(): void {
@@ -370,7 +370,6 @@ async function calculate() {
 //     let size = 45;
 //     cx.shadowBlur = 10;
 //     cx.shadowColor = 'blue';
-
 //     let mid = size / 2;
 //     size *= Math.sqrt(3) / 2;
 //     let six = mid / Math.cos(Math.PI / 6);

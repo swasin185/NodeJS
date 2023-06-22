@@ -22,34 +22,44 @@
 </head>
 
 <body bgcolor="black">
-	<div id="toolbar"
-		style="background-color: white; width: 165px; float: left; padding:10px 10px; border:2px solid; margin-right: 20px;">
+	<div id="toolbar" style="
+		background: white;
+		width: 180px;
+		float: left;
+		padding: 10px 10px;
+		border: 2px solid;
+		margin: 20px;
+	">
 		<label id="sizeLabel" for="sizeInput">Size:</label>
-		<input type="number" id="sizeInput" min="10" max="1000" step="10" value="500"
-			style="width:50px; float: right; text-align: right;" />
-		<input type="range" id="sizeSlider" min="10" max="1000" step="10" value="500" />
+		<input type="number" id="sizeInput" min="10" max="1000" step="10" value="100"
+			style="width: 50px; float: right; text-align: right" />
+		<input type="range" id="sizeSlider" min="10" max="1000" step="10" value="100"
+			@input="sizeInput.value = sizeSlider.value" />
 		<label id="connectLabel" for="connInput">Connect:</label>
 		<input type="number" id="connInput" min="0" max="1" step="0.1" value="0.5"
-			style="width:50px; float: right; text-align: right;" />
-		<input type="range" id="connSlider" min="0" max="1" step="0.1" value="0.5" />
-		<br>
+			style="width: 50px; float: right; text-align: right" />
+		<input type="range" id="connSlider" min="0" max="1" step="0.1" value="0.5"
+			@input="connInput.value = connSlider.value" />
+		<br />
 		<label id="delayLabel" for="delayInput">Delay:</label>
-		<input type="number" id="delayInput" min="0" max="100" step="1" value="10"
-			style="width:50px; float: right; text-align: right;" />
-		<input type="range" id="delaySlider" min="0" max="100" step="1" value="10" />
-		<br>
-		<label for="wait">waiting</label>
-		<input type="checkbox" id="waiting" checked=true />
-		<hr>
-		<input type="button" class="button" id="generate" value="Generate" />
-		<br>
-		<input type="button" class="button" id="reset" value="Reset" onclick="maze.reset()" />
-		<br>
-		<input type="button" class="button" value="Run" onclick="maze.solveMaze(delay.value, waiting.checked)" />
-		<br>
+		<input type="number" id="delayInput" min="0" max="100" step="1" value="5"
+			style="width: 50px; float: right; text-align: right" />
+		<input type="range" id="delaySlider" min="0" max="100" step="1" value="5"
+			@input="delayInput.value = delaySlider.value" />
+		<br />
+		<label for="wait">waiting </label>
+		<input type="checkbox" id="waiting" checked="true" />
+		<hr />
+		<input type="button" class="button" id="new" value="New" onClick="genMaze()" />
+		<br />
+		<!-- <input type="button" class="button" id="reset" value="Reset" @click="maze.reset()" />
+	<br /> -->
+		<input id="start" type="button" class="button" value="Start"
+			onClick="maze.solveMaze(Number(delayInput.value), waiting.checked)" />
+		<br />
 	</div>
-	<canvas id="maze2" width="800" height="800" style="background-color: darkslategrey; color: white"
-		onclick="maze.clickXY(event)"></canvas>
+	<canvas id="maze2" width="660" height="660" style="background: #800402; color: white; margin-top: 20px"
+		onClick="maze.clickXY(event)"></canvas>
 </body>
 <script src="Maze2.js"></script>
 
@@ -59,7 +69,6 @@
 	var connInput = document.getElementById("connInput");
 	var connSlider = document.getElementById("connSlider");
 	var maze = new Maze2("maze2", sizeInput.value);
-	var generate = document.getElementById("generate");
 	var delay = document.getElementById("delayInput");
 	var waiting = document.getElementById("waiting");
 
@@ -87,11 +96,14 @@
 		delaySlider.value = this.value;
 	}
 
-	generate.onclick = function () {
-		maze.init(sizeInput.value);
-		maze.generate(connInput.value, delay.value);
+	function genMaze() {
+		maze.init(Number(sizeInput.value))
+		maze.generate(Number(connInput.value), Number(delayInput.value))
 	}
+
 	console.clear();
+	genMaze();
+
 </script>
 
 </html>

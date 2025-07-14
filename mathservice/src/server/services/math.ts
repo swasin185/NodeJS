@@ -35,63 +35,56 @@ export default (server: any, apiURL: string) => {
         let x = '2'
         if (urlParams && urlParams.get('x')) { x = urlParams.get('x') }
         const n = Number(x)
-        // let i = Math.round(n / 2)
-        // if (i % 2 !== 0) { i++ }
-        let i = n
-        let gb : string[]
-        let min :number = i
-        let max : number = 0
-        let minX : number = 1
-        let maxX : number = n
-        let text : string = '<h1>Goldbach\'s conjecture</h1>'
-        while (i <= n) {
-            gb = Prime.conjGoldbach(String(i))
-            if (gb.length / i < min) {
-                min = gb.length / i
-                minX = i
-            }
-            if (gb.length / i > max) {
-                max = gb.length / i
-                maxX = i
-            }
-            i += 2
-        }
+        Prime.createPrimeArray(x)
+        if (n % 2 != 0 && n > 2)
+            return "Event number greater than 2 is required !"
+        let gb: string[] = []
+        gb = Prime.conjGoldbach(String(n))
         const dash = '─'
-        let asc = '┌'
+        let asc = '─'
         let des = ''
         let p = 1
         const half = n / 2
-        for (let k = 3; k < n; k++) {
+        if (n == 4) {
+            asc += '┐'
+            des = '┘'
+        }
+        for (let k = 3; k < n; k += 2) {
             while (Prime.getPrime(p).toNumber() < k) p++
-            if (n === k + 1) des = '└' + des
-            else if (Prime.getPrime(p).toNumber() === k) {
-                if (half > k) asc += '┬'
-                else des = '┴' + des
-            } else {
-                if (half > k) {
-                    if (k % 2 !== 0) asc += dash
-                } else {
-                    if (k % 2 !== 0) des = dash + des
+            if (Prime.getPrime(p).toNumber() == k) {
+                if (half > k)
+                    asc += '┬'
+                if (half == k) {
+                    asc += '┐'
+                    des = '┘'
                 }
+                if (half < k) des = '┴' + des
+            } else {
+                if (half >= k) asc += dash
+                if (half <= k) des = dash + des
             }
         }
-
-        const pair : number[] = new Array(gb.length)
+        let text: string = '<h1>Goldbach\'s conjecture</h1>'
+        text += '<h5>Every even number greater than 2 can be expressed as the sum of two prime numbers. * 1 is not prime!</h5>'
+        const pair: number[] = new Array(gb.length)
+        let i = 0
         let row: string = ''
         for (const z of gb) {
             const px = n - Number(z)
-            pair[pair.length++] = px
+            pair[i++] = px
             row = dash
             for (let j = 3; j < px; j += 2) {
                 const found = pair.indexOf(j)
-                if (found !== -1) { row += '┼' } else { row += dash }
+                if (found != -1)
+                    row += '┼'
+                else
+                    row += dash
             }
             row += '┐' + px + ' + ' + z + '<br>'
             text += row
         }
-        text += '\t' + asc + '<br> ' + des + '<br>'
-        text += 'x = ' + x + '\t gb = ' + gb.length + ' == ' + gb.toString() + '<p>'
-        text += 'Min x = ' + minX + ' gl = ' + min + '\tMax x = ' + maxX + ' gl = ' + max + '<p>'
+        text += asc + '<br>' + des + '<br>'
+        text += 'x = ' + x + '\t gb = ' + gb.length + '<br>'
         res.send(text)
     })
 

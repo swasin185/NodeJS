@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KEEHIN QR Code</title>
+    <script src="https://cdn.jsdelivr.net/npm/qrious/dist/qrious.min.js"></script>
+
+</head>
+
+<body>
+    <canvas id="QrCodeCanvas"></canvas>
+    <script>
+        genQrCode();
+        function genQrCode() {
+            const url = new URL(window.location.href);
+            const params = new URLSearchParams(url.search);
+            let shop = "KB000001666683"; 
+            let account = "010753600031508"; 
+            let ref = "KE_023_1234_C"; 
+            let amount = "1234.0"; 
+
+            if (params.size == 3) {
+                shop = params.get('kshop'); 
+                // account = params.get('account'); 
+                ref = params.get('ref'); 
+                amount = params.get('amount'); 
+            }
+
+            const qrCanvas = document.getElementById('QrCodeCanvas');
+            // const data = encodePromptPay("0835558008353", "0.01", "TOM-1234");
+            // const data = encodePromptPay("0887502249", "0.01", "TOM-1234");
+            // const data = encodeKBank("KB000001666683", "010753600031508", "40.00", "/ke/132-7969H");
+            // const data = encodeKBank("KB000001666740", "010753600031508", "1.00", "023-1234C");
+            // const data = encodeTTB("03M4", "010753700001716", "99.99", "023-1234C");
+            let data = null;
+            /*
+            000201010211
+                30810016A000000677010112
+                    0115010753600031508
+                    0214KB000001666683
+                    0320KPS004KB000001666683
+                31690016A000000677010113
+                    0103004
+                    0214KB000001666683
+                    0420KPS004KB000001666683
+                5303764
+                540812345.00
+                5802TH
+                6304FE8F'
+            */
+            /*
+            000201010211
+                30710016A000000677010112
+                    0115010753600031508
+                    0214KB000001666740
+                    0310KPSTOM1234
+                31590016A000000677010113
+                    0103004
+                    0214KB000001666740
+                    0410KPSTOM1234
+                5303764
+                5406123.50
+                5802TH
+                630439A6
+            */
+            /*
+            000201010211
+                30630016A000000677010112       20
+                    0115083553300140102        19
+                    0220BAANSUKAPUNANDMATERI   24
+                5303764
+                5802TH
+                6212070823007477
+                63040A9C
+            */
+            // if (shop.startsWith("KB")) 
+            //     data = encodeKBank(shop, "010753600031508", amount, ref);
+            // else if (shop.startsWith("03M4"))
+            //     data = encodeTTB(shop, "010753700001716", amount, ref);
+            data = '00020101021130810016A00000067701011201150107536000315080214KB0000016666830320KPS004KB00000166668331690016A00000067701011301030040214KB0000016666830420KPS004KB00000166668353037645802TH63040C3B'            
+            const qr = new QRious({
+                element: qrCanvas,
+                value: data,
+                size: 400
+            });
+
+        }
+
+        function encodeTTB(shop, account, amount, ref) {
+            const refCode = lenCode(ref);
+            const payload = "000201010211" +
+                            "30" + (51 + ref.length) + "0016A000000677010112" +
+                                "0115" + account +
+                                "0204" + shop +
+                                "03" + refCode +
+                            "5303764" +
+                            "54" + lenCode(amount) +
+                            "5802TH" +
+                            "5905Digio" +
+                            "62230719SDGO862845496418556" +
+                            "6304";
+            return payload + checkSum(payload);
+        }
+
+        function encodeKBank (kshop, account, amount, ref) {
+            const refCode = lenCode(ref);
+            const payload = "000201010211" +
+                            "30" + (61 + ref.length) + "0016A000000677010112" +
+                                "0115" + account +
+                                "0214" + kshop +
+                                "03" + refCode +
+                            "31690016A000000677010113"+
+                                "0103004" +
+                                "0214" + kshop +
+                                "0420KPS004KB000001666683" +
+                            "5303764" +
+                            "54" + lenCode(amount) +
+                            "5802TH" +
+                            "6304";
+            return payload + checkSum(payload);
+        }
+
+        function encodePromptPay(account, amount, ref) {
+            const PAY = "000201010212";
+            const AID = "0016A000000677010111";
+            let accType = "01";
+            if (account.length == 13) {
+                accType = "02";
+            } else {
+                account = "066" + account;
+            }
+            const refCode = lenCode(ref);
+            const promptpayCode = lenCode(account);
+            const amountCode = lenCode(amount);
+            const bank = "29" + (24+promptpayCode.length + refCode.length).toString() + AID + accType ;
+            let data = PAY + bank + promptpayCode + "11" + refCode + "5802TH54" + amountCode + "53037646304";
+            const checksum = checkSum(data);
+            return data + checksum;
+        }
+
+        function lenCode(code) {
+            return code.length.toString().padStart(2, '0') + code;
+        }
+
+        function checkSum(payload) {
+            const polynomial = 0x11021; // Polynomial for CRC-16/CCITT-FALSE
+            let crc = 0xFFFF; // Initial value for CRC-16/CCITT-FALSE
+            for (let i = 0; i < payload.length; i++) {
+                crc ^= payload.charCodeAt(i) << 8; // XOR the current byte into the top of crc
+                for (let j = 0; j < 8; j++) {
+                    if ((crc & 0x8000) !== 0)
+                        crc = (crc << 1) ^ polynomial;
+                    else 
+                        crc <<= 1;
+                    crc &= 0xFFFF; // Keep only the lower 16 bits
+                }
+            }
+            return crc.toString(16).toUpperCase().padStart(4, '0'); // Return CRC as a 4-char hex string
+        }
+    </script>
+</body>
+
+</html>

@@ -2,20 +2,21 @@
 function shuffle(arr) {
     let j = 0
     for (let i = 0; i < arr.length; i++) {
-        if (arr[i] == i) {
-            j = Math.floor(Math.random() * arr.length)
+        if (arr[i] == i || arr[arr[i]] == i) {
+            do j = Math.floor(Math.random() * arr.length)
+            while (i == j)
             swap(arr, i, j)
         }
     }
 }
 
 function swap(arr, i, j) {
+    if (i == j) return
     let temp = arr[i]
     arr[i] = arr[j]
     arr[j] = temp
 }
 
-// Find cycles in a permutation
 function findCycles(array) {
     const visited = new Array(array.length).fill(false)
     const cycles = []
@@ -48,7 +49,7 @@ function estimateProbability(n = 100, trials = 10000, max = 50) {
         const cycles = findCycles(arr)
         const maxCycle = Math.max(...cycles)
         if (maxCycle <= max) success++
-        // success += arr[max]
+        // success += maxCycle
         // console.log(cycles)
         // console.log(arr)
     }
@@ -72,4 +73,4 @@ function histogramTest(n = 100, trials = 10000) {
     return hist
 }
 // console.log('Histogram TEST:', histogramTest(100, 100))
-console.log('Estimated probability:', estimateProbability(100, 10000, 10))
+console.log('Estimated probability:', estimateProbability(100, 10000, 50))

@@ -1,48 +1,67 @@
 public class Divisor {
-    private static int N = 49999;
-    private static int MAX_PRECISION = N * 2;
-    private static int MAX_DISPLAY = 45;
-
     public static void main(String[] args) {
-    	Divisor.N = Integer.parseInt(args[0]);
-    	Divisor.MAX_PRECISION = N * 2;
-        int[] array_x = new int[N];
-        int[] array_y = new int[N];
-        for (int i = 0; i < N; i++) {
-            array_x[i] = 1;
-            array_y[i] = i + 1;
+        if (args.length < 1) {
+            return;
         }
-        char[] digits = new char[MAX_PRECISION];
-        for (int i = 1; i <= N; i++) {
-            int x = array_x[i - 1];
-            int y = array_y[i - 1];
-            System.out.print(String.format("[%5d][%4d/%4d]", i, x, y));
+
+        int n;
+        try {
+            n = Integer.parseInt(args[0]);
+        } catch (NumberFormatException e) {
+            return;
+        }
+
+        int maxPrecision = n * 2;
+        int maxDisplay = 45;
+
+        int[] arrayX = new int[n];
+        int[] arrayY = new int[n];
+        for (int i = 0; i < n; i++) {
+            arrayX[i] = 1;
+            arrayY[i] = i + 1;
+        }
+
+        int[] digits = new int[maxPrecision];
+
+        for (int i = 1; i <= n; i++) {
+            int x = arrayX[i - 1];
+            int y = arrayY[i - 1];
+
+            String col1 = String.format("[%d]", i);
+            String col2 = String.format("[%d/%d]", x, y);
+
+            // Right alignment: widths 7 and 10
+            System.out.printf("%7s\t%10s", col1, col2);
+
             int z = x / y;
             x = (x % y) * 10;
+
             int head = 0;
             int tail = 0;
             int repeat = 0;
             int length = 0;
-            int search = 0;
-            while (tail == 0 || (tail < MAX_PRECISION && x > 0 &&
-                    (repeat < 10 || repeat < length))) {
-                digits[tail] = (char) ('0' + (x / y));
+
+            while (tail == 0 || (tail < maxPrecision && x > 0 && (repeat < 10 || repeat < length))) {
+                digits[tail] = x / y;
                 x = (x % y) * 10;
+
                 if (tail > 0) {
-                    search = 0;
+                    int search = 0;
                     while (search < tail && digits[head] != digits[tail]) {
                         search++;
                         head++;
                         head %= tail;
-                        repeat = 0; // if miss just one point reset repeat to 0;
+                        repeat = 0;
                     }
+
                     if (head < tail && digits[head] == digits[tail]) {
                         length = tail - head;
                         repeat++;
-                        if (repeat == 1) // if start count repeat, check left most position
-                            while (repeat <= head &&
-                                    digits[head - repeat] == digits[tail - repeat])
+                        if (repeat == 1) {
+                            while (repeat <= head && digits[head - repeat] == digits[tail - repeat]) {
                                 repeat++;
+                            }
+                        }
                         head++;
                     } else {
                         repeat = 0;
@@ -52,16 +71,27 @@ public class Divisor {
                 }
                 tail++;
             }
-            System.out.print(String.format("[%4d]%4d.", repeat, z));
-            for (int j = 0; j < head - repeat && j < MAX_DISPLAY; j++)
-                System.out.print(String.format("%c", digits[j]));
-            System.out.print("|");
-            for (int j = head - repeat; j < tail - repeat && j < MAX_DISPLAY; j++)
-                System.out.print(String.format("%c", digits[j]));
-            if (tail - repeat < MAX_DISPLAY)
+
+            System.out.print("\t" + z + ".");
+
+            if (repeat > 0) {
+                for (int j = 0; j < head - repeat && j < maxDisplay; j++) {
+                    System.out.print(digits[j]);
+                }
                 System.out.print("|");
-            else
-                System.out.print("..");
+                for (int j = head - repeat; j < tail - repeat && j < maxDisplay; j++) {
+                    System.out.print(digits[j]);
+                }
+                if (tail - repeat < maxDisplay) {
+                    System.out.print("|");
+                } else {
+                    System.out.print("..");
+                }
+            } else {
+                for (int j = 0; j < tail && j < maxDisplay; j++) {
+                    System.out.print(digits[j]);
+                }
+            }
             System.out.println();
         }
     }

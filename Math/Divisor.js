@@ -11,7 +11,9 @@ let digits = new Array(MAX_PRECISION);
 for (let i = 1; i <= N; i++) {
     let x = array_x[i - 1];
     let y = array_y[i - 1];
-    process.stdout.write("[" + i + "][" + x + "/" + y + "]");
+    let col1 = ("[" + i + "]").padStart(7);
+    let col2 = ("[" + x + "/" + y + "]").padStart(10);
+    process.stdout.write(col1 + "\t" + col2);
     let z = Math.floor(x / y);
     x = (x % y) * 10;
     let head = 0;
@@ -48,15 +50,20 @@ for (let i = 1; i <= N; i++) {
         }
         tail++;
     }
-    process.stdout.write("[" + repeat + "]\t" + z + ".");
-    for (let j = 0; j < head - repeat && j < MAX_DISPLAY; j++)
-        process.stdout.write(String(digits[j]));
-    process.stdout.write("|");
-    for (let j = head - repeat; j < tail - repeat && j < MAX_DISPLAY; j++)
-        process.stdout.write(String(digits[j]));
-    if (tail - repeat < MAX_DISPLAY)
+    process.stdout.write("\t" + z + ".");
+    if (repeat > 0) {
+        for (let j = 0; j < head - repeat && j < MAX_DISPLAY; j++)
+            process.stdout.write(String(digits[j]));
         process.stdout.write("|");
-    else
-        process.stdout.write("..");
+        for (let j = head - repeat; j < tail - repeat && j < MAX_DISPLAY; j++)
+            process.stdout.write(String(digits[j]));
+        if (tail - repeat < MAX_DISPLAY)
+            process.stdout.write("|");
+        else
+            process.stdout.write("..");
+    } else {
+        for (let j = 0; j < tail && j < MAX_DISPLAY; j++)
+            process.stdout.write(String(digits[j]));
+    }
     process.stdout.write("\n");
 }

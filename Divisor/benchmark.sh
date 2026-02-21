@@ -52,4 +52,15 @@ DIFF=$(echo "$END - $START" | bc)
 echo "C,$DIFF" >> results.csv
 rm c_divisor
 
+# Rust
+echo "Rust..."
+# Compile first
+rustc -O rust/divisor.rs -o rust_divisor
+START=$(date +%s.%N)
+./rust_divisor $N > /dev/null
+END=$(date +%s.%N)
+DIFF=$(echo "$END - $START" | bc)
+echo "Rust,$DIFF" >> results.csv
+rm rust_divisor
+
 cat results.csv
